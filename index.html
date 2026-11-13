@@ -216,7 +216,7 @@
             <div class="absolute inset-0 bg-gradient-to-r from-blue-950/80 via-blue-900/60 to-indigo-950/80"></div>
         </div>
 
-        <div class="relative z-10 max-w-2xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="relative z-10 max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-center md:text-left">
                 <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm border border-white/30">Kec. Cinere & Sekitarnya • JUSS 2026</span>
                 <h1 class="text-xl md:text-2xl font-extrabold mt-2 tracking-tight drop-shadow-md">Selamat Datang di Event JUSS Kecamatan Cinere Tahun 2026</h1>
@@ -224,13 +224,13 @@
             </div>
             
             <div class="flex items-center gap-2 bg-black/30 p-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg flex-wrap justify-center">
-                <button onclick="switchTab('home')" id="btn-tab-home" class="px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
+                <button onclick="switchTab('home')" id="btn-tab-home" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
                     🏠 Beranda
                 </button>
-                <button onclick="switchTab('status')" id="btn-tab-status" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                <button onclick="switchTab('status')" id="btn-tab-status" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5 whitespace-nowrap">
                     🔍 Cek Status
                 </button>
-                <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1">
+                <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5 whitespace-nowrap">
                     🔒 Panitia
                 </button>
             </div>
@@ -238,19 +238,20 @@
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-xl mx-auto px-4 py-8 flex-grow w-full">
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
 
         <!-- TAB 0: HOME / BERANDA UTAMA -->
         <section id="tab-home" class="space-y-6">
-            <!-- Hero Banner Intro -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center space-y-4">
-                <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Portal Resmi Kegiatan</span>
-                <h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Jalan Santai & Lomba Mewarnai JUSS 2026</h2>
-                <p class="text-slate-600 text-xs md:text-sm">Selamat datang warga Kecamatan Cinere dan sekitarnya! Silakan pilih layanan di bawah ini untuk pendaftaran Kaos Jalan Santai atau Pendaftaran Lomba Mewarnai Anak.</p>
-                
+            <!-- Hero Banner Intro with Side-by-Side Layout -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <div class="lg:col-span-6 space-y-4 text-center lg:text-left">
+                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Portal Resmi Kegiatan</span>
+                    <h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Jalan Santai & Lomba Mewarnai JUSS 2026</h2>
+                    <p class="text-slate-600 text-xs md:text-sm">Selamat datang warga Kecamatan Cinere dan sekitarnya! Silakan pilih layanan di bawah ini untuk pendaftaran Kaos Jalan Santai atau Pendaftaran Lomba Mewarnai Anak.</p>
+                </div>
                 <!-- Poster Utama Acara -->
-                <div class="pt-2">
-                    <div class="w-full rounded-xl overflow-hidden shadow-md border border-slate-200 bg-slate-50 cursor-pointer group relative" onclick="openImageViewer('WhatsApp Image 2026-11-13 at 15.19.10.jpeg', 'Poster Utama JUSS 2026')">
+                <div class="lg:col-span-6">
+                    <div class="w-full rounded-xl overflow-hidden shadow-md border border-slate-200 bg-slate-50 cursor-pointer group relative max-w-lg mx-auto" onclick="openImageViewer('WhatsApp Image 2026-11-13 at 15.19.10.jpeg', 'Poster Utama JUSS 2026')">
                         <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS 2026" onerror="this.onerror=null; this.src='https://placehold.co/800x450/e0f2fe/0284c7?text=Poster+Utama+JUSS';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
                         <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
                             🔍 Klik untuk Perbesar Poster Utama
@@ -259,8 +260,8 @@
                 </div>
             </div>
 
-            <!-- Two Main Action Cards -->
-            <div class="space-y-4">
+            <!-- Two Main Action Cards Side-by-Side -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 <!-- Card Pemesanan Kaos -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition space-y-4">
                     <div>
@@ -311,314 +312,279 @@
             </div>
         </section>
 
-        <!-- TAB 1: FORMULIR PEMESANAN KAOS -->
-        <section id="tab-formKaos" class="space-y-6 max-w-xl mx-auto hidden">
+        <!-- TAB 1: FORMULIR PEMESANAN KAOS (SIDE-BY-SIDE ON DESKTOP) -->
+        <section id="tab-formKaos" class="space-y-6 max-w-6xl mx-auto hidden">
             <div class="flex items-center justify-between mb-2">
                 <button onclick="switchTab('home')" class="text-xs text-sky-600 font-bold hover:underline flex items-center gap-1">
                     ← Kembali ke Beranda Utama
                 </button>
             </div>
             
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
-                <div class="text-center mb-4">
-                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Poster Informasi Kaos</span>
-                    <h2 class="text-xl font-bold text-slate-900 mt-2">Jalan Santai JUSS UMKM Kecamatan Cinere 2026</h2>
-                </div>
-                <div class="max-w-md mx-auto rounded-xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group relative" onclick="openImageViewer('kaos.jpg', 'Poster Informasi Kaos & Panduan')">
-                    <img src="kaos.jpg" alt="Poster Kaos" onerror="this.onerror=null; this.src='https://placehold.co/600x800/e0f2fe/0284c7?text=Poster+Kaos';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
-                    <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                        🔍 Klik untuk Perbesar Poster
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
-                <div class="space-y-4">
-                    <div>
-                        <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Desain Resmi Kaos</span>
-                        <h2 class="text-xl font-bold text-slate-900 mt-2 mb-1">Jalan Santai & Kuliner Nusantara</h2>
-                        <p class="text-slate-500 text-xs mb-4">Khusus Warga Kecamatan Cinere dan Seluruh Kelurahan Sekitar.</p>
-                        
-                        <div class="bg-sky-50 border border-sky-100 rounded-xl p-4 text-sm space-y-2">
-                            <span class="font-bold text-sky-900 block">💰 Rincian Harga Kaos:</span>
-                            <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
-                                <li>Size S s.d. XL: <strong class="text-slate-900">Rp 60.000</strong></li>
-                                <li>Size XXL: <strong class="text-slate-900">Rp 65.000</strong></li>
-                                <li>Size 3XL & 4XL: <strong class="text-slate-900">Rp 75.000</strong></li>
-                                <li><span class="text-sky-700 font-semibold">+ Tambahan Lengan Panjang: Rp 5.000</span></li>
-                            </ul>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <!-- Kolom Kiri: Poster Kaos & Panduan -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
+                        <div class="text-center mb-4">
+                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Poster Informasi Kaos</span>
+                            <h2 class="text-lg font-bold text-slate-900 mt-2">Jalan Santai JUSS UMKM Kecamatan Cinere 2026</h2>
                         </div>
-
-                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-xs mt-3 space-y-1">
-                            <span class="font-bold text-emerald-800 block">💳 Rekening Pembayaran Transfer:</span>
-                            <p class="text-slate-700 font-mono font-bold text-sm">BCA: 2671600624</p>
-                            <p class="text-slate-600">a.n. Mayarni D Anggoro</p>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <div class="relative w-full overflow-hidden rounded-xl shadow-sm border border-slate-200 bg-white cursor-pointer group" onclick="openImageViewer('WhatsApp Image 2026-11-13 at 11.46.15.jpeg', 'Mockup Resmi Kaos JUSS (Lengan Pendek & Panjang)')">
-                            <img src="WhatsApp Image 2026-11-13 at 11.46.15.jpeg" alt="Desain Kaos JUSS Hari Pahlawan" onerror="this.onerror=null; this.src='https://placehold.co/600x700/e0f2fe/0284c7?text=Mockup+Kaos+JUSS';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
+                        <div class="max-w-md mx-auto rounded-xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group relative" onclick="openImageViewer('kaos.jpg', 'Poster Informasi Kaos & Panduan')">
+                            <img src="kaos.jpg" alt="Poster Kaos" onerror="this.onerror=null; this.src='https://placehold.co/600x800/e0f2fe/0284c7?text=Poster+Kaos';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
                             <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                                🔍 Klik untuk Perbesar Gambar
+                                🔍 Klik untuk Perbesar Poster
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
+                        <div class="space-y-4">
+                            <div>
+                                <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Desain Resmi Kaos</span>
+                                <h2 class="text-lg font-bold text-slate-900 mt-2 mb-1">Jalan Santai & Kuliner Nusantara</h2>
+                                <p class="text-slate-500 text-xs mb-4">Khusus Warga Kecamatan Cinere dan Seluruh Kelurahan Sekitar.</p>
+                                
+                                <div class="bg-sky-50 border border-sky-100 rounded-xl p-4 text-sm space-y-2">
+                                    <span class="font-bold text-sky-900 block">💰 Rincian Harga Kaos:</span>
+                                    <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                        <li>Size S s.d. XL: <strong class="text-slate-900">Rp 60.000</strong></li>
+                                        <li>Size XXL: <strong class="text-slate-900">Rp 65.000</strong></li>
+                                        <li>Size 3XL & 4XL: <strong class="text-slate-900">Rp 75.000</strong></li>
+                                        <li><span class="text-sky-700 font-semibold">+ Tambahan Lengan Panjang: Rp 5.000</span></li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-xs mt-3 space-y-1">
+                                    <span class="font-bold text-emerald-800 block">💳 Rekening Pembayaran Transfer:</span>
+                                    <p class="text-slate-700 font-mono font-bold text-sm">BCA: 2671600624</p>
+                                    <p class="text-slate-600">a.n. Mayarni D Anggoro</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <div class="mb-4">
-                    <h3 class="font-bold text-slate-900 text-base">📏 Panduan Ukuran & Size Chart Aftertex</h3>
-                    <p class="text-slate-500 text-xs mt-0.5">Pastikan memilih ukuran yang pas berdasarkan panduan di bawah ini.</p>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="rounded-xl overflow-hidden border border-slate-200 bg-white p-2 shadow-sm cursor-pointer group relative" onclick="openImageViewer('WhatsApp Image 2026-11-13 at 11.46.15 (1).jpeg', 'Panduan Ukuran (Size Chart Aftertex)')">
-                        <img src="WhatsApp Image 2026-11-13 at 11.46.15 (1).jpeg" alt="Size Chart Aftertex" onerror="this.onerror=null; this.src='https://placehold.co/600x700/f8fafc/334155?text=Size+Chart+Aftertex';" class="w-full h-auto object-contain rounded-lg group-hover:scale-105 transition duration-300">
-                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold rounded-lg">
-                            🔍 Perbesar Ukuran
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                <div class="border-b border-slate-100 pb-4 mb-6">
-                    <h3 class="text-lg font-bold text-slate-900">Formulir Pemesanan</h3>
-                    <p class="text-slate-500 text-xs">Lengkapi data diri dan unggah bukti transfer pembayaran. Tersinkronisasi otomatis ke Google Sheets.</p>
-                </div>
-
-                <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap & Gelar *</label>
-                        <input type="text" id="name" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Aktif *</label>
-                        <input type="text" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
+                <!-- Kolom Kanan: Formulir Pemesanan Kaos -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                    <div class="border-b border-slate-100 pb-4 mb-6">
+                        <h3 class="text-lg font-bold text-slate-900">Formulir Pemesanan Kaos</h3>
+                        <p class="text-slate-500 text-xs">Lengkapi data diri dan unggah bukti transfer pembayaran. Tersinkronisasi otomatis ke Google Sheets.</p>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Asal Kelurahan / Wilayah di Kec. Cinere *</label>
-                        <select id="instansi" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
-                            <option value="Kelurahan Cinere">Kelurahan Cinere</option>
-                            <option value="Kelurahan Gandul">Kelurahan Gandul</option>
-                            <option value="Kelurahan Pangkalan Jati">Kelurahan Pangkalan Jati</option>
-                            <option value="Kelurahan Pangkalan Jati Baru">Kelurahan Pangkalan Jati Baru</option>
-                            <option value="Lainnya di luar Kec. Cinere">Lainnya / Luar Kec. Cinere</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Model Lengan Kaos *</label>
-                        <select id="sleeve" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
-                            <option value="Pendek">Lengan Pendek (Standar)</option>
-                            <option value="Panjang">Lengan Panjang (+ Rp 5.000)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Ukuran Kaos (Size) *</label>
-                        <select id="size" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
-                            <option value="S">Size S (Rp 60.000)</option>
-                            <option value="M">Size M (Rp 60.000)</option>
-                            <option value="L">Size L (Rp 60.000)</option>
-                            <option value="XL">Size XL (Rp 60.000)</option>
-                            <option value="XXL">Size XXL (Rp 65.000)</option>
-                            <option value="3XL">Size 3XL (Rp 75.000)</option>
-                            <option value="4XL">Size 4XL (Rp 75.000)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Jumlah Pesanan (Pcs) *</label>
-                        <input type="number" id="qty" min="1" value="1" onchange="calculateTotal()" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
-                    </div>
-
-                    <div class="bg-sky-50/70 border border-sky-100 p-4 rounded-xl flex items-center justify-between">
+                    <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
                         <div>
-                            <span class="text-xs text-slate-600 block">Total Pembayaran:</span>
-                            <span id="displayTotal" class="text-lg font-extrabold text-sky-900">Rp 60.000</span>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar *</label>
+                            <input type="text" id="name" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
                         </div>
-                        <div class="text-right text-xs text-slate-500">
-                            BCA: <strong class="text-slate-800 font-mono">2671600624</strong>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp / HP Aktif *</label>
+                            <input type="text" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
                         </div>
-                    </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Unggah Bukti Transfer / Struk *</label>
-                        <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-2 rounded-xl border border-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 text-xs text-slate-500 bg-white">
-                    </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Asal Kelurahan / Wilayah di Kec. Cinere *</label>
+                            <select id="instansi" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
+                                <option value="Kelurahan Cinere">Kelurahan Cinere</option>
+                                <option value="Kelurahan Gandul">Kelurahan Gandul</option>
+                                <option value="Kelurahan Pangkalan Jati">Kelurahan Pangkalan Jati</option>
+                                <option value="Kelurahan Pangkalan Jati Baru">Kelurahan Pangkalan Jati Baru</option>
+                                <option value="Lainnya di luar Kec. Cinere">Lainnya / Luar Kec. Cinere</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Model Lengan Kaos *</label>
+                            <select id="sleeve" onchange="calculateTotal()" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
+                                <option value="Pendek">Lengan Pendek (Standar)</option>
+                                <option value="Panjang">Lengan Panjang (+ Rp 5.000)</option>
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Catatan (Opsional)</label>
-                        <textarea id="notes" rows="2" placeholder="Contoh: Titip ambil di posko kelurahan..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm"></textarea>
-                    </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Ukuran Kaos (Size) *</label>
+                            <select id="size" onchange="calculateTotal()" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
+                                <option value="S">Size S (Rp 60.000)</option>
+                                <option value="M">Size M (Rp 60.000)</option>
+                                <option value="L">Size L (Rp 60.000)</option>
+                                <option value="XL">Size XL (Rp 60.000)</option>
+                                <option value="XXL">Size XXL (Rp 65.000)</option>
+                                <option value="3XL">Size 3XL (Rp 75.000)</option>
+                                <option value="4XL">Size 4XL (Rp 75.000)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Pesanan (Pcs) *</label>
+                            <input type="number" id="qty" min="1" value="1" onchange="calculateTotal()" required class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
+                        </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
-                        Kirim Pesanan Kaos Sekarang 🚀
-                    </button>
-                </form>
+                        <div class="bg-sky-50/70 border border-sky-100 p-3 rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-600 block">Total Pembayaran:</span>
+                                <span id="displayTotal" class="text-base font-extrabold text-sky-900">Rp 60.000</span>
+                            </div>
+                            <div class="text-right text-xs text-slate-500">
+                                BCA: <strong class="text-slate-800 font-mono">2671600624</strong>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Unggah Bukti Transfer / Struk *</label>
+                            <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs text-slate-500 bg-white">
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition text-sm">
+                            Kirim Pesanan Kaos Sekarang 🚀
+                        </button>
+                    </form>
+                </div>
             </div>
         </section>
 
-        <!-- TAB 1B: FORMULIR LOMBA MEWARNAI -->
-        <section id="tab-formMewarnai" class="space-y-6 max-w-xl mx-auto hidden">
+        <!-- TAB 1B: FORMULIR LOMBA MEWARNAI (SIDE-BY-SIDE ON DESKTOP) -->
+        <section id="tab-formMewarnai" class="space-y-6 max-w-6xl mx-auto hidden">
             <div class="flex items-center justify-between mb-2">
                 <button onclick="switchTab('home')" class="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1">
                     ← Kembali ke Beranda Utama
                 </button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
-                <div class="text-center mb-4">
-                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Poster Lomba Mewarnai</span>
-                    <h2 class="text-xl font-bold text-slate-900 mt-2">Lomba Mewarnai Anak - JUSS 2026</h2>
-                </div>
-                <div class="max-w-md mx-auto rounded-xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group relative" onclick="openImageViewer('mewarnai.jpeg', 'Poster Lomba Mewarnai')">
-                    <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/600x800/fef3c7/d97706?text=Poster+Mewarnai';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
-                    <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                        🔍 Klik untuk Perbesar Poster
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <!-- Kolom Kiri: Poster Lomba Mewarnai -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
+                    <div class="text-center mb-4">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Poster Lomba Mewarnai</span>
+                        <h2 class="text-lg font-bold text-slate-900 mt-2">Lomba Mewarnai Anak - JUSS 2026</h2>
+                    </div>
+                    <div class="max-w-md mx-auto rounded-xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group relative" onclick="openImageViewer('mewarnai.jpeg', 'Poster Lomba Mewarnai')">
+                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/600x800/fef3c7/d97706?text=Poster+Mewarnai';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
+                            🔍 Klik untuk Perbesar Poster
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                <div class="border-b border-slate-100 pb-4 mb-6">
-                    <h3 class="text-lg font-bold text-slate-900">Formulir Pendaftaran Lomba Mewarnai</h3>
-                    <p class="text-slate-500 text-xs">Acara: Sabtu, 28 Nov 2026 di Mall Cinere. <strong class="text-slate-800">Gratis!</strong> Tersinkronisasi otomatis ke Google Sheets (SheetMewarnai).</p>
+                <!-- Kolom Kanan: Formulir Pendaftaran Lomba Mewarnai -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                    <div class="border-b border-slate-100 pb-4 mb-6">
+                        <h3 class="text-lg font-bold text-slate-900">Formulir Pendaftaran Lomba Mewarnai</h3>
+                        <p class="text-slate-500 text-xs">Acara: Sabtu, 28 Nov 2026 di Mall Cinere. <strong class="text-slate-800">Gratis!</strong> Tersinkronisasi otomatis ke Google Sheets (SheetMewarnai).</p>
+                    </div>
+
+                    <form id="mewarnaiForm" onsubmit="handleMewarnaiSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Anak *</label>
+                            <input type="text" id="mewarnaiNamaAnak" required placeholder="Contoh: Alula Khansa" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Usia Anak (Tahun) *</label>
+                            <input type="number" id="mewarnaiUsia" min="3" max="12" required placeholder="Contoh: 6" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Lomba *</label>
+                            <select id="mewarnaiKategori" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm bg-white">
+                                <option value="Kategori A (PAUD / TK)">Kategori A (PAUD / TK)</option>
+                                <option value="Kategori B (SD Kelas 1-3)">Kategori B (SD Kelas 1-3)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Orang Tua / Pendamping *</label>
+                            <input type="text" id="mewarnaiOrtu" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp Orang Tua / HP Aktif *</label>
+                            <input type="text" id="mewarnaiPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
+                            <span class="font-bold block">📌 Syarat & Ketentuan Lomba:</span>
+                            <p>1. Peserta wajib membawa peralatan mewarnai dan meja lipat sendiri.</p>
+                            <p>2. Informasi lebih lanjut hubungi PIC Amanda: <strong>0813-8778-3916</strong>.</p>
+                        </div>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
+                            Kirim Pendaftaran Lomba Mewarnai 🎨
+                        </button>
+                    </form>
                 </div>
-
-                <form id="mewarnaiForm" onsubmit="handleMewarnaiSubmit(event)" class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap Anak *</label>
-                        <input type="text" id="mewarnaiNamaAnak" required placeholder="Contoh: Alula Khansa" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Usia Anak (Tahun) *</label>
-                        <input type="number" id="mewarnaiUsia" min="3" max="12" required placeholder="Contoh: 6" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Kategori Lomba *</label>
-                        <select id="mewarnaiKategori" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm bg-white">
-                            <option value="Kategori A (PAUD / TK)">Kategori A (PAUD / TK)</option>
-                            <option value="Kategori B (SD Kelas 1-3)">Kategori B (SD Kelas 1-3)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Orang Tua / Pendamping *</label>
-                        <input type="text" id="mewarnaiOrtu" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp Orang Tua / HP Aktif *</label>
-                        <input type="text" id="mewarnaiPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                    </div>
-
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-1">
-                        <span class="font-bold block">📌 Syarat & Ketentuan Lomba:</span>
-                        <p>1. Peserta wajib membawa peralatan mewarnai dan meja lipat sendiri.</p>
-                        <p>2. Informasi lebih lanjut hubungi PIC Amanda: <strong>0813-8778-3916</strong>.</p>
-                    </div>
-
-                    <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
-                        Kirim Pendaftaran Lomba Mewarnai 🎨
-                    </button>
-                </form>
             </div>
         </section>
 
         <!-- TAB 2: CEK STATUS & E-TICKET -->
-        <section id="tab-status" class="space-y-6 max-w-xl mx-auto hidden">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                <div class="text-center max-w-md mx-auto mb-6">
-                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Cek Status Keikutsertaan</span>
-                    <h3 class="text-xl font-bold text-slate-900 mt-2">Cek Status & E-Ticket</h3>
-                    <p class="text-slate-500 text-xs mt-1">Pilih kategori kegiatan dan masukkan Nomor WhatsApp atau Nama untuk memeriksa status & E-Ticket QR Code Anda.</p>
-                </div>
-
-                <div class="flex justify-center gap-2 mb-4">
-                    <button onclick="setSearchFilter('kaos')" id="filterBtnKaos" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm">
-                        👕 Kaos Jalan Santai
-                    </button>
-                    <button onclick="setSearchFilter('mewarnai')" id="filterBtnMewarnai" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                        🎨 Lomba Mewarnai
-                    </button>
-                </div>
-
-                <div class="flex gap-2 max-w-md mx-auto mb-6">
-                    <input type="text" id="searchKeyword" oninput="searchParticipantStatus()" placeholder="Cari No WhatsApp atau Nama..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-sm">
-                    <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari</button>
-                </div>
-
-                <div id="searchResultContainer" class="space-y-4">
-                    <div class="text-center py-8 text-slate-400 text-xs">Belum ada pencarian atau data tidak ditemukan.</div>
-                </div>
-            </div>
-
-            <!-- Informasi Alur & Panduan Kaos -->
-            <div id="statusInfoBoxKaos" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-                <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">📦 Alur & Titik Lokasi Pengambilan Kaos Warga Cinere</h4>
-                
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
-                        <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
-                        <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
+        <section id="tab-status" class="space-y-6 max-w-5xl mx-auto hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                    <div class="text-center max-w-md mx-auto mb-6">
+                        <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Cek Status Keikutsertaan</span>
+                        <h3 class="text-xl font-bold text-slate-900 mt-2">Cek Status & E-Ticket</h3>
+                        <p class="text-slate-500 text-xs mt-1">Pilih kategori kegiatan dan masukkan Nomor WhatsApp atau Nama untuk memeriksa status & E-Ticket QR Code Anda.</p>
                     </div>
-                    <a href="https://www.google.com/maps/place/JS+Coffee/@-6.3239398,106.8005432,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69ef3e2aaa1217:0xd67f71cdbd4b2a1e!8m2!3d-6.3239451!4d106.8031181!16s%2Fg%2F11t1jz5mdc" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
-                        🗺️ Buka Google Maps (JS Coffee)
-                    </a>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
-                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">1</span>
-                        <span class="font-bold text-sky-900 block">Status Lunas & Buka E-Ticket</span>
-                        <p class="text-slate-600">Pastikan status pembayaran di atas sudah <strong class="text-emerald-600">"Lunas"</strong>. Tunjukkan E-Ticket QR Code langsung dari HP Anda.</p>
+                    <div class="flex justify-center gap-2 mb-4">
+                        <button onclick="setSearchFilter('kaos')" id="filterBtnKaos" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm">
+                            👕 Kaos Jalan Santai
+                        </button>
+                        <button onclick="setSearchFilter('mewarnai')" id="filterBtnMewarnai" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200">
+                            🎨 Lomba Mewarnai
+                        </button>
                     </div>
-                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
-                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">2</span>
-                        <span class="font-bold text-sky-900 block">Kunjungi Titik Posko</span>
-                        <p class="text-slate-600">Datangi titik posko pengambilan yang tertera di peta Google Maps untuk warga Kecamatan Cinere & Kelurahan sekitar.</p>
+
+                    <div class="flex gap-2 max-w-md mx-auto mb-6">
+                        <input type="text" id="searchKeyword" oninput="searchParticipantStatus()" placeholder="Cari No WhatsApp atau Nama..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-sm">
+                        <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari</button>
                     </div>
-                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
-                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">3</span>
-                        <span class="font-bold text-sky-900 block">Verifikasi & Terima Kaos</span>
-                        <p class="text-slate-600">Panitia memindai/mencocokkan data E-Ticket dan menyerahkan kaos sesuai ukuran serta model yang dipesan.</p>
+
+                    <div id="searchResultContainer" class="space-y-4">
+                        <div class="text-center py-8 text-slate-400 text-xs">Belum ada pencarian atau data tidak ditemukan.</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Informasi Khusus Lomba Mewarnai -->
-            <div id="statusInfoBoxMewarnai" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4 hidden">
-                <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">🎨 Informasi & Ketentuan Lomba Mewarnai Anak</h4>
-                
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2 text-xs">
-                    <p class="font-bold text-amber-900 text-sm">📅 Waktu & Tempat Acara:</p>
-                    <p class="text-slate-800"><strong>Waktu Acara:</strong> Sabtu, 28 November 2026</p>
-                    <p class="text-slate-800"><strong>Alamat Acara:</strong> Halaman Parkir Mall Cinere</p>
-                </div>
+                <!-- Informasi Alur & Panduan Kaos / Mewarnai -->
+                <div class="lg:col-span-6 space-y-6">
+                    <div id="statusInfoBoxKaos" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">📦 Alur & Titik Lokasi Pengambilan Kaos Warga Cinere</h4>
+                        
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div>
+                                <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
+                                <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
+                                <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok</p>
+                            </div>
+                            <a href="https://www.google.com/maps/place/JS+Coffee/@-6.3239398,106.8005432,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69ef3e2aaa1217:0xd67f71cdbd4b2a1e!8m2!3d-6.3239451!4d106.8031181!16s%2Fg%2F11t1jz5mdc" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
+                                🗺️ Buka Google Maps
+                            </a>
+                        </div>
+                    </div>
 
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-xs text-slate-700">
-                    <span class="font-bold text-slate-900 block">📋 Syarat & Ketentuan Peserta:</span>
-                    <p>1. Peserta diwajibkan membawa peralatan mewarnai sendiri.</p>
-                    <p>2. Peserta diwajibkan membawa meja lipat untuk alas mewarnai sendiri.</p>
-                    <p class="pt-2 border-t border-slate-200 text-amber-900 font-semibold">Untuk informasi lebih lanjut:<br>Hubungi kami di <strong>0813-8778-3916 (Amanda)</strong>.</p>
+                    <div id="statusInfoBoxMewarnai" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4 hidden">
+                        <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">🎨 Informasi & Ketentuan Lomba Mewarnai Anak</h4>
+                        
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2 text-xs">
+                            <p class="font-bold text-amber-900 text-sm">📅 Waktu & Tempat Acara:</p>
+                            <p class="text-slate-800"><strong>Waktu Acara:</strong> Sabtu, 28 November 2026</p>
+                            <p class="text-slate-800"><strong>Alamat Acara:</strong> Halaman Parkir Mall Cinere</p>
+                        </div>
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-xs text-slate-700">
+                            <span class="font-bold text-slate-900 block">📋 Syarat & Ketentuan Peserta:</span>
+                            <p>1. Peserta diwajibkan membawa peralatan mewarnai sendiri.</p>
+                            <p>2. Peserta diwajibkan membawa meja lipat untuk alas mewarnai sendiri.</p>
+                            <p class="pt-2 border-t border-slate-200 text-amber-900 font-semibold">Hubungi PIC Amanda: <strong>0813-8778-3916</strong></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- TAB 3: PANEL PANITIA (ADMIN) -->
-        <section id="tab-admin" class="space-y-6 max-w-xl mx-auto hidden">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between items-start gap-4">
+        <section id="tab-admin" class="space-y-6 max-w-6xl mx-auto hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Panel Khusus Panitia</span>
                     <h2 class="text-xl font-bold text-slate-900 mt-2">Rekapitulasi Pemesanan & Keuangan</h2>
-                    <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran, kirim konfirmasi WhatsApp, dan pantau rekap ukuran kaos (Tersinkronisasi Google Sheets).</p>
+                    <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran dan pantau rekap ukuran kaos (Tersinkronisasi Google Sheets).</p>
                 </div>
-                <div class="flex gap-2 flex-wrap w-full">
-                    <button onclick="exportToCSV()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
                         📥 Download CSV/Excel
                     </button>
                     <button onclick="lockAdminSession()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition">
@@ -627,30 +593,33 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">⚙️ Kelola Papan Berjalan (Pengumuman Publik)</h3>
-                <div class="flex gap-2">
-                    <input type="text" id="adminMarqueeInput" placeholder="Ketik pengumuman baru di sini..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-xs">
-                    <button onclick="updateMarqueeAnnouncement()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-sm">Perbarui</button>
+            <!-- Admin Statistics Cards Side-by-Side -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block">Total Pendaftar Kaos</span>
+                        <span id="statTotalRegistrants" class="text-lg font-black text-slate-900">0 Peserta</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">👕</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block">Total Kaos Dipesan</span>
+                        <span id="statTotalPcs" class="text-lg font-black text-sky-600">0 Pcs</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">📦</div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block">Estimasi Dana Masuk</span>
+                        <span id="statTotalRevenue" class="text-lg font-black text-emerald-600">Rp 0</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">💰</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="adminSizeSummaryCards"></div>
-
-            <div class="space-y-3">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                    <span class="text-xs font-semibold text-slate-400">Total Pendaftar Kaos</span>
-                    <span id="statTotalRegistrants" class="text-lg font-black text-slate-900">0 Peserta</span>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                    <span class="text-xs font-semibold text-slate-400">Total Kaos Dipesan</span>
-                    <span id="statTotalPcs" class="text-lg font-black text-sky-600">0 Pcs</span>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                    <span class="text-xs font-semibold text-slate-400">Estimasi Dana Masuk (Lunas)</span>
-                    <span id="statTotalRevenue" class="text-lg font-black text-emerald-600">Rp 0</span>
-                </div>
-            </div>
+            <!-- Size Summary Cards Side-by-Side -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3" id="adminSizeSummaryCards"></div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
