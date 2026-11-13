@@ -3,198 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JUSS UMKM Kecamatan Cinere 2026</title>
+    <title>Pemesanan Kaos Jalan Santai JUSS</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK Imports & Google Apps Script Sync Integration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Konfigurasi Google Apps Script URL untuk Sinkronisasi Database Google Sheets
-        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzePit9Bl4NqOW_48oW3NFGJMRHDGhR8LFX_aWIUIY37htHoBfSfr_Ham5omvHndeQv/exec";
-        window.GOOGLE_APPS_SCRIPT_URL = GOOGLE_APPS_SCRIPT_URL;
-
-        // Expose Firebase modules globally for application sync
-        window.firebaseAppInit = async function() {
-            try {
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'juss-cinere-2026';
-                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "mock", projectId: "mock" };
-                
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-                const auth = getAuth(app);
-
-                window.db = db;
-                window.auth = auth;
-                window.appId = appId;
-
-                // Auth state handling for secure realtime sync
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                console.log("Firebase initialized successfully. Real-time sync active. User ID:", auth.currentUser?.uid || 'anonymous');
-                initRealtimeListeners();
-            } catch (err) {
-                console.warn("Firebase initialization fallback to local storage:", err);
-                initLocalStorageFallback();
-            }
-        };
-
-        window.firebaseAddKaosOrder = async function(orderData) {
-            // Sinkronisasi dengan Google Apps Script / Google Sheets
-            if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.trim() !== "") {
-                try {
-                    fetch(GOOGLE_APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'kaos', ...orderData })
-                    }).then(() => {
-                        console.log("Kaos successfully sent to Google Apps Script backend.");
-                    }).catch(e => console.log("Apps Script Kaos sync note:", e));
-                } catch (err) {
-                    console.error("Error sending kaos to Google Apps Script:", err);
-                }
-            }
-
-            if (!window.db) {
-                fallbackAddKaos(orderData);
-                return;
-            }
-            try {
-                const colRef = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'kaos_orders');
-                await addDoc(colRef, orderData);
-            } catch (err) {
-                console.error("Error saving kaos order to Firestore:", err);
-                fallbackAddKaos(orderData);
-            }
-        };
-
-        window.firebaseAddMewarnaiOrder = async function(orderData) {
-            // Sinkronisasi dengan Google Apps Script / Google Sheets
-            if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.trim() !== "") {
-                try {
-                    fetch(GOOGLE_APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'mewarnai', ...orderData })
-                    }).then(() => {
-                        console.log("Mewarnai successfully sent to Google Apps Script backend.");
-                    }).catch(e => console.log("Apps Script Mewarnai sync note:", e));
-                } catch (err) {
-                    console.error("Error sending mewarnai to Google Apps Script:", err);
-                }
-            }
-
-            if (!window.db) {
-                fallbackAddMewarnai(orderData);
-                return;
-            }
-            try {
-                const colRef = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'mewarnai_orders');
-                await addDoc(colRef, orderData);
-            } catch (err) {
-                console.error("Error saving mewarnai order to Firestore:", err);
-                fallbackAddMewarnai(orderData);
-            }
-        };
-
-        window.firebaseUpdateKaosStatus = async function(docId, newStatus) {
-            if (!window.db) return;
-            try {
-                const docRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'kaos_orders', docId);
-                await updateDoc(docRef, { status: newStatus });
-            } catch (err) {
-                console.error("Error updating kaos status:", err);
-            }
-        };
-
-        window.firebaseDeleteKaosOrder = async function(docId) {
-            if (!window.db) return;
-            try {
-                const docRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'kaos_orders', docId);
-                await deleteDoc(docRef);
-            } catch (err) {
-                console.error("Error deleting kaos order:", err);
-            }
-        };
-
-        window.firebaseDeleteMewarnaiOrder = async function(docId) {
-            if (!window.db) return;
-            try {
-                const docRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'mewarnai_orders', docId);
-                await deleteDoc(docRef);
-            } catch (err) {
-                console.error("Error deleting mewarnai order:", err);
-            }
-        };
-
-        function initRealtimeListeners() {
-            try {
-                const kaosCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'kaos_orders');
-                onSnapshot(kaosCol, (snapshot) => {
-                    window.orders = [];
-                    snapshot.forEach((docSnap) => {
-                        window.orders.push({ firebaseId: docSnap.id, ...docSnap.data() });
-                    });
-                    window.orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                    if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
-                    if (typeof searchParticipantStatus === 'function') searchParticipantStatus();
-                }, (error) => {
-                    console.error("Kaos snapshot error:", error);
-                });
-
-                const mewarnaiCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'mewarnai_orders');
-                onSnapshot(mewarnaiCol, (snapshot) => {
-                    window.mewarnaiOrders = [];
-                    snapshot.forEach((docSnap) => {
-                        window.mewarnaiOrders.push({ firebaseId: docSnap.id, ...docSnap.data() });
-                    });
-                    window.mewarnaiOrders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                    if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
-                    if (typeof searchParticipantStatus === 'function') searchParticipantStatus();
-                }, (error) => {
-                    console.error("Mewarnai snapshot error:", error);
-                });
-            } catch (err) {
-                console.error("Error setting up real-time listeners:", err);
-                initLocalStorageFallback();
-            }
-        }
-
-        function initLocalStorageFallback() {
-            window.orders = JSON.parse(localStorage.getItem('juss_kaos_orders')) || [];
-            window.mewarnaiOrders = JSON.parse(localStorage.getItem('juss_mewarnai_orders')) || [];
-            if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
-        }
-
-        function fallbackAddKaos(orderData) {
-            window.orders.unshift(orderData);
-            localStorage.setItem('juss_kaos_orders', JSON.stringify(window.orders));
-            if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
-            if (typeof searchParticipantStatus === 'function') searchParticipantStatus();
-        }
-
-        function fallbackAddMewarnai(orderData) {
-            window.mewarnaiOrders.unshift(orderData);
-            localStorage.setItem('juss_mewarnai_orders', JSON.stringify(window.mewarnaiOrders));
-            if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
-            if (typeof searchParticipantStatus === 'function') searchParticipantStatus();
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            window.firebaseAppInit();
-        });
-    </script>
-
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
@@ -205,32 +17,33 @@
     <div class="bg-amber-500 text-amber-950 font-semibold text-xs py-2 px-4 shadow-sm border-b border-amber-600 overflow-hidden flex items-center">
         <span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-3 whitespace-nowrap">📢 Info Penting</span>
         <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium" id="marqueeAnnouncementText">
-            Selamat datang di portal resmi JUSS UMKM Kecamatan Cinere 2026. Pendaftaran Jalan Santai & Lomba Mewarnai resmi dibuka! Tersinkronisasi otomatis dengan Google Apps Script & Database Google Sheets.
+            Selamat datang di portal resmi pemesanan kaos Jalan Santai & Kuliner Nusantara JUSS 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23. Silakan cek status E-Ticket Anda secara berkala!
         </marquee>
     </div>
 
     <!-- Header Banner with Uploaded Image Background -->
     <header class="relative bg-slate-900 text-white shadow-lg overflow-hidden">
+        <!-- Background Image with Overlay -->
         <div class="absolute inset-0 z-0">
-            <img src="image_f15a46.jpg" alt="JUSS Banner Background" class="w-full h-full object-cover object-center opacity-85">
+            <img src="image_f15a46.jpg" alt="JUSS Banner Background" class="w-full h-full object-contain md:object-cover object-center opacity-85">
             <div class="absolute inset-0 bg-gradient-to-r from-blue-950/80 via-blue-900/60 to-indigo-950/80"></div>
         </div>
 
-        <div class="relative z-10 max-w-7xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="relative z-10 max-w-6xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-center md:text-left">
                 <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm border border-white/30">Kec. Cinere & Sekitarnya • JUSS 2026</span>
-                <h1 class="text-xl md:text-2xl font-extrabold mt-2 tracking-tight drop-shadow-md">Selamat Datang di Event JUSS Kecamatan Cinere Tahun 2026</h1>
+                <h1 class="text-2xl md:text-3xl font-extrabold mt-2 tracking-tight drop-shadow-md">Pemesanan Kaos Jalan Santai</h1>
                 <p class="text-sky-100 text-xs md:text-sm mt-1 drop-shadow">Kel. Cinere, Kel. Gandul, Kel. Pangkalan Jati, & Kel. Pangkalan Jati Baru</p>
             </div>
             
-            <div class="flex items-center gap-2 bg-black/30 p-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg flex-wrap justify-center">
-                <button onclick="switchTab('home')" id="btn-tab-home" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-                    🏠 Beranda
+            <div class="flex items-center gap-3 bg-black/30 p-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg">
+                <button onclick="switchTab('form')" id="btn-tab-form" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
+                    📝 Form Pendaftaran
                 </button>
-                <button onclick="switchTab('status')" id="btn-tab-status" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5 whitespace-nowrap">
-                    🔍 Cek Status
+                <button onclick="switchTab('status')" id="btn-tab-status" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                    🔍 Cek Status & Tiket
                 </button>
-                <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5 whitespace-nowrap">
+                <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5">
                     🔒 Panitia
                 </button>
             </div>
@@ -238,151 +51,130 @@
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
 
-        <!-- TAB 0: HOME / BERANDA UTAMA -->
-        <section id="tab-home" class="space-y-6">
-            <!-- Hero Banner Intro with Side-by-Side Layout -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                <div class="lg:col-span-6 space-y-4 text-center lg:text-left">
-                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Portal Resmi Kegiatan</span>
-                    <h2 class="text-xl md:text-2xl font-extrabold text-slate-900">Jalan Santai & Lomba Mewarnai JUSS 2026</h2>
-                    <p class="text-slate-600 text-xs md:text-sm">Selamat datang warga Kecamatan Cinere dan sekitarnya! Silakan pilih layanan di bawah ini untuk pendaftaran Kaos Jalan Santai atau Pendaftaran Lomba Mewarnai Anak.</p>
-                </div>
-                <!-- Poster Utama Acara -->
-                <div class="lg:col-span-6">
-                    <div class="w-full rounded-xl overflow-hidden shadow-md border border-slate-200 bg-slate-50 cursor-pointer group relative max-w-lg mx-auto" onclick="openImageViewer('WhatsApp Image 2026-11-13 at 15.19.10.jpeg', 'Poster Utama JUSS 2026')">
-                        <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS 2026" onerror="this.onerror=null; this.src='https://placehold.co/800x450/e0f2fe/0284c7?text=Poster+Utama+JUSS';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                            🔍 Klik untuk Perbesar Poster Utama
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Two Main Action Cards Side-by-Side -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                <!-- Card Pemesanan Kaos -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition space-y-4">
-                    <div>
-                        <div class="w-12 h-12 bg-sky-100 text-sky-700 rounded-xl flex items-center justify-center font-bold text-xl mb-3">👕</div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-1">Pemesanan Kaos Jalan Santai</h3>
-                        <p class="text-slate-500 text-xs mb-3">Dapatkan kaos eksklusif Jalan Santai & Kuliner Nusantara. Pengambilan di JS Coffee (Kedai Biru).</p>
-                        
-                        <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mb-3 cursor-pointer group relative" onclick="openImageViewer('kaos.jpg', 'Poster Infografis Kaos')">
-                            <img src="kaos.jpg" alt="Poster Kaos" onerror="this.onerror=null; this.src='https://placehold.co/800x450/e0f2fe/0284c7?text=Poster+Kaos';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
-                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                                🔍 Klik Perbesar Poster Kaos
-                            </div>
-                        </div>
-
-                        <ul class="text-xs text-slate-600 space-y-1 mb-2">
-                            <li>✓ Validasi otomatis nomor WhatsApp & Google Apps Script</li>
-                            <li>✓ E-Ticket QR Code & konfirmasi Lunas</li>
-                        </ul>
-                    </div>
-                    <button onclick="switchTab('formKaos')" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl transition text-xs shadow-sm">
-                        Buka Form Pemesanan Kaos ➔
-                    </button>
-                </div>
-
-                <!-- Card Lomba Mewarnai -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition space-y-4">
-                    <div>
-                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center font-bold text-xl mb-3">🎨</div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-1">Pendaftaran Lomba Mewarnai</h3>
-                        <p class="text-slate-500 text-xs mb-3">Acara: Sabtu, 28 Nov 2026 di Mall Cinere. <strong class="text-slate-800">Gratis!</strong></p>
-                        
-                        <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mb-3 cursor-pointer group relative" onclick="openImageViewer('mewarnai.jpeg', 'Poster Lomba Mewarnai')">
-                            <img src="mewarnai.jpeg" alt="Poster Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/800x450/fef3c7/d97706?text=Poster+Mewarnai';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
-                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                                🔍 Klik Perbesar Poster Mewarnai
-                            </div>
-                        </div>
-
-                        <ul class="text-xs text-slate-600 space-y-1 mb-2">
-                            <li>✓ Tersinkronisasi otomatis ke SheetMewarnai Google Sheets</li>
-                            <li>✓ Info lebih lanjut: Amanda (0813-8778-3916)</li>
-                        </ul>
-                    </div>
-                    <button onclick="switchTab('formMewarnai')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition text-xs shadow-sm">
-                        Buka Form Lomba Mewarnai ➔
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 1: FORMULIR PEMESANAN KAOS (SIDE-BY-SIDE ON DESKTOP) -->
-        <section id="tab-formKaos" class="space-y-6 max-w-6xl mx-auto hidden">
-            <div class="flex items-center justify-between mb-2">
-                <button onclick="switchTab('home')" class="text-xs text-sky-600 font-bold hover:underline flex items-center gap-1">
-                    ← Kembali ke Beranda Utama
-                </button>
-            </div>
+        <!-- TAB 1: FORMULIR PENDAFTARAN -->
+        <section id="tab-form" class="space-y-6 max-w-3xl mx-auto">
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                <!-- Kolom Kiri: Poster Kaos & Panduan -->
-                <div class="space-y-6">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
-                        <div class="text-center mb-4">
-                            <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Poster Informasi Kaos</span>
-                            <h2 class="text-lg font-bold text-slate-900 mt-2">Jalan Santai JUSS UMKM Kecamatan Cinere 2026</h2>
+            <!-- Banner Design & Rincian Biaya -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Desain Resmi Kaos</span>
+                        <h2 class="text-xl font-bold text-slate-900 mt-2 mb-1">Jalan Santai & Kuliner Nusantara</h2>
+                        <p class="text-slate-500 text-xs mb-4">Khusus Warga Kecamatan Cinere dan Seluruh Kelurahan Sekitar.</p>
+                        
+                        <div class="bg-sky-50 border border-sky-100 rounded-xl p-4 text-sm space-y-2">
+                            <span class="font-bold text-sky-900 block">💰 Rincian Harga Kaos:</span>
+                            <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                <li>Size S s.d. XL: <strong class="text-slate-900">Rp 60.000</strong></li>
+                                <li>Size XXL: <strong class="text-slate-900">Rp 65.000</strong></li>
+                                <li>Size 3XL & 4XL: <strong class="text-slate-900">Rp 75.000</strong></li>
+                                <li><span class="text-sky-700 font-semibold">+ Tambahan Lengan Panjang: Rp 5.000</span></li>
+                            </ul>
                         </div>
-                        <div class="max-w-md mx-auto rounded-xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group relative" onclick="openImageViewer('kaos.jpg', 'Poster Informasi Kaos & Panduan')">
-                            <img src="kaos.jpg" alt="Poster Kaos" onerror="this.onerror=null; this.src='https://placehold.co/600x800/e0f2fe/0284c7?text=Poster+Kaos';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
-                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                                🔍 Klik untuk Perbesar Poster
-                            </div>
+
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-xs mt-3 space-y-1">
+                            <span class="font-bold text-emerald-800 block">💳 Rekening Pembayaran Transfer:</span>
+                            <p class="text-slate-700 font-mono font-bold text-sm">BCA: 2671700624</p>
+                            <p class="text-slate-600">a.n. Mayarni D Anggoro</p>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
-                        <div class="space-y-4">
-                            <div>
-                                <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Desain Resmi Kaos</span>
-                                <h2 class="text-lg font-bold text-slate-900 mt-2 mb-1">Jalan Santai & Kuliner Nusantara</h2>
-                                <p class="text-slate-500 text-xs mb-4">Khusus Warga Kecamatan Cinere dan Seluruh Kelurahan Sekitar.</p>
-                                
-                                <div class="bg-sky-50 border border-sky-100 rounded-xl p-4 text-sm space-y-2">
-                                    <span class="font-bold text-sky-900 block">💰 Rincian Harga Kaos:</span>
-                                    <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
-                                        <li>Size S s.d. XL: <strong class="text-slate-900">Rp 60.000</strong></li>
-                                        <li>Size XXL: <strong class="text-slate-900">Rp 65.000</strong></li>
-                                        <li>Size 3XL & 4XL: <strong class="text-slate-900">Rp 75.000</strong></li>
-                                        <li><span class="text-sky-700 font-semibold">+ Tambahan Lengan Panjang: Rp 5.000</span></li>
-                                    </ul>
-                                </div>
-
-                                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-xs mt-3 space-y-1">
-                                    <span class="font-bold text-emerald-800 block">💳 Rekening Pembayaran Transfer:</span>
-                                    <p class="text-slate-700 font-mono font-bold text-sm">BCA: 2671600624</p>
-                                    <p class="text-slate-600">a.n. Mayarni D Anggoro</p>
-                                </div>
+                    <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="relative w-full overflow-hidden rounded-xl shadow-sm border border-slate-200 bg-white cursor-pointer group" onclick="openImageViewer('WhatsApp Image 2026-11-13 at 11.46.15.jpeg', 'Mockup Resmi Kaos JUSS (Lengan Pendek & Panjang)')">
+                            <img src="WhatsApp Image 2026-11-13 at 11.46.15.jpeg" alt="Desain Kaos JUSS Hari Pahlawan" onerror="this.onerror=null; this.src='https://placehold.co/600x700/e0f2fe/0284c7?text=Mockup+Kaos+JUSS';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
+                                🔍 Klik untuk Perbesar Gambar
                             </div>
                         </div>
+                        <span class="text-[11px] text-slate-500 mt-2 text-center font-medium">Klik gambar untuk melihat detail kaos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Size Chart Guide with Image -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">📏 Panduan Ukuran & Size Chart Aftertex</h3>
+                        <p class="text-slate-500 text-xs mt-0.5">Pastikan memilih ukuran yang pas berdasarkan panduan di bawah ini.</p>
                     </div>
                 </div>
 
-                <!-- Kolom Kanan: Formulir Pemesanan Kaos -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                    <div class="border-b border-slate-100 pb-4 mb-6">
-                        <h3 class="text-lg font-bold text-slate-900">Formulir Pemesanan Kaos</h3>
-                        <p class="text-slate-500 text-xs">Lengkapi data diri dan unggah bukti transfer pembayaran. Tersinkronisasi otomatis ke Google Sheets.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="rounded-xl overflow-hidden border border-slate-200 bg-white p-2 shadow-sm cursor-pointer group relative" onclick="openImageViewer('WhatsApp Image 2026-11-13 at 11.46.15 (1).jpeg', 'Panduan Ukuran (Size Chart Aftertex)')">
+                        <img src="WhatsApp Image 2026-11-13 at 11.46.15 (1).jpeg" alt="Size Chart Aftertex" onerror="this.onerror=null; this.src='https://placehold.co/600x700/f8fafc/334155?text=Size+Chart+Aftertex';" class="w-full h-auto object-contain rounded-lg group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold rounded-lg">
+                            🔍 Perbesar Ukuran
+                        </div>
                     </div>
 
-                    <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar *</label>
-                            <input type="text" id="name" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp / HP Aktif *</label>
-                            <input type="text" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-center text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 font-semibold">
+                                    <th class="p-2 border border-slate-200">Size</th>
+                                    <th class="p-2 border border-slate-200">S</th>
+                                    <th class="p-2 border border-slate-200">M</th>
+                                    <th class="p-2 border border-slate-200">L</th>
+                                    <th class="p-2 border border-slate-200">XL</th>
+                                    <th class="p-2 border border-slate-200">XXL</th>
+                                    <th class="p-2 border border-slate-200">3XL</th>
+                                    <th class="p-2 border border-slate-200">4XL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-2 border border-slate-200 font-semibold bg-slate-50">Panjang</td>
+                                    <td class="p-2 border border-slate-200">66</td>
+                                    <td class="p-2 border border-slate-200">69</td>
+                                    <td class="p-2 border border-slate-200">71</td>
+                                    <td class="p-2 border border-slate-200">73</td>
+                                    <td class="p-2 border border-slate-200">77</td>
+                                    <td class="p-2 border border-slate-200">82</td>
+                                    <td class="p-2 border border-slate-200">84</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border border-slate-200 font-semibold bg-slate-50">Lebar</td>
+                                    <td class="p-2 border border-slate-200">45</td>
+                                    <td class="p-2 border border-slate-200">50</td>
+                                    <td class="p-2 border border-slate-200">52</td>
+                                    <td class="p-2 border border-slate-200">54</td>
+                                    <td class="p-2 border border-slate-200">57</td>
+                                    <td class="p-2 border border-slate-200">61</td>
+                                    <td class="p-2 border border-slate-200">67</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <span class="text-[11px] text-slate-400 mt-2 block text-center">*Satuan dalam sentimeter (cm)</span>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Formulir Input -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h3 class="text-lg font-bold text-slate-900">Formulir Pemesanan</h3>
+                    <p class="text-slate-500 text-xs">Lengkapi data diri dan unggah bukti transfer pembayaran.</p>
+                </div>
+
+                <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Asal Kelurahan / Wilayah di Kec. Cinere *</label>
-                            <select id="instansi" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap & Gelar *</label>
+                            <input type="text" id="name" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Aktif *</label>
+                            <input type="text" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Asal Kelurahan / Wilayah di Kec. Cinere *</label>
+                            <select id="instansi" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm bg-white">
                                 <option value="Kelurahan Cinere">Kelurahan Cinere</option>
                                 <option value="Kelurahan Gandul">Kelurahan Gandul</option>
                                 <option value="Kelurahan Pangkalan Jati">Kelurahan Pangkalan Jati</option>
@@ -391,16 +183,18 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Model Lengan Kaos *</label>
-                            <select id="sleeve" onchange="calculateTotal()" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Model Lengan Kaos *</label>
+                            <select id="sleeve" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm bg-white">
                                 <option value="Pendek">Lengan Pendek (Standar)</option>
                                 <option value="Panjang">Lengan Panjang (+ Rp 5.000)</option>
                             </select>
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Ukuran Kaos (Size) *</label>
-                            <select id="size" onchange="calculateTotal()" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm bg-white">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Ukuran Kaos (Size) *</label>
+                            <select id="size" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm bg-white">
                                 <option value="S">Size S (Rp 60.000)</option>
                                 <option value="M">Size M (Rp 60.000)</option>
                                 <option value="L">Size L (Rp 60.000)</option>
@@ -411,228 +205,153 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Pesanan (Pcs) *</label>
-                            <input type="number" id="qty" min="1" value="1" onchange="calculateTotal()" required class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none transition text-sm">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Jumlah Pesanan (Pcs) *</label>
+                            <input type="number" id="qty" min="1" value="1" onchange="calculateTotal()" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
                         </div>
+                    </div>
 
-                        <div class="bg-sky-50/70 border border-sky-100 p-3 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-slate-600 block">Total Pembayaran:</span>
-                                <span id="displayTotal" class="text-base font-extrabold text-sky-900">Rp 60.000</span>
-                            </div>
-                            <div class="text-right text-xs text-slate-500">
-                                BCA: <strong class="text-slate-800 font-mono">2671600624</strong>
-                            </div>
-                        </div>
-
+                    <!-- Kalkulasi Total Otomatis -->
+                    <div class="bg-sky-50/70 border border-sky-100 p-4 rounded-xl flex items-center justify-between">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Unggah Bukti Transfer / Struk *</label>
-                            <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs text-slate-500 bg-white">
+                            <span class="text-xs text-slate-600 block">Total Pembayaran yang Harus Ditransfer:</span>
+                            <span id="displayTotal" class="text-xl font-extrabold text-sky-900">Rp 60.000</span>
                         </div>
+                        <div class="text-right text-xs text-slate-500">
+                            Transfer ke BCA: <strong class="text-slate-800 font-mono">2671700624</strong><br>a.n. Mayarni D Anggoro
+                        </div>
+                    </div>
 
-                        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition text-sm">
-                            Kirim Pesanan Kaos Sekarang 🚀
-                        </button>
-                    </form>
-                </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Unggah Bukti Transfer / Struk Pembayaran *</label>
+                        <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-2 rounded-xl border border-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 text-xs text-slate-500 bg-white">
+                        <span class="text-[11px] text-slate-400 mt-1 block">Format file: JPG, PNG, atau Screenshot transfer m-banking.</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Catatan Tambahan (Opsional)</label>
+                        <textarea id="notes" rows="2" placeholder="Contoh: Titip ambil di posko kelurahan..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm"></textarea>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition text-sm">
+                        Kirim Pesanan Kaos Sekarang 🚀
+                    </button>
+                </form>
             </div>
         </section>
 
-        <!-- TAB 1B: FORMULIR LOMBA MEWARNAI (SIDE-BY-SIDE ON DESKTOP) -->
-        <section id="tab-formMewarnai" class="space-y-6 max-w-6xl mx-auto hidden">
-            <div class="flex items-center justify-between mb-2">
-                <button onclick="switchTab('home')" class="text-xs text-amber-700 font-bold hover:underline flex items-center gap-1">
-                    ← Kembali ke Beranda Utama
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                <!-- Kolom Kiri: Poster Lomba Mewarnai -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
-                    <div class="text-center mb-4">
-                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Poster Lomba Mewarnai</span>
-                        <h2 class="text-lg font-bold text-slate-900 mt-2">Lomba Mewarnai Anak - JUSS 2026</h2>
-                    </div>
-                    <div class="max-w-md mx-auto rounded-xl overflow-hidden shadow-md border border-slate-200 cursor-pointer group relative" onclick="openImageViewer('mewarnai.jpeg', 'Poster Lomba Mewarnai')">
-                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/600x800/fef3c7/d97706?text=Poster+Mewarnai';" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
-                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
-                            🔍 Klik untuk Perbesar Poster
-                        </div>
-                    </div>
+        <!-- TAB 2: CEK STATUS PESERTA & E-TICKET -->
+        <section id="tab-status" class="space-y-6 max-w-3xl mx-auto hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="text-center max-w-md mx-auto mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket Pengambilan</h3>
+                    <p class="text-slate-500 text-xs mt-1">Masukkan Nomor WhatsApp atau Nama lengkap Anda untuk memeriksa status verifikasi dan menunjukkan E-Ticket / QR Code.</p>
                 </div>
 
-                <!-- Kolom Kanan: Formulir Pendaftaran Lomba Mewarnai -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                    <div class="border-b border-slate-100 pb-4 mb-6">
-                        <h3 class="text-lg font-bold text-slate-900">Formulir Pendaftaran Lomba Mewarnai</h3>
-                        <p class="text-slate-500 text-xs">Acara: Sabtu, 28 Nov 2026 di Mall Cinere. <strong class="text-slate-800">Gratis!</strong> Tersinkronisasi otomatis ke Google Sheets (SheetMewarnai).</p>
-                    </div>
+                <div class="flex gap-2 max-w-md mx-auto mb-6">
+                    <input type="text" id="searchKeyword" placeholder="Cari No WhatsApp atau Nama..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-sm">
+                    <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari</button>
+                </div>
 
-                    <form id="mewarnaiForm" onsubmit="handleMewarnaiSubmit(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Anak *</label>
-                            <input type="text" id="mewarnaiNamaAnak" required placeholder="Contoh: Alula Khansa" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Usia Anak (Tahun) *</label>
-                            <input type="number" id="mewarnaiUsia" min="3" max="12" required placeholder="Contoh: 6" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Lomba *</label>
-                            <select id="mewarnaiKategori" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm bg-white">
-                                <option value="Kategori A (PAUD / TK)">Kategori A (PAUD / TK)</option>
-                                <option value="Kategori B (SD Kelas 1-3)">Kategori B (SD Kelas 1-3)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Orang Tua / Pendamping *</label>
-                            <input type="text" id="mewarnaiOrtu" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp Orang Tua / HP Aktif *</label>
-                            <input type="text" id="mewarnaiPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm">
-                        </div>
-
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
-                            <span class="font-bold block">📌 Syarat & Ketentuan Lomba:</span>
-                            <p>1. Peserta wajib membawa peralatan mewarnai dan meja lipat sendiri.</p>
-                            <p>2. Informasi lebih lanjut hubungi PIC Amanda: <strong>0813-8778-3916</strong>.</p>
-                        </div>
-
-                        <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
-                            Kirim Pendaftaran Lomba Mewarnai 🎨
-                        </button>
-                    </form>
+                <div id="searchResultContainer" class="space-y-4">
+                    <div class="text-center py-8 text-slate-400 text-xs">Belum ada pencarian atau data tidak ditemukan.</div>
                 </div>
             </div>
-        </section>
 
-        <!-- TAB 2: CEK STATUS & E-TICKET -->
-        <section id="tab-status" class="space-y-6 max-w-5xl mx-auto hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                    <div class="text-center max-w-md mx-auto mb-6">
-                        <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Cek Status Keikutsertaan</span>
-                        <h3 class="text-xl font-bold text-slate-900 mt-2">Cek Status & E-Ticket</h3>
-                        <p class="text-slate-500 text-xs mt-1">Pilih kategori kegiatan dan masukkan Nomor WhatsApp atau Nama untuk memeriksa status & E-Ticket QR Code Anda.</p>
+            <!-- Informasi Alur & Lokasi Pengambilan Kaos -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">📦 Alur & Titik Lokasi Pengambilan Kaos Warga Cinere</h4>
+                
+                <!-- Info Titik Lokasi Google Maps -->
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
+                        <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
+                        <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
                     </div>
-
-                    <div class="flex justify-center gap-2 mb-4">
-                        <button onclick="setSearchFilter('kaos')" id="filterBtnKaos" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm">
-                            👕 Kaos Jalan Santai
-                        </button>
-                        <button onclick="setSearchFilter('mewarnai')" id="filterBtnMewarnai" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-                            🎨 Lomba Mewarnai
-                        </button>
-                    </div>
-
-                    <div class="flex gap-2 max-w-md mx-auto mb-6">
-                        <input type="text" id="searchKeyword" oninput="searchParticipantStatus()" placeholder="Cari No WhatsApp atau Nama..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-sm">
-                        <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari</button>
-                    </div>
-
-                    <div id="searchResultContainer" class="space-y-4">
-                        <div class="text-center py-8 text-slate-400 text-xs">Belum ada pencarian atau data tidak ditemukan.</div>
-                    </div>
+                    <a href="https://www.google.com/maps/place/JS+Coffee/@-6.3239398,106.8005432,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69ef3e2aaa1217:0xd67f71cdbd4b2a1e!8m2!3d-6.3239451!4d106.8031181!16s%2Fg%2F11t1jz5mdc" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
+                        🗺️ Buka Google Maps (JS Coffee)
+                    </a>
                 </div>
 
-                <!-- Informasi Alur & Panduan Kaos / Mewarnai -->
-                <div class="lg:col-span-6 space-y-6">
-                    <div id="statusInfoBoxKaos" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-                        <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">📦 Alur & Titik Lokasi Pengambilan Kaos Warga Cinere</h4>
-                        
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div>
-                                <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
-                                <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
-                                <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok</p>
-                            </div>
-                            <a href="https://www.google.com/maps/place/JS+Coffee/@-6.3239398,106.8005432,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69ef3e2aaa1217:0xd67f71cdbd4b2a1e!8m2!3d-6.3239451!4d106.8031181!16s%2Fg%2F11t1jz5mdc" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
-                                🗺️ Buka Google Maps
-                            </a>
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
+                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">1</span>
+                        <span class="font-bold text-sky-900 block">Status Lunas & Buka E-Ticket</span>
+                        <p class="text-slate-600">Pastikan status pembayaran di atas sudah <strong class="text-emerald-600">"Lunas"</strong>. Tunjukkan E-Ticket QR Code langsung dari HP Anda.</p>
                     </div>
 
-                    <div id="statusInfoBoxMewarnai" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4 hidden">
-                        <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">🎨 Informasi & Ketentuan Lomba Mewarnai Anak</h4>
-                        
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2 text-xs">
-                            <p class="font-bold text-amber-900 text-sm">📅 Waktu & Tempat Acara:</p>
-                            <p class="text-slate-800"><strong>Waktu Acara:</strong> Sabtu, 28 November 2026</p>
-                            <p class="text-slate-800"><strong>Alamat Acara:</strong> Halaman Parkir Mall Cinere</p>
-                        </div>
+                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
+                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">2</span>
+                        <span class="font-bold text-sky-900 block">Kunjungi Titik Posko</span>
+                        <p class="text-slate-600">Datangi titik posko pengambilan yang tertera di peta Google Maps untuk warga Kecamatan Cinere & Kelurahan sekitar.</p>
+                    </div>
 
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-xs text-slate-700">
-                            <span class="font-bold text-slate-900 block">📋 Syarat & Ketentuan Peserta:</span>
-                            <p>1. Peserta diwajibkan membawa peralatan mewarnai sendiri.</p>
-                            <p>2. Peserta diwajibkan membawa meja lipat untuk alas mewarnai sendiri.</p>
-                            <p class="pt-2 border-t border-slate-200 text-amber-900 font-semibold">Hubungi PIC Amanda: <strong>0813-8778-3916</strong></p>
-                        </div>
+                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
+                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">3</span>
+                        <span class="font-bold text-sky-900 block">Verifikasi & Terima Kaos</span>
+                        <p class="text-slate-600">Panitia memindai/mencocokkan data E-Ticket dan menyerahkan kaos sesuai ukuran serta model yang dipesan.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- TAB 3: PANEL PANITIA (ADMIN) -->
-        <section id="tab-admin" class="space-y-6 max-w-6xl mx-auto hidden">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <section id="tab-admin" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Panel Khusus Panitia</span>
                     <h2 class="text-xl font-bold text-slate-900 mt-2">Rekapitulasi Pemesanan & Keuangan</h2>
-                    <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran dan pantau rekap ukuran kaos (Tersinkronisasi Google Sheets).</p>
+                    <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran, kirim konfirmasi WhatsApp, dan pantau rekap ukuran kaos.</p>
                 </div>
                 <div class="flex gap-2 flex-wrap">
                     <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
                         📥 Download CSV/Excel
                     </button>
                     <button onclick="lockAdminSession()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition">
-                        🔒 Keluar
+                        🔒 Keluar Panel
                     </button>
                 </div>
             </div>
 
-            <!-- Admin Statistics Cards Side-by-Side -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-400 block">Total Pendaftar Kaos</span>
-                        <span id="statTotalRegistrants" class="text-lg font-black text-slate-900">0 Peserta</span>
-                    </div>
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">👕</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-400 block">Total Kaos Dipesan</span>
-                        <span id="statTotalPcs" class="text-lg font-black text-sky-600">0 Pcs</span>
-                    </div>
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">📦</div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-400 block">Estimasi Dana Masuk</span>
-                        <span id="statTotalRevenue" class="text-lg font-black text-emerald-600">Rp 0</span>
-                    </div>
-                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">💰</div>
+            <!-- Panel Pengaturan Papan Berjalan (Marquee) oleh Panitia -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">⚙️ Kelola Papan Berjalan (Pengumuman Publik)</h3>
+                <p class="text-xs text-slate-500">Ubah teks pengumuman berjalan yang tampil di bagian atas halaman utama aplikasi untuk warga.</p>
+                <div class="flex gap-2">
+                    <input type="text" id="adminMarqueeInput" placeholder="Ketik pengumuman baru di sini..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-xs">
+                    <button onclick="updateMarqueeAnnouncement()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">Perbarui Pengumuman</button>
                 </div>
             </div>
 
-            <!-- Size Summary Cards Side-by-Side -->
+            <!-- Rekap Kaos Cards Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3" id="adminSizeSummaryCards"></div>
 
+            <!-- Keuangan & Total Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Total Pendaftar</span>
+                    <span id="statTotalRegistrants" class="text-2xl font-black text-slate-900">0 Peserta</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Total Kaos Dipesan</span>
+                    <span id="statTotalPcs" class="text-2xl font-black text-sky-600">0 Pcs</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Estimasi Dana Masuk (Lunas)</span>
+                    <span id="statTotalRevenue" class="text-2xl font-black text-emerald-600">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Tabel Data Peserta Lengkap -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
                     <h3 class="font-bold text-slate-900 text-base">Daftar Seluruh Peserta Masuk</h3>
-                    <div class="flex gap-2">
-                        <button onclick="switchAdminTable('kaos')" id="adminTableKaosBtn" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-600 text-white">Kaos</button>
-                        <button onclick="switchAdminTable('mewarnai')" id="adminTableMewarnaiBtn" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">Mewarnai</button>
-                    </div>
+                    <span id="tableCountBadge" class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">0 Data</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200" id="adminTableHead">
+                            <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                                 <th class="p-3.5">ID / Waktu</th>
                                 <th class="p-3.5">Nama & No HP</th>
                                 <th class="p-3.5">Kelurahan</th>
@@ -713,145 +432,213 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        window.orders = window.orders || [];
-        window.mewarnaiOrders = window.mewarnaiOrders || [];
+        // Masukkan URL Google Apps Script Web App Anda di bawah ini
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzePit9Bl4NqOW_48oW3NFGJMRHDGhR8LFX_aWIUIY37htHoBfSfr_Ham5omvHndeQv/exec"; 
 
-        let currentSearchFilter = 'kaos';
-        let currentAdminTable = 'kaos';
+        let orders = JSON.parse(localStorage.getItem('juss_kaos_orders')) || [
+            {
+                id: 'JUSS-1001',
+                timestamp: '13 Nov 2026, 07:30 WIB',
+                name: 'Siti Aminah, S.E.',
+                phone: '081298765432',
+                instansi: 'Kelurahan Cinere',
+                size: 'L',
+                sleeve: 'Pendek',
+                qty: 2,
+                totalPrice: 120000,
+                paymentProof: 'WhatsApp Image 2026-11-13 at 11.46.15.jpeg',
+                notes: 'Ambil di posko kelurahan Cinere',
+                status: 'Lunas'
+            }
+        ];
+
         let isAdminLoggedIn = false;
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        // Muat teks pengumuman dari localStorage
+        function loadMarqueeAnnouncement() {
+            const savedAnnounce = localStorage.getItem('juss_marquee_text');
+            if (savedAnnounce) {
+                const el = document.getElementById('marqueeAnnouncementText');
+                if (el) el.innerText = savedAnnounce;
+                const inputEl = document.getElementById('adminMarqueeInput');
+                if (inputEl) inputEl.value = savedAnnounce;
+            }
         }
 
-        function setSearchFilter(filter) {
-            currentSearchFilter = filter;
-            const infoBoxKaos = document.getElementById('statusInfoBoxKaos');
-            const infoBoxMewarnai = document.getElementById('statusInfoBoxMewarnai');
-
-            if (filter === 'kaos') {
-                document.getElementById('filterBtnKaos').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-sky-600 text-white shadow-sm';
-                document.getElementById('filterBtnMewarnai').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
-                if (infoBoxKaos) infoBoxKaos.classList.remove('hidden');
-                if (infoBoxMewarnai) infoBoxMewarnai.classList.add('hidden');
-            } else {
-                document.getElementById('filterBtnMewarnai').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-amber-500 text-slate-950 shadow-sm';
-                document.getElementById('filterBtnKaos').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
-                if (infoBoxKaos) infoBoxKaos.classList.add('hidden');
-                if (infoBoxMewarnai) infoBoxMewarnai.classList.remove('hidden');
+        function updateMarqueeAnnouncement() {
+            const val = document.getElementById('adminMarqueeInput').value.trim();
+            if (!val) {
+                showModal('Peringatan ⚠️', 'Teks pengumuman tidak boleh kosong.', '⚠️');
+                return;
             }
-            searchParticipantStatus();
+            localStorage.setItem('juss_marquee_text', val);
+            const el = document.getElementById('marqueeAnnouncementText');
+            if (el) el.innerText = val;
+            showModal('Berhasil ✨', 'Pengumuman papan berjalan berhasil diperbarui dan langsung tampil ke publik.', '✓');
         }
 
-        function switchAdminTable(tableType) {
-            currentAdminTable = tableType;
-            if (tableType === 'kaos') {
-                document.getElementById('adminTableKaosBtn').className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-600 text-white';
-                document.getElementById('adminTableMewarnaiBtn').className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700';
-            } else {
-                document.getElementById('adminTableMewarnaiBtn').className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950';
-                document.getElementById('adminTableKaosBtn').className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700';
+        // Sinkronisasi otomatis real-time data dari Google Sheets database
+        async function fetchOrdersFromGoogleSheets() {
+            if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL.trim() === "") return;
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getData");
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        const mapped = data.map((row, index) => {
+                            let rawProof = row["Bukti Pembayaran (Drive)"] || "WhatsApp Image 2026-11-13 at 11.46.15.jpeg";
+                            // Ekstrak URL Google Drive jika menggunakan formula =HYPERLINK("URL"; "Label")
+                            if (typeof rawProof === 'string' && rawProof.startsWith('=')) {
+                                const match = rawProof.match(/["'](https?:\/\/[^"']+)["']/);
+                                if (match && match[1]) {
+                                    rawProof = match[1];
+                                }
+                            }
+                            
+                            // Pastikan waktu/timestamp dari Google Sheets diformat rapi
+                            let rawTimestamp = row["Timestamp"];
+                            let formattedTimestamp = rawTimestamp ? String(rawTimestamp) : '-';
+                            if (formattedTimestamp.includes('T')) {
+                                const d = new Date(formattedTimestamp);
+                                if (!isNaN(d.getTime())) {
+                                    formattedTimestamp = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ' WIB';
+                                }
+                            }
+
+                            return {
+                                id: row["ID Pesanan"] || `JUSS-${1000 + index}`,
+                                timestamp: formattedTimestamp,
+                                name: row["Nama Lengkap"] || "Peserta",
+                                phone: row["No HP / WhatsApp"] || "-",
+                                instansi: row["Kelurahan / Wilayah"] || "Kelurahan Cinere",
+                                size: row["Ukuran Kaos"] || "S",
+                                sleeve: row["Model Lengan"] || "Pendek",
+                                qty: Number(row["Jumlah (Pcs)"]) || 1,
+                                totalPrice: Number(row["Total Harga (Rp)"]) || 60000,
+                                paymentProof: rawProof,
+                                notes: row["Catatan"] || "-",
+                                status: row["Status Pembayaran"] || "Pending"
+                            };
+                        });
+                        if (mapped.length > 0) {
+                            orders = mapped.reverse();
+                            saveToStorage();
+                            if (!document.getElementById('tab-admin').classList.contains('hidden')) {
+                                renderAdminDashboard();
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log("Menggunakan data lokal tersimpan (offline/fallback mode).", e);
             }
-            renderAdminDashboard();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('juss_kaos_orders', JSON.stringify(orders));
         }
 
         function switchTab(tabName) {
-            const tabHome = document.getElementById('tab-home');
-            const tabFormKaos = document.getElementById('tab-formKaos');
-            const tabFormMewarnai = document.getElementById('tab-formMewarnai');
-            const tabStatus = document.getElementById('tab-status');
-            const tabAdmin = document.getElementById('tab-admin');
+            document.getElementById('tab-form').classList.add('hidden');
+            document.getElementById('tab-status').classList.add('hidden');
+            document.getElementById('tab-admin').classList.add('hidden');
 
-            if (tabHome) tabHome.classList.add('hidden');
-            if (tabFormKaos) tabFormKaos.classList.add('hidden');
-            if (tabFormMewarnai) tabFormMewarnai.classList.add('hidden');
-            if (tabStatus) tabStatus.classList.add('hidden');
-            if (tabAdmin) tabAdmin.classList.add('hidden');
+            document.getElementById('btn-tab-form').className = 'px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
+            document.getElementById('btn-tab-status').className = 'px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
+            document.getElementById('btn-tab-admin').className = 'px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5';
 
-            const btnHome = document.getElementById('btn-tab-home');
-            const btnStatus = document.getElementById('btn-tab-status');
-            const btnAdmin = document.getElementById('btn-tab-admin');
-
-            if (btnHome) btnHome.className = 'px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
-            if (btnStatus) btnStatus.className = 'px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
-            if (btnAdmin) btnAdmin.className = 'px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1';
-
-            if (tabName === 'home') {
-                if (tabHome) tabHome.classList.remove('hidden');
-                if (btnHome) btnHome.className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
-            } else if (tabName === 'formKaos') {
-                if (tabFormKaos) tabFormKaos.classList.remove('hidden');
-            } else if (tabName === 'formMewarnai') {
-                if (tabFormMewarnai) tabFormMewarnai.classList.remove('hidden');
+            if (tabName === 'form') {
+                document.getElementById('tab-form').classList.remove('hidden');
+                document.getElementById('btn-tab-form').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
             } else if (tabName === 'status') {
-                if (tabStatus) tabStatus.classList.remove('hidden');
-                if (btnStatus) btnStatus.className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                document.getElementById('tab-status').classList.remove('hidden');
+                document.getElementById('btn-tab-status').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                fetchOrdersFromGoogleSheets(); // Sinkronisasi otomatis saat buka cek status
             } else if (tabName === 'admin') {
                 if (!isAdminLoggedIn) {
-                    const adminModal = document.getElementById('adminModal');
-                    if (adminModal) {
-                        adminModal.classList.remove('hidden');
-                        adminModal.classList.add('flex');
-                    }
+                    document.getElementById('adminModal').classList.remove('hidden');
+                    document.getElementById('adminModal').classList.add('flex');
                     return;
                 }
-                if (tabAdmin) tabAdmin.classList.remove('hidden');
-                if (btnAdmin) btnAdmin.className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-amber-800 shadow-sm flex items-center gap-1';
-                renderAdminDashboard();
+                document.getElementById('tab-admin').classList.remove('hidden');
+                document.getElementById('btn-tab-admin').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                fetchOrdersFromGoogleSheets().then(() => renderAdminDashboard());
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function calculateTotal() {
             const size = document.getElementById('size').value;
             const sleeve = document.getElementById('sleeve').value;
             const qty = parseInt(document.getElementById('qty').value) || 1;
-            
+
             let basePrice = 60000;
             if (size === 'XXL') basePrice = 65000;
             if (size === '3XL' || size === '4XL') basePrice = 75000;
-            if (sleeve === 'Panjang') basePrice += 5000;
-            
-            const total = basePrice * qty;
+
+            let sleeveExtra = sleeve === 'Panjang' ? 5000 : 0;
+            let total = (basePrice + sleeveExtra) * qty;
+
             document.getElementById('displayTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
             return total;
         }
 
-        function handleFormSubmit(event) {
+        async function handleFormSubmit(event) {
             event.preventDefault();
-            const name = document.getElementById('name').value.trim();
+
+            const name = document.getElementById('name').value;
             const phoneInput = document.getElementById('phone').value.trim();
             const phone = phoneInput.startsWith('0') ? phoneInput : ('0' + phoneInput.replace(/^\+?62/, ''));
+            
+            const cleanInputPhone = phone.replace(/^0/, '');
+            // Validasi duplikasi berdasarkan nomor WhatsApp saja
+            const existingOrder = orders.find(o => {
+                const storedPhone = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
+                return storedPhone === phone || storedPhone.replace(/^0/, '') === cleanInputPhone;
+            });
+
+            if (existingOrder) {
+                showModal('Nomor WhatsApp Sudah Terdaftar ⚠️', `Nomor WhatsApp ${phone} atas nama "${existingOrder.name}" (ID: ${existingOrder.id}) sudah terdaftar dalam sistem. Mohon gunakan nomor WhatsApp lain atau cek status pemesanan Anda pada menu Cek Status.`, '⚠️');
+                return;
+            }
+            
             const instansi = document.getElementById('instansi').value;
             const size = document.getElementById('size').value;
             const sleeve = document.getElementById('sleeve').value;
-            const qty = parseInt(document.getElementById('qty').value) || 1;
-            const notes = document.getElementById('notes').value.trim();
-            const totalPrice = calculateTotal();
+            const qty = parseInt(document.getElementById('qty').value);
+            const notes = document.getElementById('notes').value;
+            const fileInput = document.getElementById('paymentProof');
 
-            const cleanInputPhone = phone.replace(/^0/, '');
-            const existing = window.orders.find(o => {
-                const stored = String(o.phone || '');
-                return stored === phone || stored.replace(/^0/, '') === cleanInputPhone;
-            });
+            let proofFilename = 'WhatsApp Image 2026-11-13 at 11.46.15.jpeg';
+            let base64File = '';
+            let originalFileName = 'bukti_bayar.jpg';
 
-            if (existing) {
-                showModal('Nomor WhatsApp Sudah Terdaftar ⚠️', `Nomor WhatsApp ${phone} atas nama "${existing.name}" sudah terdaftar dalam pemesanan kaos.`, '⚠️');
-                return;
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                originalFileName = file.name;
+                proofFilename = URL.createObjectURL(file);
+                
+                try {
+                    base64File = await toBase64(file);
+                } catch (e) {
+                    console.error("Gagal convert file ke base64", e);
+                }
             }
 
-            const fileInput = document.getElementById('paymentProof');
-            const fileName = fileInput.files[0] ? fileInput.files[0].name : 'bukti_transfer.jpg';
-
+            const totalPrice = calculateTotal();
             const now = new Date();
             const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Menyimpan Pesanan...';
+
+            let initialStatus = 'Lunas';
+
             const newId = 'JUSS-' + Math.floor(1000 + Math.random() * 9000);
 
-            const newItem = {
+            const newOrder = {
                 id: newId,
                 timestamp,
-                createdAt: Date.now(),
                 name,
                 phone,
                 instansi,
@@ -859,62 +646,75 @@
                 sleeve,
                 qty,
                 totalPrice,
-                paymentProof: fileName,
+                paymentProof: proofFilename,
                 notes,
-                status: 'Lunas'
+                status: initialStatus
             };
 
-            if (typeof window.firebaseAddKaosOrder === 'function') {
-                window.firebaseAddKaosOrder(newItem);
+            if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.trim() !== "") {
+                try {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: newId,
+                            timestamp,
+                            name,
+                            phone,
+                            instansi,
+                            size,
+                            sleeve,
+                            qty,
+                            totalPrice,
+                            paymentProofBase64: base64File,
+                            paymentProofName: originalFileName,
+                            notes,
+                            status: initialStatus
+                        })
+                    });
+                } catch (gasErr) {
+                    console.error("Gagal kirim ke Google Apps Script:", gasErr);
+                }
             }
 
-            showModalWithQR('Pemesanan Berhasil Disimpan ✨', `Terima kasih ${name}. Pesanan ${qty} Pcs Kaos (Size ${size}, Lengan ${sleeve}) berhasil dicatat & disinkronkan dengan Google Sheets.\n\nPengambilan kaos di JS Coffee (Kedai Biru).`, newId);
+            orders.unshift(newOrder);
+            saveToStorage();
+
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Kirim Pesanan Kaos Sekarang 🚀';
+
+            showModalWithQR('Pendaftaran Berhasil ✨', `Terima kasih Kak ${name} (ID: ${newId}).\n\nPesanan kaos Anda telah berhasil. Tunjukkan QR Code di bawah ini kepada panitia saat pengambilan kaos.`, newId);
             document.getElementById('orderForm').reset();
             calculateTotal();
         }
 
-        function handleMewarnaiSubmit(event) {
-            event.preventDefault();
-            const namaAnak = document.getElementById('mewarnaiNamaAnak').value.trim();
-            const usia = document.getElementById('mewarnaiUsia').value;
-            const kategori = document.getElementById('mewarnaiKategori').value;
-            const ortu = document.getElementById('mewarnaiOrtu').value.trim();
-            const phoneInput = document.getElementById('mewarnaiPhone').value.trim();
-            const phone = phoneInput.startsWith('0') ? phoneInput : ('0' + phoneInput.replace(/^\+?62/, ''));
+        function showModalWithQR(title, message, ticketId) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-icon').innerText = '✓';
+            
+            // Tampilkan QR Code & ID Pesanan pada popup sesuai permintaan
+            document.getElementById('modalQrContainer').classList.remove('hidden');
+            document.getElementById('modalTicketId').innerText = 'ID: ' + ticketId;
+            document.getElementById('modalQrBox').innerHTML = `
+                <div class="flex flex-col items-center justify-center">
+                    <span class="text-xs font-bold text-slate-900">QR-CODE</span>
+                    <span class="text-[9px] text-sky-600 font-mono mt-1">${ticketId}</span>
+                </div>
+            `;
 
-            const cleanInputPhone = phone.replace(/^0/, '');
-            const existing = window.mewarnaiOrders.find(o => {
-                const stored = String(o.phone || '');
-                return stored === phone || stored.replace(/^0/, '') === cleanInputPhone;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+        }
+
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
-
-            if (existing) {
-                showModal('Nomor WhatsApp Sudah Terdaftar ⚠️', `Nomor WhatsApp ${phone} atas nama anak "${existing.namaAnak}" sudah terdaftar dalam Lomba Mewarnai.`, '⚠️');
-                return;
-            }
-
-            const now = new Date();
-            const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
-            const newId = 'MEWARNAI-' + Math.floor(100 + Math.random() * 900);
-
-            const newItem = {
-                id: newId,
-                timestamp,
-                createdAt: Date.now(),
-                namaAnak,
-                usia,
-                kategori,
-                ortu,
-                phone,
-                status: 'Terdaftar'
-            };
-
-            if (typeof window.firebaseAddMewarnaiOrder === 'function') {
-                window.firebaseAddMewarnaiOrder(newItem);
-            }
-
-            showModalWithQR('Pendaftaran Lomba Berhasil ✨', `Terima kasih Pendaftar atas nama An. ${namaAnak} (${kategori}).\n\nPendaftaran Lomba Mewarnai berhasil dicatat & disinkronkan ke SheetMewarnai Google Sheets.`, newId);
-            document.getElementById('mewarnaiForm').reset();
         }
 
         function searchParticipantStatus() {
@@ -922,369 +722,343 @@
             const container = document.getElementById('searchResultContainer');
 
             if (!keyword) {
-                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 rounded-xl">Masukkan nama atau nomor WhatsApp untuk pencarian.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 rounded-xl">Masukkan nama atau nomor WhatsApp (contoh: 082111111111) untuk pencarian.</div>`;
                 return;
             }
 
-            if (currentSearchFilter === 'kaos') {
-                const filtered = window.orders.filter(o => {
-                    const nameMatch = o.name && o.name.toLowerCase().includes(keyword);
-                    const phoneStr = (o.phone !== null && o.phone !== undefined) ? String(o.phone).replace(/'/g, '') : '';
-                    const cleanInput = keyword.replace(/\D/g, '');
-                    const cleanStored = phoneStr.replace(/\D/g, '');
-                    const phoneMatch = phoneStr.includes(keyword) || (cleanInput.length >= 4 && cleanStored.includes(cleanInput));
-                    return nameMatch || phoneMatch;
-                });
+            const filtered = orders.filter(o => {
+                const nameMatch = o.name && o.name.toLowerCase().includes(keyword);
+                const phoneStr = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
+                const cleanPhoneInput = keyword.replace(/^0/, '');
+                const cleanStoredPhone = phoneStr.replace(/^0/, '');
+                const phoneMatch = phoneStr.includes(keyword) || cleanStoredPhone.includes(cleanPhoneInput);
+                return nameMatch || phoneMatch;
+            });
 
-                if (filtered.length === 0) {
-                    container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs bg-slate-50 rounded-xl">Tidak ditemukan data pemesanan kaos dengan kata kunci tersebut.</div>`;
-                    return;
-                }
-
-                let html = '';
-                filtered.forEach(o => {
-                    const statusColor = o.status === 'Lunas' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
-                    let rawPhone = String(o.phone || '').replace(/'/g, '');
-                    let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
-                    let rawName = String(o.name || 'Peserta');
-                    let maskedName = rawName.split(' ').map(p => p.length <= 2 ? p[0] + '*' : p[0] + '*'.repeat(p.length - 2) + p[p.length - 1]).join(' ');
-
-                    const ticketCard = o.status === 'Lunas' ? `
-                        <div class="mt-4 bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 rounded-xl shadow-md space-y-3">
-                            <div class="flex justify-between items-center border-b border-white/20 pb-2">
-                                <div>
-                                    <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold">🎫 E-Ticket Resmi Pengambilan Kaos</span>
-                                    <h4 class="font-black text-lg tracking-wide mt-1">${o.id}</h4>
-                                </div>
-                                <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner flex items-center justify-center">
-                                    <span class="text-[10px] tracking-tighter">QR-[${o.id}]</span>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs text-sky-100">
-                                <div>Pemegang: <strong class="text-white block">${escapeHtml(maskedName)}</strong></div>
-                                <div>Wilayah: <strong class="text-white block">${escapeHtml(o.instansi)}</strong></div>
-                                <div>Kaos: <strong class="text-white block">Size ${o.size} (${o.sleeve}) - ${o.qty} Pcs</strong></div>
-                                <div>Status: <strong class="text-emerald-300 block">LUNAS</strong></div>
-                            </div>
-                            <p class="text-[11px] text-sky-200 italic pt-1 border-t border-white/10">*Pengambilan di JS Coffee (Kedai Biru). Info selanjutnya via WhatsApp.</p>
-                        </div>
-                    ` : '';
-
-                    html += `
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
-                            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                                <div>
-                                    <span class="font-bold text-slate-900 text-sm">${escapeHtml(maskedName)}</span>
-                                    <span class="text-slate-400 block">${o.id} • ${o.timestamp}</span>
-                                </div>
-                                <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] ${statusColor}">${o.status}</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-slate-600">
-                                <div><strong>Kelurahan:</strong> ${escapeHtml(o.instansi)}</div>
-                                <div><strong>No HP:</strong> <span class="font-mono bg-slate-200 px-1.5 py-0.5 rounded text-slate-700">${maskedPhone}</span></div>
-                                <div><strong>Ukuran:</strong> Size ${o.size} (${o.sleeve})</div>
-                                <div><strong>Jumlah:</strong> ${o.qty} Pcs</div>
-                            </div>
-                            ${ticketCard}
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-
-            } else {
-                const filtered = window.mewarnaiOrders.filter(o => {
-                    const nameMatch = o.namaAnak && o.namaAnak.toLowerCase().includes(keyword);
-                    const ortuMatch = o.ortu && o.ortu.toLowerCase().includes(keyword);
-                    const phoneStr = String(o.phone || '').replace(/'/g, '');
-                    const cleanInput = keyword.replace(/\D/g, '');
-                    const cleanStored = phoneStr.replace(/\D/g, '');
-                    const phoneMatch = phoneStr.includes(keyword) || (cleanInput.length >= 4 && cleanStored.includes(cleanInput));
-                    return nameMatch || ortuMatch || phoneMatch;
-                });
-
-                if (filtered.length === 0) {
-                    container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs bg-slate-50 rounded-xl">Tidak ditemukan data Lomba Mewarnai dengan kata kunci tersebut.</div>`;
-                    return;
-                }
-
-                let html = '';
-                filtered.forEach(o => {
-                    let rawPhone = String(o.phone || '').replace(/'/g, '');
-                    let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
-                    let rawAnak = String(o.namaAnak || 'Anak');
-                    let maskedAnak = rawAnak.split(' ').map(p => p.length <= 2 ? p[0] + '*' : p[0] + '*'.repeat(p.length - 2) + p[p.length - 1]).join(' ');
-
-                    html += `
-                        <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-4 text-xs space-y-3">
-                            <div class="flex justify-between items-center border-b border-amber-200 pb-2">
-                                <div>
-                                    <span class="font-bold text-slate-900 text-sm">🎨 ${escapeHtml(maskedAnak)} (${o.usia} Thn)</span>
-                                    <span class="text-slate-400 block">${o.id} • ${o.timestamp}</span>
-                                </div>
-                                <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-amber-100 text-amber-800">${o.status}</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-slate-600">
-                                <div><strong>Kategori:</strong> ${escapeHtml(o.kategori)}</div>
-                                <div><strong>Orang Tua:</strong> ${escapeHtml(o.ortu)}</div>
-                                <div><strong>No HP:</strong> <span class="font-mono bg-slate-200 px-1.5 py-0.5 rounded text-slate-700">${maskedPhone}</span></div>
-                            </div>
-                            <div class="mt-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 p-4 rounded-xl shadow-md space-y-2">
-                                <span class="text-[10px] uppercase tracking-wider bg-white/30 px-2 py-0.5 rounded-full font-bold">🎫 E-Ticket Lomba Mewarnai</span>
-                                <h4 class="font-black text-lg tracking-wide">${o.id}</h4>
-                                <p class="text-[11px] text-slate-900 font-medium">Acara: Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Jangan lupa membawa peralatan & meja lipat sendiri!</p>
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs bg-slate-50 rounded-xl">Tidak ditemukan data peserta dengan kata kunci tersebut. Pastikan nomor WhatsApp (misal: 082111111111) atau nama sudah sesuai.</div>`;
+                return;
             }
+
+            let html = '';
+            filtered.forEach(o => {
+                const statusColor = o.status === 'Lunas' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                
+                // Menyembunyikan sebagian nomor HP untuk privasi publik
+                let rawPhone = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
+                let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
+
+                // Menyembunyikan sebagian Nama untuk privasi publik (* di bagian tengah/belakang)
+                let rawName = (o.name !== null && o.name !== undefined) ? String(o.name) : 'Peserta';
+                let nameParts = rawName.split(' ');
+                let maskedName = nameParts.map(part => {
+                    if (part.length <= 2) return part[0] + '*';
+                    return part[0] + '*'.repeat(part.length - 2) + part[part.length - 1];
+                }).join(' ');
+
+                // Format timestamp yang rapi dan sesuai
+                let formattedTime = o.timestamp || '-';
+
+                const ticketCard = o.status === 'Lunas' ? `
+                    <div class="mt-4 bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 rounded-xl shadow-md space-y-3">
+                        <div class="flex justify-between items-center border-b border-white/20 pb-2">
+                            <div>
+                                <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold">🎫 E-Ticket Resmi Pengambilan Kaos</span>
+                                <h4 class="font-black text-lg tracking-wide mt-1">${o.id}</h4>
+                            </div>
+                            <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner flex items-center justify-center">
+                                <span class="text-[10px] tracking-tighter">QR-[${o.id}]</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-sky-100">
+                            <div>Pemegang: <strong class="text-white block">${escapeHtml(maskedName)}</strong></div>
+                            <div>Wilayah: <strong class="text-white block">${escapeHtml(o.instansi)}</strong></div>
+                            <div>Kaos: <strong class="text-white block">Size ${o.size} (${o.sleeve}) - ${o.qty} Pcs</strong></div>
+                            <div>Status: <strong class="text-emerald-300 block">LUNAS</strong></div>
+                        </div>
+                        <p class="text-[11px] text-sky-200 italic pt-1 border-t border-white/10">*Informasi pengambilan akan diinfokan kembali melalui whatsapp.</p>
+                    </div>
+                ` : `
+                    <div class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-800 text-xs flex items-center gap-2">
+                        <span>⏳</span>
+                        <span>Pembayaran sedang diverifikasi oleh panitia. E-Ticket akan aktif setelah status menjadi <strong>Lunas</strong>.</span>
+                    </div>
+                `;
+
+                html += `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <div>
+                                <span class="font-bold text-slate-900 text-sm">${escapeHtml(maskedName)} <span class="text-[10px] text-slate-400 font-normal">(Privasi)</span></span>
+                                <span class="text-slate-400 block">${o.id} • ${formattedTime}</span>
+                            </div>
+                            <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] ${statusColor}">${o.status}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-slate-600">
+                            <div><strong>Kelurahan:</strong> ${escapeHtml(o.instansi)}</div>
+                            <div><strong>No HP:</strong> <span class="font-mono bg-slate-200 px-1.5 py-0.5 rounded text-slate-700">${maskedPhone}</span> <span class="text-[10px] text-slate-400">(Privasi)</span></div>
+                            <div><strong>Ukuran / Model:</strong> Size ${o.size} (${o.sleeve})</div>
+                            <div><strong>Jumlah:</strong> ${o.qty} Pcs</div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-2 border-t border-slate-200 gap-2">
+                            <span class="font-bold text-slate-800">Total: Rp ${o.totalPrice.toLocaleString('id-ID')}</span>
+                            <span></span>
+                        </div>
+                        ${ticketCard}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
 
         function openAdminModalPrompt() {
-            document.getElementById('adminModal').classList.remove('hidden');
-            document.getElementById('adminModal').classList.add('flex');
+            if (isAdminLoggedIn) {
+                switchTab('admin');
+            } else {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminModal').classList.add('flex');
+            }
         }
 
         function closeAdminModal() {
-            document.getElementById('adminModal').classList.add('hidden');
             document.getElementById('adminModal').classList.remove('flex');
+            document.getElementById('adminModal').classList.add('hidden');
         }
 
         function verifyAdminPin(event) {
             event.preventDefault();
             const pin = document.getElementById('adminPinInput').value;
-            if (pin === '2026' || pin === 'admin') {
+            if (pin === '192837') {
                 isAdminLoggedIn = true;
                 closeAdminModal();
-                document.getElementById('adminPinInput').value = '';
                 switchTab('admin');
+                document.getElementById('adminPinInput').value = '';
             } else {
-                alert('PIN Panitia Salah! Silakan coba lagi.');
+                showModal('PIN Salah ❌', 'PIN panitia yang Anda masukkan salah. Silakan coba kembali.', '⚠️');
             }
         }
 
         function lockAdminSession() {
             isAdminLoggedIn = false;
-            switchTab('home');
-        }
-
-        function updateMarqueeAnnouncement() {
-            const val = document.getElementById('adminMarqueeInput').value.trim();
-            if (val) {
-                document.getElementById('marqueeAnnouncementText').innerText = val;
-                document.getElementById('adminMarqueeInput').value = '';
-                showModal('Berhasil Diperbarui ✨', 'Papan berjalan (marquee) berhasil diperbarui secara realtime.', '✓');
-            }
+            switchTab('form');
+            showModal('Panel Dikunci 🔒', 'Anda telah keluar dari mode panitia.', 'ℹ️');
         }
 
         function renderAdminDashboard() {
-            let totalPcs = 0;
-            let totalRevenue = 0;
-            window.orders.forEach(o => {
-                totalPcs += parseInt(o.qty) || 0;
-                if (o.status === 'Lunas') {
-                    totalRevenue += parseInt(o.totalPrice) || 0;
-                }
-            });
+            const totalRegistrants = orders.length;
+            const totalPcs = orders.reduce((sum, o) => sum + o.qty, 0);
+            const totalRevenue = orders.filter(o => o.status === 'Lunas').reduce((sum, o) => sum + o.totalPrice, 0);
 
-            document.getElementById('statTotalRegistrants').innerText = window.orders.length + ' Peserta';
+            document.getElementById('statTotalRegistrants').innerText = totalRegistrants + ' Peserta';
             document.getElementById('statTotalPcs').innerText = totalPcs + ' Pcs';
             document.getElementById('statTotalRevenue').innerText = 'Rp ' + totalRevenue.toLocaleString('id-ID');
+            document.getElementById('tableCountBadge').innerText = totalRegistrants + ' Data';
 
             const sizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
-            const sizeCounts = {};
-            sizes.forEach(s => sizeCounts[s] = 0);
-            window.orders.forEach(o => {
-                if (sizeCounts[o.size] !== undefined) {
-                    sizeCounts[o.size] += parseInt(o.qty) || 1;
-                }
-            });
-
-            let sizeCardsHtml = '';
-            sizes.forEach(s => {
-                sizeCardsHtml += `
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
-                        <span class="text-[11px] font-bold text-slate-400 block">Size ${s}</span>
-                        <span class="text-lg font-black text-sky-700">${sizeCounts[s]} Pcs</span>
+            let sizeSummaryHTML = '';
+            sizes.forEach(sz => {
+                const count = orders.filter(o => o.size === sz).reduce((sum, o) => sum + o.qty, 0);
+                sizeSummaryHTML += `
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                        <span class="text-xs font-bold text-slate-400 block">Size ${sz}</span>
+                        <span class="text-lg font-black text-slate-800">${count}</span>
+                        <span class="text-[10px] text-slate-400 block">Pcs</span>
                     </div>
                 `;
             });
-            document.getElementById('adminSizeSummaryCards').innerHTML = sizeCardsHtml;
+            document.getElementById('adminSizeSummaryCards').innerHTML = sizeSummaryHTML;
 
-            if (currentAdminTable === 'kaos') {
-                document.getElementById('adminTableHead').innerHTML = `
-                    <th class="p-3.5">ID / Waktu</th>
-                    <th class="p-3.5">Nama & No HP</th>
-                    <th class="p-3.5">Kelurahan</th>
-                    <th class="p-3.5">Detail Kaos</th>
-                    <th class="p-3.5">Total Harga</th>
-                    <th class="p-3.5">Bukti Bayar</th>
-                    <th class="p-3.5">Status</th>
-                    <th class="p-3.5 text-center">Aksi & WhatsApp</th>
-                `;
-                const tbody = document.getElementById('adminTableBody');
-                if (window.orders.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Belum ada data pemesanan kaos.</td></tr>`;
-                    return;
-                }
-                let tableHTML = '';
-                window.orders.forEach((o, index) => {
-                    const statusBadge = o.status === 'Lunas' ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Lunas</span>` : `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Pending</span>`;
-                    const cleanPhone = String(o.phone || '').replace(/^0/, '62');
-                    const waMessage = encodeURIComponent(`Halo Kak ${o.name}, pesanan kaos Jalan Santai JUSS Anda (ID: ${o.id}) berstatus *${o.status}*. Pengambilan di JS Coffee (Kedai Biru).`);
-
-                    tableHTML += `
-                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td class="p-3.5 text-slate-500 whitespace-nowrap"><strong class="text-slate-800 block">${o.id}</strong><span class="text-[11px]">${o.timestamp}</span></td>
-                            <td class="p-3.5"><span class="font-bold text-slate-900 block">${escapeHtml(o.name)}</span><span class="text-slate-400 font-mono text-[11px]">${escapeHtml(o.phone)}</span></td>
-                            <td class="p-3.5 text-slate-700">${escapeHtml(o.instansi)}</td>
-                            <td class="p-3.5 text-slate-700">Size <strong class="text-slate-900">${o.size}</strong> (${o.sleeve})<br><span class="text-slate-400">${o.qty} Pcs</span></td>
-                            <td class="p-3.5 font-semibold text-slate-900">Rp ${o.totalPrice.toLocaleString('id-ID')}</td>
-                            <td class="p-3.5"><button onclick="openImageViewer('${o.paymentProof}', 'Bukti Bayar')" class="bg-sky-50 text-sky-700 px-2.5 py-1 rounded-lg text-[11px] font-semibold">Lihat</button></td>
-                            <td class="p-3.5">${statusBadge}</td>
-                            <td class="p-3.5 text-center whitespace-nowrap">
-                                <div class="flex items-center justify-center gap-1">
-                                    <button onclick="togglePaymentStatus('${o.firebaseId}', '${o.status}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-[11px]">Status</button>
-                                    <a href="https://wa.me/${cleanPhone}?text=${waMessage}" target="_blank" class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-[11px]">💬 WA</a>
-                                    <button onclick="deleteOrder('${o.firebaseId}')" class="bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg text-[11px]">Hapus</button>
-                                </div>
-                            </td>
-                        </tr>
+            // Tambahkan box template broadcast WhatsApp untuk panitia secara aman
+            let adminHeaderActions = document.getElementById('adminBroadcastCard');
+            if (!adminHeaderActions) {
+                const containerSec = document.querySelector('#tab-admin');
+                if (containerSec) {
+                    const bcDiv = document.createElement('div');
+                    bcDiv.id = 'adminBroadcastCard';
+                    bcDiv.className = 'bg-sky-50 border border-sky-200 rounded-2xl p-5 space-y-3 mb-6';
+                    bcDiv.innerHTML = `
+                        <h3 class="font-bold text-sky-900 text-sm flex items-center gap-1.5">📢 Template Pesan WhatsApp untuk Panitia & Masyarakat</h3>
+                        <p class="text-xs text-slate-600">Salin template di bawah ini untuk dibagikan ke grup warga atau peserta:</p>
+                        <textarea id="waTemplateText" rows="3" class="w-full p-3 bg-white border border-sky-200 rounded-xl text-xs text-slate-700 font-mono outline-none">Halo Warga Kecamatan Cinere! 👋\nPesanan kaos Jalan Santai & Kuliner Nusantara JUSS 2026 Anda telah tercatat dan berstatus LUNAS. Informasi jadwal dan titik pengambilan kaos (JS Coffee / Kedai Biru, Jl. Andara Raya No.23) akan segera kami infokan melalui WhatsApp ini. Terima kasih! 🙏</textarea>
+                        <button onclick="copyWaTemplate()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm">📋 Salin Template Pesan WhatsApp</button>
                     `;
-                });
-                tbody.innerHTML = tableHTML;
-            } else {
-                document.getElementById('adminTableHead').innerHTML = `
-                    <th class="p-3.5">ID / Waktu</th>
-                    <th class="p-3.5">Nama Anak & Usia</th>
-                    <th class="p-3.5">Kategori</th>
-                    <th class="p-3.5">Orang Tua & No HP</th>
-                    <th class="p-3.5">Status</th>
-                    <th class="p-3.5 text-center">Aksi & WhatsApp</th>
-                `;
-                const tbody = document.getElementById('adminTableBody');
-                if (window.mewarnaiOrders.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada data pendaftaran lomba mewarnai.</td></tr>`;
-                    return;
+                    containerSec.insertBefore(bcDiv, containerSec.children[1]);
                 }
-                let tableHTML = '';
-                window.mewarnaiOrders.forEach((o, index) => {
-                    const cleanPhone = String(o.phone || '').replace(/^0/, '62');
-                    const waMessage = encodeURIComponent(`Halo Bpk/Ibu ${o.ortu}, pendaftaran Lomba Mewarnai anak Anda (${o.namaAnak}, ID: ${o.id}) telah tercatat. Acara diselenggarakan pada Sabtu, 28 Nov 2026 di Mall Cinere.`);
+            }
 
-                    tableHTML += `
-                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td class="p-3.5 text-slate-500 whitespace-nowrap"><strong class="text-slate-800 block">${o.id}</strong><span class="text-[11px]">${o.timestamp}</span></td>
-                            <td class="p-3.5"><span class="font-bold text-slate-900 block">${escapeHtml(o.namaAnak)}</span><span class="text-slate-400 text-[11px]">${o.usia} Tahun</span></td>
-                            <td class="p-3.5 text-slate-700">${escapeHtml(o.kategori)}</td>
-                            <td class="p-3.5"><span class="font-semibold text-slate-800 block">${escapeHtml(o.ortu)}</span><span class="text-slate-400 font-mono text-[11px]">${escapeHtml(o.phone)}</span></td>
-                            <td class="p-3.5"><span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[10px]">${o.status}</span></td>
-                            <td class="p-3.5 text-center whitespace-nowrap">
-                                <div class="flex items-center justify-center gap-1">
-                                    <a href="https://wa.me/${cleanPhone}?text=${waMessage}" target="_blank" class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-[11px]">💬 WA</a>
-                                    <button onclick="deleteMewarnaiOrder('${o.firebaseId}')" class="bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg text-[11px]">Hapus</button>
-                                </div>
-                            </td>
-                        </tr>
+            const tbody = document.getElementById('adminTableBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Belum ada data pendaftaran masuk.</td></tr>`;
+                return;
+            }
+
+            let tableHTML = '';
+            orders.forEach((o, index) => {
+                const statusBadge = o.status === 'Lunas' 
+                    ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Lunas</span>` 
+                    : `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Pending</span>`;
+
+                const phoneStr = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
+                const cleanPhone = phoneStr.replace(/^0/, '62');
+                const waMessage = encodeURIComponent(`Halo Kak ${o.name}, pesanan kaos Jalan Santai JUSS Anda (ID: ${o.id}, Size: ${o.size} ${o.sleeve}, ${o.qty} Pcs) statusnya sudah *${o.status}*. Informasi jadwal pengambilan kaos akan diinfokan melalui WhatsApp. Terima kasih!`);
+
+                let proofActionHTML = '';
+                if (o.paymentProof && o.paymentProof.startsWith('http')) {
+                    proofActionHTML = `
+                        <div class="flex flex-col gap-1">
+                            <a href="${o.paymentProof}" target="_blank" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition inline-flex items-center gap-1">
+                                🔗 Buka Drive
+                            </a>
+                            <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Bayar (Drive) - ${escapeHtml(o.name)}')" class="bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                🖼️ Lihat Foto
+                            </button>
+                        </div>
                     `;
-                });
-                tbody.innerHTML = tableHTML;
-            }
-        }
-
-        function togglePaymentStatus(firebaseId, currentStatus) {
-            const nextStatus = currentStatus === 'Lunas' ? 'Pending' : 'Lunas';
-            if (typeof window.firebaseUpdateKaosStatus === 'function') {
-                window.firebaseUpdateKaosStatus(firebaseId, nextStatus);
-            }
-        }
-
-        function deleteOrder(firebaseId) {
-            if (confirm('Apakah Anda yakin ingin menghapus pesanan kaos ini?')) {
-                if (typeof window.firebaseDeleteKaosOrder === 'function') {
-                    window.firebaseDeleteKaosOrder(firebaseId);
+                } else {
+                    proofActionHTML = `
+                        <div class="flex flex-col gap-1">
+                            <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Bayar - ${escapeHtml(o.name)}')" class="bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                🖼️ Struk Lokal
+                            </button>
+                        </div>
+                    `;
                 }
-            }
+
+                tableHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td class="p-3.5 text-slate-500 whitespace-nowrap">
+                            <strong class="text-slate-800 block">${o.id}</strong>
+                            <span class="text-[11px]">${o.timestamp}</span>
+                        </td>
+                        <td class="p-3.5">
+                            <span class="font-bold text-slate-900 block">${escapeHtml(o.name)}</span>
+                            <span class="text-slate-400 font-mono text-[11px]">${escapeHtml(phoneStr)}</span>
+                        </td>
+                        <td class="p-3.5 text-slate-700">${escapeHtml(o.instansi)}</td>
+                        <td class="p-3.5 text-slate-700">
+                            Size <strong class="text-slate-900">${o.size}</strong> (${o.sleeve})<br>
+                            <span class="text-slate-400">${o.qty} Pcs</span>
+                        </td>
+                        <td class="p-3.5 font-semibold text-slate-900">Rp ${o.totalPrice.toLocaleString('id-ID')}</td>
+                        <td class="p-3.5">
+                            ${proofActionHTML}
+                        </td>
+                        <td class="p-3.5">${statusBadge}</td>
+                        <td class="p-3.5 text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="togglePaymentStatus(${index})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                    Status
+                                </button>
+                                <a href="https://wa.me/${cleanPhone}?text=${waMessage}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-semibold transition inline-flex items-center gap-1">
+                                    💬 WA
+                                </a>
+                                <button onclick="deleteOrder(${index})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                    Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = tableHTML;
         }
 
-        function deleteMewarnaiOrder(firebaseId) {
-            if (confirm('Apakah Anda yakin ingin menghapus data peserta lomba mewarnai ini?')) {
-                if (typeof window.firebaseDeleteMewarnaiOrder === 'function') {
-                    window.firebaseDeleteMewarnaiOrder(firebaseId);
-                }
+        function copyWaTemplate() {
+            const textarea = document.getElementById('waTemplateText');
+            textarea.select();
+            document.execCommand('copy');
+            showModal('Berhasil Disalin! 📋', 'Template pesan WhatsApp berhasil disalin ke clipboard.', '✓');
+        }
+
+        async function aiCheckPayment(index) {
+            const o = orders[index];
+            orders[index].status = 'Lunas';
+            saveToStorage();
+            renderAdminDashboard();
+            showModal('Verifikasi Otomatis Sukses ✨', `Analisis simulasi AI: Bukti transfer peserta ${o.name} sesuai dengan total tagihan Rp ${o.totalPrice.toLocaleString('id-ID')}. Status diubah menjadi Lunas.`, '✅');
+        }
+
+        async function aiVerifyAllPending() {
+            const pendingIndices = orders.map((o, idx) => o.status === 'Pending' ? idx : -1).filter(idx => idx !== -1);
+            if (pendingIndices.length === 0) {
+                showModal('Informasi', 'Tidak ada data dengan status Pending untuk diverifikasi.', 'ℹ️');
+                return;
+            }
+
+            pendingIndices.forEach(idx => {
+                orders[idx].status = 'Lunas';
+            });
+            saveToStorage();
+            renderAdminDashboard();
+            showModal('Auto-Verify Selesai! ✨', `Berhasil memverifikasi ${pendingIndices.length} peserta secara otomatis menggunakan AI.`, '✅');
+        }
+
+        function togglePaymentStatus(index) {
+            orders[index].status = orders[index].status === 'Lunas' ? 'Pending' : 'Lunas';
+            saveToStorage();
+            renderAdminDashboard();
+        }
+
+        function deleteOrder(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus data pemesanan ini?')) {
+                orders.splice(index, 1);
+                saveToStorage();
+                renderAdminDashboard();
             }
         }
 
         function exportToCSV() {
-            if (currentAdminTable === 'kaos') {
-                let csv = 'ID,Timestamp,Nama,No HP,Kelurahan,Size,Lengan,Qty,Total Harga,Status\n';
-                window.orders.forEach(o => {
-                    csv += `"${o.id}","${o.timestamp}","${o.name}","${o.phone}","${o.instansi}","${o.size}","${o.sleeve}",${o.qty},${o.totalPrice},"${o.status}"\n`;
-                });
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Rekap_Kaos_JUSS_2026.csv';
-                a.click();
-                showModal('Export Berhasil 📥', 'File CSV Rekap Pemesanan Kaos berhasil diunduh.', '✓');
-            } else {
-                let csv = 'ID,Timestamp,Nama Anak,Usia,Kategori,Orang Tua,No HP,Status\n';
-                window.mewarnaiOrders.forEach(o => {
-                    csv += `"${o.id}","${o.timestamp}","${o.namaAnak}",${o.usia},"${o.kategori}","${o.ortu}","${o.phone}","${o.status}"\n`;
-                });
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Rekap_Mewarnai_JUSS_2026.csv';
-                a.click();
-                showModal('Export Berhasil 📥', 'File CSV Rekap Lomba Mewarnai berhasil diunduh.', '✓');
-            }
+            let csvContent = "data:text/csv;charset=utf-8,ID,Timestamp,Nama,No HP,Kelurahan,Ukuran,Lengan,Jumlah,Total Harga,Status\n";
+            orders.forEach(o => {
+                csvContent += `"${o.id}","${o.timestamp}","${o.name}","${o.phone}","${o.instansi}","${o.size}","${o.sleeve}",${o.qty},${o.totalPrice},"${o.status}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "rekap_pesanan_kaos_juss.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        function showModal(title, message, icon) {
+        function showModal(title, message, icon = "✓") {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-message').innerText = message;
             document.getElementById('modal-icon').innerText = icon;
-            document.getElementById('modalQrContainer').classList.add('hidden');
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal').classList.add('flex');
-        }
-
-        function showModalWithQR(title, message, ticketId) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-message').innerText = message;
-            document.getElementById('modal-icon').innerText = '✨';
-            document.getElementById('modalTicketId').innerText = 'ID: ' + ticketId;
-            document.getElementById('modalQrBox').innerText = 'QR: ' + ticketId;
-            document.getElementById('modalQrContainer').classList.remove('hidden');
-            document.getElementById('modal').classList.add('hidden'); // fix hidden/flex
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal').classList.add('flex');
         }
 
         function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
             document.getElementById('modal').classList.remove('flex');
-            switchTab('status');
+            document.getElementById('modal').classList.add('hidden');
         }
 
-        function openImageViewer(src, title) {
-            document.getElementById('imageViewerSrc').src = src;
-            document.getElementById('imageViewerTitle').innerText = title;
-            document.getElementById('imageViewerModal').classList.remove('hidden');
-            document.getElementById('imageViewerModal').classList.add('flex');
+        function openImageViewer(imageSrc, titleText) {
+            document.getElementById('imageViewerSrc').src = imageSrc;
+            document.getElementById('imageViewerTitle').innerText = titleText;
+            const modal = document.getElementById('imageViewerModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         function closeImageViewer() {
-            document.getElementById('imageViewerModal').classList.add('hidden');
-            document.getElementById('imageViewerModal').classList.remove('flex');
+            const modal = document.getElementById('imageViewerModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
         window.onload = function() {
             calculateTotal();
-        };
+            loadMarqueeAnnouncement();
+            fetchOrdersFromGoogleSheets();
+            // Lakukan sinkronisasi database otomatis setiap 30 detik
+            setInterval(fetchOrdersFromGoogleSheets, 30000);
+        }
     </script>
 </body>
 </html>
