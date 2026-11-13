@@ -417,7 +417,7 @@
         let orders = JSON.parse(localStorage.getItem('juss_kaos_orders')) || [
             {
                 id: 'JUSS-1001',
-                timestamp: '2026-11-13 07:30',
+                timestamp: '13 Nov 2026, 07:30 WIB',
                 name: 'Siti Aminah, S.E.',
                 phone: '081298765432',
                 instansi: 'Kelurahan Cinere',
@@ -441,24 +441,44 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        const mapped = data.map((row, index) => ({
-                            id: row["ID Pesanan"] || `JUSS-${1000 + index}`,
-                            timestamp: row["Timestamp"] || new Date().toLocaleString(),
-                            name: row["Nama Lengkap"] || "Peserta",
-                            phone: row["No HP / WhatsApp"] || "-",
-                            instansi: row["Kelurahan / Wilayah"] || "Kelurahan Cinere",
-                            size: row["Ukuran Kaos"] || "S",
-                            sleeve: row["Model Lengan"] || "Pendek",
-                            qty: Number(row["Jumlah (Pcs)"]) || 1,
-                            totalPrice: Number(row["Total Harga (Rp)"]) || 60000,
-                            paymentProof: row["Bukti Pembayaran (Drive)"] || "WhatsApp Image 2026-11-13 at 11.46.15.jpeg",
-                            notes: row["Catatan"] || "-",
-                            status: row["Status Pembayaran"] || "Pending"
-                        }));
+                        const mapped = data.map((row, index) => {
+                            let rawProof = row["Bukti Pembayaran (Drive)"] || "WhatsApp Image 2026-11-13 at 11.46.15.jpeg";
+                            // Ekstrak URL Google Drive jika menggunakan formula =HYPERLINK("URL"; "Label")
+                            if (typeof rawProof === 'string' && rawProof.startsWith('=')) {
+                                const match = rawProof.match(/["'](https?:\/\/[^"']+)["']/);
+                                if (match && match[1]) {
+                                    rawProof = match[1];
+                                }
+                            }
+                            
+                            // Pastikan waktu/timestamp dari Google Sheets diformat rapi
+                            let rawTimestamp = row["Timestamp"];
+                            let formattedTimestamp = rawTimestamp ? String(rawTimestamp) : '-';
+                            if (formattedTimestamp.includes('T')) {
+                                const d = new Date(formattedTimestamp);
+                                if (!isNaN(d.getTime())) {
+                                    formattedTimestamp = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ' WIB';
+                                }
+                            }
+
+                            return {
+                                id: row["ID Pesanan"] || `JUSS-${1000 + index}`,
+                                timestamp: formattedTimestamp,
+                                name: row["Nama Lengkap"] || "Peserta",
+                                phone: row["No HP / WhatsApp"] || "-",
+                                instansi: row["Kelurahan / Wilayah"] || "Kelurahan Cinere",
+                                size: row["Ukuran Kaos"] || "S",
+                                sleeve: row["Model Lengan"] || "Pendek",
+                                qty: Number(row["Jumlah (Pcs)"]) || 1,
+                                totalPrice: Number(row["Total Harga (Rp)"]) || 60000,
+                                paymentProof: rawProof,
+                                notes: row["Catatan"] || "-",
+                                status: row["Status Pembayaran"] || "Pending"
+                            };
+                        });
                         if (mapped.length > 0) {
                             orders = mapped.reverse();
                             saveToStorage();
-                            // Jika sedang di admin atau status, perbarui tampilan secara otomatis
                             if (!document.getElementById('tab-admin').classList.contains('hidden')) {
                                 renderAdminDashboard();
                             }
@@ -563,7 +583,7 @@
 
             const totalPrice = calculateTotal();
             const now = new Date();
-            const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
@@ -715,8 +735,20 @@
             filtered.forEach(o => {
                 const statusColor = o.status === 'Lunas' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
                 
-                // Tautan Google Drive dihilangkan dari hasil pencarian publik sesuai permintaan
-                let proofDisplayHTML = '';
+                // Menyembunyikan sebagian nomor HP untuk privasi publik
+                let rawPhone = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
+                let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
+
+                // Menyembunyikan sebagian Nama untuk privasi publik (* di bagian tengah/belakang)
+                let rawName = (o.name !== null && o.name !== undefined) ? String(o.name) : 'Peserta';
+                let nameParts = rawName.split(' ');
+                let maskedName = nameParts.map(part => {
+                    if (part.length <= 2) return part[0] + '*';
+                    return part[0] + '*'.repeat(part.length - 2) + part[part.length - 1];
+                }).join(' ');
+
+                // Format timestamp yang rapi dan sesuai
+                let formattedTime = o.timestamp || '-';
 
                 const ticketCard = o.status === 'Lunas' ? `
                     <div class="mt-4 bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 rounded-xl shadow-md space-y-3">
@@ -730,7 +762,7 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-xs text-sky-100">
-                            <div>Pemegang: <strong class="text-white block">${escapeHtml(o.name)}</strong></div>
+                            <div>Pemegang: <strong class="text-white block">${escapeHtml(maskedName)}</strong></div>
                             <div>Wilayah: <strong class="text-white block">${escapeHtml(o.instansi)}</strong></div>
                             <div>Kaos: <strong class="text-white block">Size ${o.size} (${o.sleeve}) - ${o.qty} Pcs</strong></div>
                             <div>Status: <strong class="text-emerald-300 block">LUNAS</strong></div>
@@ -748,14 +780,14 @@
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                             <div>
-                                <span class="font-bold text-slate-900 text-sm">${escapeHtml(o.name)}</span>
-                                <span class="text-slate-400 block">${o.id} • ${o.timestamp}</span>
+                                <span class="font-bold text-slate-900 text-sm">${escapeHtml(maskedName)} <span class="text-[10px] text-slate-400 font-normal">(Privasi)</span></span>
+                                <span class="text-slate-400 block">${o.id} • ${formattedTime}</span>
                             </div>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] ${statusColor}">${o.status}</span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-slate-600">
                             <div><strong>Kelurahan:</strong> ${escapeHtml(o.instansi)}</div>
-                            <div><strong>No HP:</strong> ${escapeHtml(o.phone)}</div>
+                            <div><strong>No HP:</strong> <span class="font-mono bg-slate-200 px-1.5 py-0.5 rounded text-slate-700">${maskedPhone}</span> <span class="text-[10px] text-slate-400">(Privasi)</span></div>
                             <div><strong>Ukuran / Model:</strong> Size ${o.size} (${o.sleeve})</div>
                             <div><strong>Jumlah:</strong> ${o.qty} Pcs</div>
                         </div>
@@ -861,6 +893,28 @@
                 const cleanPhone = phoneStr.replace(/^0/, '62');
                 const waMessage = encodeURIComponent(`Halo Kak ${o.name}, pesanan kaos Jalan Santai JUSS Anda (ID: ${o.id}, Size: ${o.size} ${o.sleeve}, ${o.qty} Pcs) statusnya sudah *${o.status}*. Informasi jadwal pengambilan kaos akan diinfokan melalui WhatsApp. Terima kasih!`);
 
+                let proofActionHTML = '';
+                if (o.paymentProof && o.paymentProof.startsWith('http')) {
+                    proofActionHTML = `
+                        <div class="flex flex-col gap-1">
+                            <a href="${o.paymentProof}" target="_blank" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition inline-flex items-center gap-1">
+                                🔗 Buka Drive
+                            </a>
+                            <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Bayar (Drive) - ${escapeHtml(o.name)}')" class="bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                🖼️ Lihat Foto
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    proofActionHTML = `
+                        <div class="flex flex-col gap-1">
+                            <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Bayar - ${escapeHtml(o.name)}')" class="bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                🖼️ Struk Lokal
+                            </button>
+                        </div>
+                    `;
+                }
+
                 tableHTML += `
                     <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td class="p-3.5 text-slate-500 whitespace-nowrap">
@@ -878,14 +932,7 @@
                         </td>
                         <td class="p-3.5 font-semibold text-slate-900">Rp ${o.totalPrice.toLocaleString('id-ID')}</td>
                         <td class="p-3.5">
-                            <div class="flex flex-col gap-1">
-                                <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Bayar - ${escapeHtml(o.name)}')" class="bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
-                                    🖼️ Struk
-                                </button>
-                                <button onclick="aiCheckPayment(${index})" class="bg-purple-50 text-purple-700 hover:bg-purple-100 px-2.5 py-1 rounded-lg text-[10px] font-semibold transition inline-flex items-center gap-1">
-                                    ✨ Cek AI
-                                </button>
-                            </div>
+                            ${proofActionHTML}
                         </td>
                         <td class="p-3.5">${statusBadge}</td>
                         <td class="p-3.5 text-center whitespace-nowrap">
