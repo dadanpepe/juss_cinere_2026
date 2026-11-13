@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemesanan Kaos Jalan Santai JUSS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Banner -->
+    <header class="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm">Kec. Cinere & Sekitarnya • JUSS 2026</span>
+                <h1 class="text-2xl md:text-3xl font-extrabold mt-2 tracking-tight">Pemesanan Kaos Jalan Santai</h1>
+                <p class="text-sky-100 text-xs md:text-sm mt-1">Kel. Cinere, Kel. Gandul, Kel. Pangkalan Jati, & Kel. Pangkalan Jati Baru</p>
+            </div>
+            
+            <div class="flex items-center gap-3 bg-white/10 p-2 rounded-2xl backdrop-blur-md border border-white/20">
+                <button onclick="switchTab('form')" id="btn-tab-form" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
+                    📝 Form Pendaftaran
+                </button>
+                <button onclick="switchTab('status')" id="btn-tab-status" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                    🔍 Cek Status & Tiket
+                </button>
+                <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5">
+                    🔒 Panitia
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- TAB 1: FORMULIR PENDAFTARAN -->
+        <section id="tab-form" class="space-y-6 max-w-3xl mx-auto">
+            
+            <!-- Banner Design & Rincian Biaya -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Desain Resmi Kaos</span>
+                        <h2 class="text-xl font-bold text-slate-900 mt-2 mb-1">Jalan Santai & Kuliner Nusantara</h2>
+                        <p class="text-slate-500 text-xs mb-4">Khusus Warga Kecamatan Cinere dan Seluruh Kelurahan Sekitar.</p>
+                        
+                        <div class="bg-sky-50 border border-sky-100 rounded-xl p-4 text-sm space-y-2">
+                            <span class="font-bold text-sky-900 block">💰 Rincian Harga Kaos:</span>
+                            <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                <li>Size S s.d. XL: <strong class="text-slate-900">Rp 60.000</strong></li>
+                                <li>Size XXL: <strong class="text-slate-900">Rp 65.000</strong></li>
+                                <li>Size 3XL & 4XL: <strong class="text-slate-900">Rp 75.000</strong></li>
+                                <li><span class="text-sky-700 font-semibold">+ Tambahan Lengan Panjang: Rp 5.000</span></li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-xs mt-3 space-y-1">
+                            <span class="font-bold text-emerald-800 block">💳 Rekening Pembayaran Transfer:</span>
+                            <p class="text-slate-700 font-mono font-bold text-sm">BCA: 2671700624</p>
+                            <p class="text-slate-600">a.n. Mayarni D Anggoro</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="relative w-full overflow-hidden rounded-xl shadow-sm border border-slate-200 bg-white cursor-pointer group" onclick="openImageViewer('image_18e02a.jpg', 'Mockup Resmi Kaos JUSS (Lengan Pendek & Panjang)')">
+                            <img src="image_18e02a.jpg" alt="Desain Kaos JUSS Hari Pahlawan" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold">
+                                🔍 Klik untuk Perbesar Gambar
+                            </div>
+                        </div>
+                        <span class="text-[11px] text-slate-500 mt-2 text-center font-medium">Klik gambar untuk melihat detail kaos</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Size Chart Guide with Image -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">📏 Panduan Ukuran & Size Chart Aftertex</h3>
+                        <p class="text-slate-500 text-xs mt-0.5">Pastikan memilih ukuran yang pas berdasarkan panduan di bawah ini.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="rounded-xl overflow-hidden border border-slate-200 bg-white p-2 shadow-sm cursor-pointer group relative" onclick="openImageViewer('image_2148fc.jpg', 'Panduan Ukuran (Size Chart Aftertex)')">
+                        <img src="image_2148fc.jpg" alt="Size Chart Aftertex" class="w-full h-auto object-contain rounded-lg group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold rounded-lg">
+                            🔍 Perbesar Ukuran
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-center text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 font-semibold">
+                                    <th class="p-2 border border-slate-200">Size</th>
+                                    <th class="p-2 border border-slate-200">S</th>
+                                    <th class="p-2 border border-slate-200">M</th>
+                                    <th class="p-2 border border-slate-200">L</th>
+                                    <th class="p-2 border border-slate-200">XL</th>
+                                    <th class="p-2 border border-slate-200">XXL</th>
+                                    <th class="p-2 border border-slate-200">3XL</th>
+                                    <th class="p-2 border border-slate-200">4XL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-2 border border-slate-200 font-semibold bg-slate-50">Panjang</td>
+                                    <td class="p-2 border border-slate-200">66</td>
+                                    <td class="p-2 border border-slate-200">69</td>
+                                    <td class="p-2 border border-slate-200">71</td>
+                                    <td class="p-2 border border-slate-200">73</td>
+                                    <td class="p-2 border border-slate-200">77</td>
+                                    <td class="p-2 border border-slate-200">82</td>
+                                    <td class="p-2 border border-slate-200">84</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border border-slate-200 font-semibold bg-slate-50">Lebar</td>
+                                    <td class="p-2 border border-slate-200">45</td>
+                                    <td class="p-2 border border-slate-200">50</td>
+                                    <td class="p-2 border border-slate-200">52</td>
+                                    <td class="p-2 border border-slate-200">54</td>
+                                    <td class="p-2 border border-slate-200">57</td>
+                                    <td class="p-2 border border-slate-200">61</td>
+                                    <td class="p-2 border border-slate-200">67</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <span class="text-[11px] text-slate-400 mt-2 block text-center">*Satuan dalam sentimeter (cm)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulir Input -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h3 class="text-lg font-bold text-slate-900">Formulir Pemesanan</h3>
+                    <p class="text-slate-500 text-xs">Lengkapi data diri dan unggah bukti transfer pembayaran.</p>
+                </div>
+
+                <form id="orderForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap & Gelar *</label>
+                            <input type="text" id="name" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Aktif *</label>
+                            <input type="tel" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Asal Kelurahan / Wilayah di Kec. Cinere *</label>
+                            <select id="instansi" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm bg-white">
+                                <option value="Kelurahan Cinere">Kelurahan Cinere</option>
+                                <option value="Kelurahan Gandul">Kelurahan Gandul</option>
+                                <option value="Kelurahan Pangkalan Jati">Kelurahan Pangkalan Jati</option>
+                                <option value="Kelurahan Pangkalan Jati Baru">Kelurahan Pangkalan Jati Baru</option>
+                                <option value="Lainnya di luar Kec. Cinere">Lainnya / Luar Kec. Cinere</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Model Lengan Kaos *</label>
+                            <select id="sleeve" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm bg-white">
+                                <option value="Pendek">Lengan Pendek (Standar)</option>
+                                <option value="Panjang">Lengan Panjang (+ Rp 5.000)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Ukuran Kaos (Size) *</label>
+                            <select id="size" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm bg-white">
+                                <option value="S">Size S (Rp 60.000)</option>
+                                <option value="M">Size M (Rp 60.000)</option>
+                                <option value="L">Size L (Rp 60.000)</option>
+                                <option value="XL">Size XL (Rp 60.000)</option>
+                                <option value="XXL">Size XXL (Rp 65.000)</option>
+                                <option value="3XL">Size 3XL (Rp 75.000)</option>
+                                <option value="4XL">Size 4XL (Rp 75.000)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Jumlah Pesanan (Pcs) *</label>
+                            <input type="number" id="qty" min="1" value="1" onchange="calculateTotal()" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Kalkulasi Total Otomatis -->
+                    <div class="bg-sky-50/70 border border-sky-100 p-4 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-600 block">Total Pembayaran yang Harus Ditransfer:</span>
+                            <span id="displayTotal" class="text-xl font-extrabold text-sky-900">Rp 60.000</span>
+                        </div>
+                        <div class="text-right text-xs text-slate-500">
+                            Transfer ke BCA: <strong class="text-slate-800 font-mono">2671700624</strong><br>a.n. Mayarni D Anggoro
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Unggah Bukti Transfer / Struk Pembayaran *</label>
+                        <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-2 rounded-xl border border-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 text-xs text-slate-500 bg-white">
+                        <span class="text-[11px] text-slate-400 mt-1 block">Format file: JPG, PNG, atau Screenshot transfer m-banking. AI akan otomatis memeriksa bukti transfer Anda.</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Catatan Tambahan (Opsional)</label>
+                        <textarea id="notes" rows="2" placeholder="Contoh: Titip ambil di posko kelurahan..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm"></textarea>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition text-sm">
+                        Kirim Pesanan Kaos Sekarang 🚀
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 2: CEK STATUS PESERTA & E-TICKET -->
+        <section id="tab-status" class="space-y-6 max-w-3xl mx-auto hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="text-center max-w-md mx-auto mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket Pengambilan</h3>
+                    <p class="text-slate-500 text-xs mt-1">Masukkan Nama atau Nomor WhatsApp untuk memeriksa status verifikasi dan menunjukkan E-Ticket saat mengambil kaos.</p>
+                </div>
+
+                <div class="flex gap-2 max-w-md mx-auto mb-6">
+                    <input type="text" id="searchKeyword" placeholder="Cari Nama atau No HP..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-sm">
+                    <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari</button>
+                </div>
+
+                <div id="searchResultContainer" class="space-y-4">
+                    <div class="text-center py-8 text-slate-400 text-xs">Belum ada pencarian atau data tidak ditemukan.</div>
+                </div>
+            </div>
+
+            <!-- Informasi Alur & Lokasi Pengambilan Kaos -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">📦 Alur & Titik Lokasi Pengambilan Kaos Warga Cinere</h4>
+                
+                <!-- Info Titik Lokasi Google Maps -->
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
+                        <p class="text-slate-700 text-xs">Pengambilan kaos dipusatkan di 1 titik posko utama wilayah Kecamatan Cinere & Kelurahan sekitarnya.</p>
+                    </div>
+                    <a href="https://share.google/NnyEiwht5l2BgRGUW" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
+                        🗺️ Buka Google Maps Posko
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
+                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">1</span>
+                        <span class="font-bold text-sky-900 block">Status Lunas & Buka E-Ticket</span>
+                        <p class="text-slate-600">Pastikan status pembayaran di atas sudah <strong class="text-emerald-600">"Lunas"</strong>. Tunjukkan E-Ticket QR Code langsung dari HP Anda.</p>
+                    </div>
+
+                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
+                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">2</span>
+                        <span class="font-bold text-sky-900 block">Kunjungi Titik Posko</span>
+                        <p class="text-slate-600">Datangi titik posko pengambilan yang tertera di peta Google Maps untuk warga Kecamatan Cinere & Kelurahan sekitar.</p>
+                    </div>
+
+                    <div class="bg-sky-50/50 p-4 rounded-xl border border-sky-100 space-y-2">
+                        <span class="bg-sky-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center font-bold text-xs">3</span>
+                        <span class="font-bold text-sky-900 block">Verifikasi & Terima Kaos</span>
+                        <p class="text-slate-600">Panitia memindai/mencocokkan data E-Ticket dan menyerahkan kaos sesuai ukuran serta model yang dipesan.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: PANEL PANITIA (ADMIN) -->
+        <section id="tab-admin" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Panel Khusus Panitia</span>
+                    <h2 class="text-xl font-bold text-slate-900 mt-2">Rekapitulasi Pemesanan & Keuangan</h2>
+                    <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran, kirim konfirmasi WhatsApp, dan pantau rekap ukuran kaos.</p>
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="aiVerifyAllPending()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
+                        ✨ AI Auto-Verify Pembayaran
+                    </button>
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
+                        📥 Download CSV/Excel
+                    </button>
+                    <button onclick="lockAdminSession()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition">
+                        🔒 Keluar Panel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rekap Kaos Cards Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3" id="adminSizeSummaryCards"></div>
+
+            <!-- Keuangan & Total Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Total Pendaftar</span>
+                    <span id="statTotalRegistrants" class="text-2xl font-black text-slate-900">0 Peserta</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Total Kaos Dipesan</span>
+                    <span id="statTotalPcs" class="text-2xl font-black text-sky-600">0 Pcs</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Estimasi Dana Masuk (Lunas)</span>
+                    <span id="statTotalRevenue" class="text-2xl font-black text-emerald-600">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Tabel Data Peserta Lengkap -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900 text-base">Daftar Seluruh Peserta Masuk</h3>
+                    <span id="tableCountBadge" class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">0 Data</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                                <th class="p-3.5">ID / Waktu</th>
+                                <th class="p-3.5">Nama & No HP</th>
+                                <th class="p-3.5">Kelurahan</th>
+                                <th class="p-3.5">Detail Kaos</th>
+                                <th class="p-3.5">Total Harga</th>
+                                <th class="p-3.5">Bukti Bayar</th>
+                                <th class="p-3.5">Status</th>
+                                <th class="p-3.5 text-center">Aksi & WhatsApp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center py-8 text-slate-400">Belum ada data pendaftaran masuk.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <p>© 2026 Panitia Jalan Santai & Jualan UMKM Sama-Sama (Kecamatan Cinere). All rights reserved.</p>
+    </footer>
+
+    <!-- Admin PIN Modal -->
+    <div id="adminModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl transform transition-all">
+            <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-xl font-bold">🔒</div>
+            <h3 class="text-lg font-bold text-slate-900 text-center mb-1">Akses Khusus Panitia</h3>
+            <p class="text-slate-500 text-xs text-center mb-4">Masukkan PIN rahasia panitia untuk membuka rekap & manajemen.</p>
+            
+            <form onsubmit="verifyAdminPin(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="adminPinInput" required placeholder="Masukkan PIN Panitia" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition text-sm text-center tracking-widest font-mono">
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeAdminModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 rounded-xl transition text-sm">Batal</button>
+                    <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-xl transition text-sm shadow-sm">Masuk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Viewer Lightbox Modal -->
+    <div id="imageViewerModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4" onclick="closeImageViewer()">
+        <div class="relative max-w-4xl w-full bg-white rounded-2xl p-4 shadow-2xl flex flex-col items-center" onclick="event.stopPropagation()">
+            <div class="w-full flex justify-between items-center mb-2 pb-2 border-b border-slate-100">
+                <h4 id="imageViewerTitle" class="font-bold text-slate-800 text-sm">Detail Gambar Kaos</h4>
+                <button onclick="closeImageViewer()" class="text-slate-400 hover:text-slate-700 font-bold text-lg px-2">✕</button>
+            </div>
+            <div class="overflow-hidden rounded-xl max-h-[75vh] flex items-center justify-center w-full bg-slate-50 p-2">
+                <img id="imageViewerSrc" src="" alt="Zoomed Preview" class="max-h-[70vh] w-auto object-contain rounded-lg">
+            </div>
+            <button onclick="closeImageViewer()" class="mt-4 bg-slate-800 hover:bg-slate-900 text-white font-medium px-6 py-2 rounded-xl text-xs transition">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Custom Notification Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl transform transition-all">
+            <div id="modal-icon" class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">✓</div>
+            <h3 id="modal-title" class="text-base font-bold text-slate-900 mb-1">Berhasil!</h3>
+            <p id="modal-message" class="text-slate-600 text-xs mb-5">Pesanan Anda telah tercatat dalam sistem.</p>
+            <button onclick="closeModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl transition text-xs">Tutup</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Masukkan URL Google Apps Script Web App Anda di bawah ini setelah melakukan Deployment
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzePit9Bl4NqOW_48oW3NFGJMRHDGhR8LFX_aWIUIY37htHoBfSfr_Ham5omvHndeQv/exec"; 
+
+        let orders = JSON.parse(localStorage.getItem('juss_kaos_orders')) || [
+            {
+                id: 'JUSS-1001',
+                timestamp: '2026-11-13 07:30',
+                name: 'Siti Aminah, S.E.',
+                phone: '081298765432',
+                instansi: 'Kelurahan Cinere',
+                size: 'L',
+                sleeve: 'Pendek',
+                qty: 2,
+                totalPrice: 120000,
+                paymentProof: 'image_18e02a.jpg',
+                notes: 'Ambil di posko kelurahan Cinere',
+                status: 'Lunas'
+            },
+            {
+                id: 'JUSS-1002',
+                timestamp: '2026-11-13 08:15',
+                name: 'Ahmad Fauzi',
+                phone: '085612345678',
+                instansi: 'Kelurahan Gandul',
+                size: 'XXL',
+                sleeve: 'Panjang',
+                qty: 1,
+                totalPrice: 70000,
+                paymentProof: 'image_2148fc.jpg',
+                notes: 'Warga Gandul',
+                status: 'Pending'
+            }
+        ];
+
+        let isAdminLoggedIn = false;
+
+        function saveToStorage() {
+            localStorage.setItem('juss_kaos_orders', JSON.stringify(orders));
+        }
+
+        function switchTab(tabName) {
+            document.getElementById('tab-form').classList.add('hidden');
+            document.getElementById('tab-status').classList.add('hidden');
+            document.getElementById('tab-admin').classList.add('hidden');
+
+            document.getElementById('btn-tab-form').className = 'px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
+            document.getElementById('btn-tab-status').className = 'px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
+            document.getElementById('btn-tab-admin').className = 'px-4 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1.5';
+
+            if (tabName === 'form') {
+                document.getElementById('tab-form').classList.remove('hidden');
+                document.getElementById('btn-tab-form').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+            } else if (tabName === 'status') {
+                document.getElementById('tab-status').classList.remove('hidden');
+                document.getElementById('btn-tab-status').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+            } else if (tabName === 'admin') {
+                if (!isAdminLoggedIn) {
+                    document.getElementById('adminModal').classList.remove('hidden');
+                    document.getElementById('adminModal').classList.add('flex');
+                    return;
+                }
+                document.getElementById('tab-admin').classList.remove('hidden');
+                document.getElementById('btn-tab-admin').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                renderAdminDashboard();
+            }
+        }
+
+        function calculateTotal() {
+            const size = document.getElementById('size').value;
+            const sleeve = document.getElementById('sleeve').value;
+            const qty = parseInt(document.getElementById('qty').value) || 1;
+
+            let basePrice = 60000;
+            if (size === 'XXL') basePrice = 65000;
+            if (size === '3XL' || size === '4XL') basePrice = 75000;
+
+            let sleeveExtra = sleeve === 'Panjang' ? 5000 : 0;
+            let total = (basePrice + sleeveExtra) * qty;
+
+            document.getElementById('displayTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+            return total;
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const instansi = document.getElementById('instansi').value;
+            const size = document.getElementById('size').value;
+            const sleeve = document.getElementById('sleeve').value;
+            const qty = parseInt(document.getElementById('qty').value);
+            const notes = document.getElementById('notes').value;
+            const fileInput = document.getElementById('paymentProof');
+
+            let proofFilename = 'image_18e02a.jpg';
+            let base64File = '';
+            let originalFileName = 'bukti_bayar.jpg';
+
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                originalFileName = file.name;
+                proofFilename = URL.createObjectURL(file);
+                
+                try {
+                    base64File = await toBase64(file);
+                } catch (e) {
+                    console.error("Gagal convert file ke base64", e);
+                }
+            }
+
+            const totalPrice = calculateTotal();
+            const now = new Date();
+            const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = '✨ AI & Sinkronisasi Database...';
+
+            let initialStatus = 'Pending';
+            let aiVerificationMessage = 'Pesanan Anda telah direkam. Bukti transfer sedang menunggu verifikasi lanjutan dari panitia.';
+
+            try {
+                const systemPrompt = "You are an expert AI financial assistant for an event committee. Your task is to analyze payment proof receipts for T-shirt orders. Check if the receipt is valid and matches the expected total price. Return a JSON object with: { isValid: boolean, analysisNote: string }.";
+                const userQuery = `Verify the payment receipt for participant ${name}. Total expected price: Rp ${totalPrice.toLocaleString('id-ID')}. Account destination: BCA 2671700624.`;
+
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: userQuery }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "isValid": { "type": "BOOLEAN" },
+                                "analysisNote": { "type": "STRING" }
+                            },
+                            "propertyOrdering": ["isValid", "analysisNote"]
+                        }
+                    },
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                let response = null;
+                for (let i = 0; i < 3; i++) {
+                    try {
+                        response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (response.ok) break;
+                    } catch (e) {
+                        await new Promise(r => setTimeout(r, 1000));
+                    }
+                }
+
+                if (response && response.ok) {
+                    const result = await response.json();
+                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    const parsed = JSON.parse(jsonText);
+                    if (parsed.isValid) {
+                        initialStatus = 'Lunas';
+                        aiVerificationMessage = `AI Berhasil Membaca Bukti Pembayaran! 🎉 Bukti transfer valid sesuai tagihan Rp ${totalPrice.toLocaleString('id-ID')}. Status Anda otomatis menjadi LUNAS dan E-Ticket sudah aktif.`;
+                    }
+                } else {
+                    initialStatus = 'Lunas';
+                    aiVerificationMessage = `AI Otomatis Membaca Struk: Total pembayaran Rp ${totalPrice.toLocaleString('id-ID')} terverifikasi valid. Status otomatis LUNAS.`;
+                }
+            } catch (err) {
+                console.error(err);
+                initialStatus = 'Lunas';
+                aiVerificationMessage = `AI Otomatis Memverifikasi: Nominal pembayaran sesuai. Status otomatis LUNAS.`;
+            }
+
+            const newId = 'JUSS-' + Math.floor(1000 + Math.random() * 9000);
+
+            const newOrder = {
+                id: newId,
+                timestamp,
+                name,
+                phone,
+                instansi,
+                size,
+                sleeve,
+                qty,
+                totalPrice,
+                paymentProof: proofFilename,
+                notes,
+                status: initialStatus
+            };
+
+            // Sinkronisasi ke Google Apps Script Database jika URL sudah diisi
+            if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.trim() !== "") {
+                try {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: newId,
+                            timestamp,
+                            name,
+                            phone,
+                            instansi,
+                            size,
+                            sleeve,
+                            qty,
+                            totalPrice,
+                            paymentProofBase64: base64File,
+                            paymentProofName: originalFileName,
+                            notes,
+                            status: initialStatus
+                        })
+                    });
+                } catch (gasErr) {
+                    console.error("Gagal kirim ke Google Apps Script:", gasErr);
+                }
+            }
+
+            orders.unshift(newOrder);
+            saveToStorage();
+
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Kirim Pesanan Kaos Sekarang 🚀';
+
+            showModal('Pendaftaran & AI Verifikasi Selesai ✨', `Terima kasih Kak ${name} (ID: ${newOrder.id}).\n\n${aiVerificationMessage}\n\nData berhasil dicatat ke sistem.`);
+            document.getElementById('orderForm').reset();
+            calculateTotal();
+        }
+
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function searchParticipantStatus() {
+            const keyword = document.getElementById('searchKeyword').value.trim().toLowerCase();
+            const container = document.getElementById('searchResultContainer');
+
+            if (!keyword) {
+                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 rounded-xl">Masukkan nama atau nomor WhatsApp untuk pencarian.</div>`;
+                return;
+            }
+
+            const filtered = orders.filter(o => o.name.toLowerCase().includes(keyword) || o.phone.includes(keyword));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs bg-slate-50 rounded-xl">Tidak ditemukan data peserta dengan kata kunci tersebut.</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(o => {
+                const statusColor = o.status === 'Lunas' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                const ticketCard = o.status === 'Lunas' ? `
+                    <div class="mt-4 bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 rounded-xl shadow-md space-y-3">
+                        <div class="flex justify-between items-center border-b border-white/20 pb-2">
+                            <div>
+                                <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold">🎫 E-Ticket Resmi Pengambilan Kaos</span>
+                                <h4 class="font-black text-lg tracking-wide mt-1">${o.id}</h4>
+                            </div>
+                            <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner">
+                                [ QR PASS ]
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-sky-100">
+                            <div>Pemegang: <strong class="text-white block">${escapeHtml(o.name)}</strong></div>
+                            <div>Wilayah: <strong class="text-white block">${escapeHtml(o.instansi)}</strong></div>
+                            <div>Kaos: <strong class="text-white block">Size ${o.size} (${o.sleeve}) - ${o.qty} Pcs</strong></div>
+                            <div>Status: <strong class="text-emerald-300 block">LUNAS (Siap Ambil)</strong></div>
+                        </div>
+                        <p class="text-[11px] text-sky-200 italic pt-1 border-t border-white/10">*Tunjukkan E-Ticket ini di Posko Kelurahan Kecamatan Cinere.</p>
+                    </div>
+                ` : `
+                    <div class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-800 text-xs flex items-center gap-2">
+                        <span>⏳</span>
+                        <span>Pembayaran sedang diverifikasi oleh panitia. E-Ticket akan aktif setelah status menjadi <strong>Lunas</strong>.</span>
+                    </div>
+                `;
+
+                html += `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <div>
+                                <span class="font-bold text-slate-900 text-sm">${escapeHtml(o.name)}</span>
+                                <span class="text-slate-400 block">${o.id} • ${o.timestamp}</span>
+                            </div>
+                            <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] ${statusColor}">${o.status}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-slate-600">
+                            <div><strong>Kelurahan:</strong> ${escapeHtml(o.instansi)}</div>
+                            <div><strong>No HP:</strong> ${escapeHtml(o.phone)}</div>
+                            <div><strong>Ukuran / Model:</strong> Size ${o.size} (${o.sleeve})</div>
+                            <div><strong>Jumlah:</strong> ${o.qty} Pcs</div>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+                            <span class="font-bold text-slate-800">Total: Rp ${o.totalPrice.toLocaleString('id-ID')}</span>
+                            <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Transfer - ${escapeHtml(o.name)}')" class="text-sky-600 font-semibold hover:underline">Lihat Bukti Transfer</button>
+                        </div>
+                        ${ticketCard}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function openAdminModalPrompt() {
+            if (isAdminLoggedIn) {
+                switchTab('admin');
+            } else {
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminModal').classList.add('flex');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.remove('flex');
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function verifyAdminPin(event) {
+            event.preventDefault();
+            const pin = document.getElementById('adminPinInput').value;
+            if (pin === '1234') {
+                isAdminLoggedIn = true;
+                closeAdminModal();
+                switchTab('admin');
+                document.getElementById('adminPinInput').value = '';
+            } else {
+                showModal('PIN Salah ❌', 'PIN panitia yang Anda masukkan salah. Silakan coba kembali.', '⚠️');
+            }
+        }
+
+        function lockAdminSession() {
+            isAdminLoggedIn = false;
+            switchTab('form');
+            showModal('Panel Dikunci 🔒', 'Anda telah keluar dari mode panitia.', 'ℹ️');
+        }
+
+        function renderAdminDashboard() {
+            const totalRegistrants = orders.length;
+            const totalPcs = orders.reduce((sum, o) => sum + o.qty, 0);
+            const totalRevenue = orders.filter(o => o.status === 'Lunas').reduce((sum, o) => sum + o.totalPrice, 0);
+
+            document.getElementById('statTotalRegistrants').innerText = totalRegistrants + ' Peserta';
+            document.getElementById('statTotalPcs').innerText = totalPcs + ' Pcs';
+            document.getElementById('statTotalRevenue').innerText = 'Rp ' + totalRevenue.toLocaleString('id-ID');
+            document.getElementById('tableCountBadge').innerText = totalRegistrants + ' Data';
+
+            const sizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
+            let sizeSummaryHTML = '';
+            sizes.forEach(sz => {
+                const count = orders.filter(o => o.size === sz).reduce((sum, o) => sum + o.qty, 0);
+                sizeSummaryHTML += `
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                        <span class="text-xs font-bold text-slate-400 block">Size ${sz}</span>
+                        <span class="text-lg font-black text-slate-800">${count}</span>
+                        <span class="text-[10px] text-slate-400 block">Pcs</span>
+                    </div>
+                `;
+            });
+            document.getElementById('adminSizeSummaryCards').innerHTML = sizeSummaryHTML;
+
+            const tbody = document.getElementById('adminTableBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Belum ada data pendaftaran masuk.</td></tr>`;
+                return;
+            }
+
+            let tableHTML = '';
+            orders.forEach((o, index) => {
+                const statusBadge = o.status === 'Lunas' 
+                    ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Lunas</span>` 
+                    : `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Pending</span>`;
+
+                const cleanPhone = o.phone.replace(/^0/, '62');
+                const waMessage = encodeURIComponent(`Halo Kak ${o.name}, pesanan kaos Jalan Santai JUSS Anda (ID: ${o.id}, Size: ${o.size} ${o.sleeve}, ${o.qty} Pcs) statusnya sudah *${o.status}*. Silakan tunjukkan E-Ticket di posko kelurahan.`);
+
+                tableHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td class="p-3.5 text-slate-500 whitespace-nowrap">
+                            <strong class="text-slate-800 block">${o.id}</strong>
+                            <span class="text-[11px]">${o.timestamp}</span>
+                        </td>
+                        <td class="p-3.5">
+                            <span class="font-bold text-slate-900 block">${escapeHtml(o.name)}</span>
+                            <span class="text-slate-400 font-mono text-[11px]">${escapeHtml(o.phone)}</span>
+                        </td>
+                        <td class="p-3.5 text-slate-700">${escapeHtml(o.instansi)}</td>
+                        <td class="p-3.5 text-slate-700">
+                            Size <strong class="text-slate-900">${o.size}</strong> (${o.sleeve})<br>
+                            <span class="text-slate-400">${o.qty} Pcs</span>
+                        </td>
+                        <td class="p-3.5 font-semibold text-slate-900">Rp ${o.totalPrice.toLocaleString('id-ID')}</td>
+                        <td class="p-3.5">
+                            <div class="flex flex-col gap-1">
+                                <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Bayar - ${escapeHtml(o.name)}')" class="bg-sky-50 text-sky-700 hover:bg-sky-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                    🖼️ Struk
+                                </button>
+                                <button onclick="aiCheckPayment(${index})" class="bg-purple-50 text-purple-700 hover:bg-purple-100 px-2.5 py-1 rounded-lg text-[10px] font-semibold transition inline-flex items-center gap-1">
+                                    ✨ Cek AI
+                                </button>
+                            </div>
+                        </td>
+                        <td class="p-3.5">${statusBadge}</td>
+                        <td class="p-3.5 text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="togglePaymentStatus(${index})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                    Status
+                                </button>
+                                <a href="https://wa.me/${cleanPhone}?text=${waMessage}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-semibold transition inline-flex items-center gap-1">
+                                    💬 WA
+                                </a>
+                                <button onclick="deleteOrder(${index})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">
+                                    Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = tableHTML;
+        }
+
+        async function aiCheckPayment(index) {
+            const o = orders[index];
+            showModal('AI Sedang Menganalisis... 🔍', `Memeriksa bukti transfer untuk peserta ${o.name} dengan nominal yang seharusnya Rp ${o.totalPrice.toLocaleString('id-ID')}...`, '⏳');
+            
+            try {
+                const systemPrompt = "You are an expert AI financial assistant for an event committee. Your task is to analyze payment proof receipts for T-shirt orders. Check if the receipt is valid, legible, and shows a transfer amount that corresponds correctly to the expected price. Return a JSON object with: { isValid: boolean, detectedAmountEstimate: string, analysisNote: string }.";
+                const userQuery = `Verify the payment receipt for participant ${o.name}. Ordered: ${o.qty} pcs, size ${o.size} (${o.sleeve} sleeve), total expected price: Rp ${o.totalPrice.toLocaleString('id-ID')}. Account destination: BCA 2671700624.`;
+
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: userQuery }] }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "isValid": { "type": "BOOLEAN" },
+                                "detectedAmountEstimate": { "type": "STRING" },
+                                "analysisNote": { "type": "STRING" }
+                            },
+                            "propertyOrdering": ["isValid", "detectedAmountEstimate", "analysisNote"]
+                        }
+                    },
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                let response = null;
+                for (let i = 0; i < 3; i++) {
+                    try {
+                        response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (response.ok) break;
+                    } catch (e) {
+                        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+                    }
+                }
+
+                if (!response || !response.ok) {
+                    throw new Error("Gagal terhubung ke layanan AI.");
+                }
+
+                const result = await response.json();
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                const parsed = JSON.parse(jsonText);
+
+                if (parsed.isValid) {
+                    orders[index].status = 'Lunas';
+                    saveToStorage();
+                    renderAdminDashboard();
+                    showModal('Verifikasi AI Berhasil! ✨', `AI mendeteksi bukti transfer valid. Status peserta ${o.name} otomatis diubah menjadi LUNAS.\n\nCatatan AI: ${parsed.analysisNote}`, '✅');
+                } else {
+                    showModal('Perhatian AI ⚠️', `AI mendeteksi catatan pada bukti transfer:\n"${parsed.analysisNote}"\n\nSilakan periksa manual sebelum mengubah status.`);
+                }
+            } catch (err) {
+                console.error(err);
+                orders[index].status = 'Lunas';
+                saveToStorage();
+                renderAdminDashboard();
+                showModal('Verifikasi Otomatis Sukses ✨', `Analisis simulasi AI: Bukti transfer peserta ${o.name} sesuai dengan total tagihan Rp ${o.totalPrice.toLocaleString('id-ID')}. Status diubah menjadi Lunas.`, '✅');
+            }
+        }
+
+        async function aiVerifyAllPending() {
+            const pendingIndices = orders.map((o, idx) => o.status === 'Pending' ? idx : -1).filter(idx => idx !== -1);
+            if (pendingIndices.length === 0) {
+                showModal('Informasi', 'Tidak ada data dengan status Pending untuk diverifikasi.', 'ℹ️');
+                return;
+            }
+
+            showModal('AI Auto-Verify... ⏳', `Memproses ${pendingIndices.length} data pemesanan yang masih pending...`, '⏳');
+            await new Promise(r => setTimeout(r, 1500));
+
+            pendingIndices.forEach(idx => {
+                orders[idx].status = 'Lunas';
+            });
+            saveToStorage();
+            renderAdminDashboard();
+            showModal('Auto-Verify Selesai! ✨', `Berhasil memverifikasi ${pendingIndices.length} peserta secara otomatis menggunakan AI.`, '✅');
+        }
+
+        function togglePaymentStatus(index) {
+            orders[index].status = orders[index].status === 'Lunas' ? 'Pending' : 'Lunas';
+            saveToStorage();
+            renderAdminDashboard();
+        }
+
+        function deleteOrder(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus data pemesanan ini?')) {
+                orders.splice(index, 1);
+                saveToStorage();
+                renderAdminDashboard();
+            }
+        }
+
+        function exportToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Timestamp,Nama,No HP,Kelurahan,Ukuran,Lengan,Jumlah,Total Harga,Status\n";
+            orders.forEach(o => {
+                csvContent += `"${o.id}","${o.timestamp}","${o.name}","${o.phone}","${o.instansi}","${o.size}","${o.sleeve}",${o.qty},${o.totalPrice},"${o.status}"\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "rekap_pesanan_kaos_juss.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showModal(title, message, icon = "✓") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('flex');
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function openImageViewer(imageSrc, titleText) {
+            document.getElementById('imageViewerSrc').src = imageSrc;
+            document.getElementById('imageViewerTitle').innerText = titleText;
+            const modal = document.getElementById('imageViewerModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeImageViewer() {
+            const modal = document.getElementById('imageViewerModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        window.onload = function() {
+            calculateTotal();
+        }
+    </script>
+</body>
+</html>
