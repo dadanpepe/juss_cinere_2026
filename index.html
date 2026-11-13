@@ -19,6 +19,7 @@
             Selamat datang di portal resmi Pemesanan Kaos & Lomba Mewarnai Hari Pahlawan JUSS UMKM Kec. Cinere 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23. Lomba mewarnai di Halaman Parkir Mall Cinere (Sabtu, 28 November 2026).
         </marquee>
     </div>
+
     <!-- Header Banner -->
     <header class="relative bg-slate-900 text-white shadow-lg overflow-hidden">
         <div class="absolute inset-0 z-0">
@@ -35,19 +36,19 @@
             
             <div class="flex items-center gap-2 bg-black/30 p-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg flex-wrap justify-center">
                 <button onclick="switchTab('beranda')" id="btn-tab-beranda" class="px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
-                    🏠 Beranda
+                     Beranda
                 </button>
                 <button onclick="switchTab('form')" id="btn-tab-form" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
-                    🚶‍♂️ Jalan Santai
+                     Jalan Santai
                 </button>
                 <button onclick="switchTab('mewarnai')" id="btn-tab-mewarnai" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
-                    🎨 Lomba Mewarnai
+                     Lomba Mewarnai
                 </button>
                 <button onclick="switchTab('status')" id="btn-tab-status" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
-                    🔍 Cek Status & Tiket
+                     Cek Status & Tiket
                 </button>
                 <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1">
-                    🔒 Panitia
+                     Panitia
                 </button>
             </div>
         </div>
@@ -56,7 +57,7 @@
     <!-- Main Container -->
     <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
 
-        <!-- TAB 0: BERANDA (SLIDER POSTER ACARA DENGAN EFEK KACA / BLUR BACKGROUND) -->
+        <!-- TAB 0: BERANDA (SLIDER POSTER ACARA) -->
         <section id="tab-beranda" class="space-y-6 max-w-4xl mx-auto">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center space-y-3">
                 <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Selamat Datang di Portal Resmi JUSS 2026</span>
@@ -64,48 +65,36 @@
                 <p class="text-slate-600 text-xs md:text-sm max-w-2xl mx-auto">Saksikan dan ikuti rangkaian acara Hari Pahlawan 2026. Geser otomatis atau gunakan tombol navigasi pada poster di bawah ini untuk melihat detail informasi.</p>
             </div>
 
-            <!-- Poster Carousel / Slider Otomatis dengan Efek Kaca / Blur Background pada Area Kosong -->
+            <!-- Poster Carousel / Slider Otomatis -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 relative overflow-hidden">
-                <div class="relative w-full overflow-hidden rounded-xl shadow-md bg-slate-950 min-h-[380px] md:min-h-[500px] flex items-center justify-center">
+                <div class="relative w-full overflow-hidden rounded-xl shadow-md bg-slate-900 min-h-[350px] md:min-h-[480px] flex items-center justify-center">
                     
                     <!-- Slide 1 -->
-                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 flex items-center justify-center overflow-hidden" data-index="0">
-                        <!-- Background Blur Effect untuk Samping yang Kosong -->
-                        <div class="absolute inset-0 bg-cover bg-center filter blur-xl scale-110 opacity-50 brightness-75 pointer-events-none" style="background-image: url('WhatsApp Image 2026-11-13 at 15.19.10.jpeg');"></div>
-                        <div class="absolute inset-0 bg-black/30 backdrop-blur-md"></div>
-                        <!-- Poster Utama -->
-                        <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Poster+Utama+JUSS+2026';" class="relative z-10 max-h-[460px] w-auto object-contain rounded-lg shadow-2xl cursor-pointer" onclick="openImageViewer(this.src, 'Poster Utama JUSS 2026')">
-                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 flex flex-col items-center justify-center p-2" data-index="0">
+                        <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Poster+Utama+JUSS+2026';" class="max-h-[420px] w-auto object-contain rounded-lg cursor-pointer" onclick="openImageViewer(this.src, 'Poster Utama JUSS 2026')">
+                        <div class="absolute bottom-3 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
                             1 / 3 • Poster Utama Acara JUSS 2026
                         </div>
                     </div>
 
                     <!-- Slide 2 -->
-                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex items-center justify-center overflow-hidden" data-index="1">
-                        <!-- Background Blur Effect untuk Samping yang Kosong -->
-                        <div class="absolute inset-0 bg-cover bg-center filter blur-xl scale-110 opacity-50 brightness-75 pointer-events-none" style="background-image: url('mewarnai.jpeg');"></div>
-                        <div class="absolute inset-0 bg-black/30 backdrop-blur-md"></div>
-                        <!-- Poster Utama -->
-                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/334155/ffffff?text=Poster+Lomba+Mewarnai';" class="relative z-10 max-h-[460px] w-auto object-contain rounded-lg shadow-2xl cursor-pointer" onclick="openImageViewer(this.src, 'Poster Lomba Mewarnai Anak')">
-                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex flex-col items-center justify-center p-2" data-index="1">
+                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/334155/ffffff?text=Poster+Lomba+Mewarnai';" class="max-h-[420px] w-auto object-contain rounded-lg cursor-pointer" onclick="openImageViewer(this.src, 'Poster Lomba Mewarnai Anak')">
+                        <div class="absolute bottom-3 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
                             2 / 3 • Poster Lomba Mewarnai Anak Mall Cinere
                         </div>
                     </div>
 
                     <!-- Slide 3 -->
-                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex items-center justify-center overflow-hidden" data-index="2">
-                        <!-- Background Blur Effect untuk Samping yang Kosong -->
-                        <div class="absolute inset-0 bg-cover bg-center filter blur-xl scale-110 opacity-50 brightness-75 pointer-events-none" style="background-image: url('kaos.jpeg');"></div>
-                        <div class="absolute inset-0 bg-black/30 backdrop-blur-md"></div>
-                        <!-- Poster Utama -->
-                        <img src="kaos.jpeg" alt="Mockup Kaos Jalan Santai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Mockup+Kaos+Jalan+Santai';" class="relative z-10 max-h-[460px] w-auto object-contain rounded-lg shadow-2xl cursor-pointer" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
-                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex flex-col items-center justify-center p-2" data-index="2">
+                        <img src="kaos.jpeg" alt="Mockup Kaos Jalan Santai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Mockup+Kaos+Jalan+Santai';" class="max-h-[420px] w-auto object-contain rounded-lg cursor-pointer" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
+                        <div class="absolute bottom-3 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
                             3 / 3 • Mockup & Size Chart Kaos Jalan Santai
                         </div>
                     </div>
 
-                    <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❮</button>
-                    <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❯</button>
+                    <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❮</button>
+                    <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❯</button>
                 </div>
 
                 <div class="flex justify-center gap-2 mt-4" id="carouselDots">
@@ -123,7 +112,7 @@
                         <p class="text-xs text-white mt-1 font-medium">Dapatkan kaos eksklusif Jalan Santai & Kuliner Nusantara JUSS 2026. Tersedia berbagai ukuran lengkap dengan opsi lengan panjang.</p>
                     </div>
                     <button onclick="switchTab('form')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-sm self-start">
-                        Pesan Kaos Sekarang 👕
+                        Pesan Kaos Sekarang 
                     </button>
                 </div>
 
@@ -134,7 +123,7 @@
                         <p class="text-xs text-white mt-1 font-medium">Tunjukkan bakat si kecil di Mall Cinere pada 28 November 2026. Hadiah menarik menanti!</p>
                     </div>
                     <button onclick="switchTab('mewarnai')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-sm self-start">
-                        Daftar Lomba Mewarnai 🎨
+                        Daftar Lomba Mewarnai 
                     </button>
                 </div>
             </div>
@@ -171,7 +160,7 @@
                 <!-- Mockup Kaos di Sebelah Kanan dengan Gaya Kotak Rapi -->
                 <div class="bg-slate-50 border border-slate-200 p-6 rounded-xl flex items-center justify-center w-full lg:w-80 shadow-inner shrink-0">
                     <div class="flex flex-col items-center">
-                        <img src="kaos.jpeg" alt="Mockup Kaos" onerror="this.src='https://placehold.co/400x400/0284c7/ffffff?text=Mockup+Kaos';" class="max-h-72 w-auto object-contain rounded-lg cursor-pointer shadow-sm" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
+                        <img src="bajudoang" alt="Mockup Kaos" onerror="this.src='https://placehold.co/400x400/0284c7/ffffff?text=Mockup+Kaos';" class="max-h-72 w-auto object-contain rounded-lg cursor-pointer shadow-sm" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
                         <span class="text-[11px] text-slate-500 mt-3 font-medium block">Klik gambar untuk melihat detail kaos</span>
                     </div>
                 </div>
@@ -364,7 +353,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Orang Tua / Pendamping *</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Orang Tua / Pendamping </label>
                             <input type="text" id="namaOrtu" required placeholder="Contoh: Ibu Siti" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
                         </div>
                     </div>
@@ -425,10 +414,10 @@
                 </div>
                 <div class="flex gap-2 flex-wrap">
                     <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm">
-                        📥 Download CSV Kaos
+                         Download CSV Kaos
                     </button>
                     <button onclick="lockAdminSession()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition">
-                        🔒 Keluar Panel
+                         Keluar Panel
                     </button>
                 </div>
             </div>
@@ -445,10 +434,10 @@
             <!-- Sub-Tab Panitia Selector -->
             <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl max-w-md">
                 <button onclick="switchAdminSubTab('kaos')" id="btn-subadmin-kaos" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
-                    👕 Pemesanan Kaos Jalan Santai
+                     Pemesanan Kaos Jalan Santai
                 </button>
                 <button onclick="switchAdminSubTab('mewarnai')" id="btn-subadmin-mewarnai" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">
-                    🎨 Lomba Mewarnai Anak
+                     Lomba Mewarnai Anak
                 </button>
             </div>
 
