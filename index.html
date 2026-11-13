@@ -247,45 +247,34 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center space-y-4">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Didukung Oleh Mitra & Sponsor Resmi</span>
                 
-                <!-- Sponsor Slider Container -->
-                <div class="relative w-full overflow-hidden rounded-xl bg-slate-50 p-4 border border-slate-200 shadow-inner min-h-[140px] flex items-center justify-center">
-                    
-                    <!-- Sponsor Slide 1 -->
-                    <div class="sponsor-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 flex items-center justify-center gap-6" data-sponsor-index="0">
-                        <div class="flex flex-col items-center justify-center">
-                            <img src="kotadepok.png" alt="Logo Kota Depok" onerror="this.src='https://placehold.co/100x100/0284c7/ffffff?text=Kota+Depok';" class="max-h-20 w-auto object-contain cursor-pointer" onclick="openImageViewer(this.src, 'Logo Kota Depok')">
+                <!-- Sponsor Container dengan Deteksi Otomatis Lebih dari 5 Logo -->
+                <div class="relative w-full overflow-hidden rounded-xl bg-slate-50 py-5 px-2 border border-slate-200 shadow-inner flex items-center" id="sponsorContainerWrapper">
+                    <div id="sponsorTrack" class="flex gap-8 items-center whitespace-nowrap w-full overflow-x-auto scrollbar-none py-2">
+                        <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
+                            <img src="kotadepok.png" alt="Logo Kota Depok" onerror="this.src='https://placehold.co/100x100/0284c7/ffffff?text=Kota+Depok';" class="max-h-16 w-auto object-contain cursor-pointer" onclick="openImageViewer(this.src, 'Logo Kota Depok')">
                             <span class="font-bold text-slate-700 text-xs mt-1">Kota Depok</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center">
-                            <img src="cineremall.jpg" alt="Mal Cinere" onerror="this.src='https://placehold.co/100x100/334155/ffffff?text=Mal+Cinere';" class="max-h-20 w-auto object-contain cursor-pointer rounded-full" onclick="openImageViewer(this.src, 'Logo Mal Cinere')">
+                        <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
+                            <img src="cineremall.jpg" alt="Mal Cinere" onerror="this.src='https://placehold.co/100x100/334155/ffffff?text=Mal+Cinere';" class="max-h-16 w-auto object-contain cursor-pointer rounded-full" onclick="openImageViewer(this.src, 'Logo Mal Cinere')">
                             <span class="font-bold text-slate-700 text-xs mt-1">Mal Cinere</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center">
-                            <img src="keccinere.jpg" alt="Kantor Kecamatan Cinere" onerror="this.src='https://placehold.co/100x100/0f172a/ffffff?text=Kec.+Cinere';" class="max-h-20 w-auto object-contain cursor-pointer rounded-lg" onclick="openImageViewer(this.src, 'Kantor Kecamatan Cinere')">
+                        <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
+                            <img src="keccinere.jpg" alt="Kantor Kecamatan Cinere" onerror="this.src='https://placehold.co/100x100/0f172a/ffffff?text=Kec.+Cinere';" class="max-h-16 w-auto object-contain cursor-pointer rounded-lg" onclick="openImageViewer(this.src, 'Kantor Kecamatan Cinere')">
                             <span class="font-bold text-slate-700 text-xs mt-1">Kecamatan Cinere</span>
                         </div>
-                    </div>
-
-                    <!-- Sponsor Slide 2 (Contoh sponsor tambahan agar slider otomatis aktif) -->
-                    <div class="sponsor-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex items-center justify-center gap-6" data-sponsor-index="1">
-                        <div class="flex flex-col items-center justify-center">
-                            <img src="https://placehold.co/100x100/0284c7/ffffff?text=UMKM+Depok" alt="UMKM Depok" class="max-h-20 w-auto object-contain cursor-pointer rounded-lg">
+                        <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
+                            <img src="polsekcinere.jpg" alt="Humas Polsek Cinere" onerror="this.src='https://placehold.co/100x100/dc2626/ffffff?text=Polsek+Cinere';" class="max-h-16 w-auto object-contain cursor-pointer rounded-lg" onclick="openImageViewer(this.src, 'Logo Humas Polsek Cinere')">
+                            <span class="font-bold text-slate-700 text-xs mt-1">Humas Polsek Cinere</span>
+                        </div>
+                        <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
+                            <img src="https://placehold.co/100x100/0284c7/ffffff?text=UMKM+Depok" alt="UMKM Depok" class="max-h-16 w-auto object-contain cursor-pointer rounded-lg">
                             <span class="font-bold text-slate-700 text-xs mt-1">UMKM Juara Depok</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center">
-                            <img src="https://placehold.co/100x100/d97706/ffffff?text=JS+Coffee" alt="JS Coffee" class="max-h-20 w-auto object-contain cursor-pointer rounded-lg">
+                        <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
+                            <img src="https://placehold.co/100x100/d97706/ffffff?text=JS+Coffee" alt="JS Coffee" class="max-h-16 w-auto object-contain cursor-pointer rounded-lg">
                             <span class="font-bold text-slate-700 text-xs mt-1">JS Coffee & Kedai Biru</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center">
-                            <img src="https://placehold.co/100x100/4f46e5/ffffff?text=Sponsor+Lain" alt="Sponsor Lain" class="max-h-20 w-auto object-contain cursor-pointer rounded-lg">
-                            <span class="font-bold text-slate-700 text-xs mt-1">Mitra Kolaborasi</span>
-                        </div>
                     </div>
-
-                </div>
-                <div class="flex justify-center gap-1.5 mt-2" id="sponsorDots">
-                    <button onclick="currentSponsorSlide(0)" class="w-2.5 h-2.5 rounded-full bg-sky-600 transition" id="sponsor-dot-0"></button>
-                    <button onclick="currentSponsorSlide(1)" class="w-2.5 h-2.5 rounded-full bg-slate-300 transition" id="sponsor-dot-1"></button>
                 </div>
             </div>
         </section>
@@ -1259,7 +1248,6 @@
 
             filteredMewarnai.forEach(m => {
                 let rawOrtu = String(m.ortu || m["Nama Orang Tua"] || 'Orang Tua');
-                let maskedOrtu = rawOrtu.length > 2 ? rawOrtu[0] + '*'.repeat(rawOrtu.length - 2) + rawOrtu[rawOrtu.length - 1] : rawOrtu;
                 let rawPhoneMewarnai = String(m.phone || m["No HP / WhatsApp"] || '');
                 let maskedPhoneMewarnai = rawPhoneMewarnai.length > 4 ? rawPhoneMewarnai.substring(0, 4) + '****' + rawPhoneMewarnai.substring(rawPhoneMewarnai.length - 2) : '****';
                 let kategoriAnak = m.kategori || m["Kategori"] || 'TK A';
@@ -1280,7 +1268,7 @@
                             <div><strong>Asal Sekolah:</strong> ${escapeHtml(sekolahAnak)}</div>
                             <div><strong>Kategori:</strong> ${escapeHtml(kategoriAnak)}</div>
                             <div><strong>Alamat:</strong> ${escapeHtml(alamatAnak)}</div>
-                            <div><strong>Pendamping:</strong> ${escapeHtml(maskedOrtu)}</div>
+                            <div><strong>Pendamping:</strong> ${escapeHtml(rawOrtu)}</div>
                             <div><strong>No HP:</strong> <span class="font-mono bg-sky-600 px-1.5 py-0.5 rounded text-white">${maskedPhoneMewarnai}</span></div>
                         </div>
                         
@@ -1546,8 +1534,28 @@
             fetchOrdersFromGoogleSheets();
             showSlide(0);
             startSlideShow();
-            showSponsorSlide(0);
-            startSponsorSlideShow();
+
+            // Cek jumlah item sponsor (jika lebih dari 5, aktifkan animasi papan berjalan otomatis)
+            const sponsorTrack = document.getElementById('sponsorTrack');
+            if (sponsorTrack) {
+                const sponsorItems = sponsorTrack.querySelectorAll('.sponsor-item');
+                if (sponsorItems.length > 5) {
+                    sponsorTrack.style.display = 'flex';
+                    sponsorTrack.style.justifyContent = 'space-around';
+                    sponsorTrack.style.alignItems = 'center';
+                    sponsorTrack.classList.add('animate-marquee');
+                } else {
+                    sponsorTrack.style.display = 'flex';
+                    sponsorTrack.style.justifyContent = 'center';
+                    sponsorTrack.style.gap = '2rem';
+                    sponsorTrack.style.overflowX = 'visible';
+                }
+            }
+
+            // Sinkronisasi otomatis dengan database Google Sheets secara real-time setiap 10 detik
+            setInterval(() => {
+                fetchOrdersFromGoogleSheets();
+            }, 10000);
         }
     </script>
 </body>
