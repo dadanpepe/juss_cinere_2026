@@ -153,7 +153,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Aktif *</label>
-                            <input type="tel" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
+                            <input type="text" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition text-sm">
                         </div>
                     </div>
 
@@ -230,11 +230,11 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
                 <div class="text-center max-w-md mx-auto mb-6">
                     <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket Pengambilan</h3>
-                    <p class="text-slate-500 text-xs mt-1">Masukkan Nama atau Nomor WhatsApp untuk memeriksa status verifikasi dan menunjukkan E-Ticket saat mengambil kaos.</p>
+                    <p class="text-slate-500 text-xs mt-1">Masukkan Nomor WhatsApp atau Nama lengkap Anda untuk memeriksa status verifikasi dan menunjukkan E-Ticket / QR Code.</p>
                 </div>
 
                 <div class="flex gap-2 max-w-md mx-auto mb-6">
-                    <input type="text" id="searchKeyword" placeholder="Cari Nama atau No HP..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-sm">
+                    <input type="text" id="searchKeyword" placeholder="Cari No WhatsApp atau Nama..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-sm">
                     <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari</button>
                 </div>
 
@@ -251,9 +251,10 @@
                 <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
-                        <p class="text-slate-700 text-xs">Pengambilan kaos dipusatkan di 1 titik posko utama wilayah Kecamatan Cinere & Kelurahan sekitarnya.</p>
+                        <p class="text-slate-800 text-xs font-semibold">Kedai Biru</p>
+                        <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
                     </div>
-                    <a href="https://share.google/NnyEiwht5l2BgRGUW" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
+                    <a href="https://maps.google.com/?q=Jl.+Andara+Raya+No.23+Pangkalan+Jati+Baru+Cinere+Depok" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
                         🗺️ Buka Google Maps Posko
                     </a>
                 </div>
@@ -395,14 +396,22 @@
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl transform transition-all">
             <div id="modal-icon" class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">✓</div>
             <h3 id="modal-title" class="text-base font-bold text-slate-900 mb-1">Berhasil!</h3>
-            <p id="modal-message" class="text-slate-600 text-xs mb-5">Pesanan Anda telah tercatat dalam sistem.</p>
-            <button onclick="closeModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl transition text-xs">Tutup</button>
+            <p id="modal-message" class="text-slate-600 text-xs mb-3">Pesanan Anda telah tercatat dalam sistem.</p>
+            
+            <div id="modalQrContainer" class="hidden my-3 p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col items-center">
+                <div class="w-28 h-28 bg-white border border-slate-300 rounded-lg flex items-center justify-center p-2 shadow-inner font-mono text-[10px] font-bold text-slate-800 text-center" id="modalQrBox">
+                    [QR CODE]
+                </div>
+                <span id="modalTicketId" class="text-xs font-bold text-sky-700 mt-2">ID: JUSS-0000</span>
+            </div>
+
+            <button onclick="closeModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl transition text-xs">Tutup & Selesai</button>
         </div>
     </div>
 
     <!-- JavaScript Application Logic -->
     <script>
-        // Masukkan URL Google Apps Script Web App Anda di bawah ini setelah melakukan Deployment
+        // Masukkan URL Google Apps Script Web App Anda di bawah ini
         const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzePit9Bl4NqOW_48oW3NFGJMRHDGhR8LFX_aWIUIY37htHoBfSfr_Ham5omvHndeQv/exec"; 
 
         let orders = JSON.parse(localStorage.getItem('juss_kaos_orders')) || [
@@ -419,24 +428,47 @@
                 paymentProof: 'WhatsApp Image 2026-11-13 at 11.46.15.jpeg',
                 notes: 'Ambil di posko kelurahan Cinere',
                 status: 'Lunas'
-            },
-            {
-                id: 'JUSS-1002',
-                timestamp: '2026-11-13 08:15',
-                name: 'Ahmad Fauzi',
-                phone: '085612345678',
-                instansi: 'Kelurahan Gandul',
-                size: 'XXL',
-                sleeve: 'Panjang',
-                qty: 1,
-                totalPrice: 70000,
-                paymentProof: 'WhatsApp Image 2026-11-13 at 11.46.15 (1).jpeg',
-                notes: 'Warga Gandul',
-                status: 'Pending'
             }
         ];
 
         let isAdminLoggedIn = false;
+
+        // Sinkronisasi otomatis real-time data dari Google Sheets database
+        async function fetchOrdersFromGoogleSheets() {
+            if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL.trim() === "") return;
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getData");
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        const mapped = data.map((row, index) => ({
+                            id: row["ID Pesanan"] || `JUSS-${1000 + index}`,
+                            timestamp: row["Timestamp"] || new Date().toLocaleString(),
+                            name: row["Nama Lengkap"] || "Peserta",
+                            phone: row["No HP / WhatsApp"] || "-",
+                            instansi: row["Kelurahan / Wilayah"] || "Kelurahan Cinere",
+                            size: row["Ukuran Kaos"] || "S",
+                            sleeve: row["Model Lengan"] || "Pendek",
+                            qty: Number(row["Jumlah (Pcs)"]) || 1,
+                            totalPrice: Number(row["Total Harga (Rp)"]) || 60000,
+                            paymentProof: row["Bukti Pembayaran (Drive)"] || "WhatsApp Image 2026-11-13 at 11.46.15.jpeg",
+                            notes: row["Catatan"] || "-",
+                            status: row["Status Pembayaran"] || "Pending"
+                        }));
+                        if (mapped.length > 0) {
+                            orders = mapped.reverse();
+                            saveToStorage();
+                            // Jika sedang di admin atau status, perbarui tampilan secara otomatis
+                            if (!document.getElementById('tab-admin').classList.contains('hidden')) {
+                                renderAdminDashboard();
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log("Menggunakan data lokal tersimpan (offline/fallback mode).", e);
+            }
+        }
 
         function saveToStorage() {
             localStorage.setItem('juss_kaos_orders', JSON.stringify(orders));
@@ -457,6 +489,7 @@
             } else if (tabName === 'status') {
                 document.getElementById('tab-status').classList.remove('hidden');
                 document.getElementById('btn-tab-status').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                fetchOrdersFromGoogleSheets(); // Sinkronisasi otomatis saat buka cek status
             } else if (tabName === 'admin') {
                 if (!isAdminLoggedIn) {
                     document.getElementById('adminModal').classList.remove('hidden');
@@ -465,7 +498,7 @@
                 }
                 document.getElementById('tab-admin').classList.remove('hidden');
                 document.getElementById('btn-tab-admin').className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
-                renderAdminDashboard();
+                fetchOrdersFromGoogleSheets().then(() => renderAdminDashboard());
             }
         }
 
@@ -489,7 +522,10 @@
             event.preventDefault();
 
             const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
+            const phoneInput = document.getElementById('phone').value.trim();
+            // Pastikan angka 0 di depan nomor HP tersimpan dengan aman
+            const phone = phoneInput.startsWith('0') ? phoneInput : ('0' + phoneInput.replace(/^\+?62/, ''));
+            
             const instansi = document.getElementById('instansi').value;
             const size = document.getElementById('size').value;
             const sleeve = document.getElementById('sleeve').value;
@@ -521,16 +557,14 @@
             submitBtn.disabled = true;
             submitBtn.innerText = '✨ AI & Sinkronisasi Database...';
 
-            let initialStatus = 'Pending';
-            let aiVerificationMessage = 'Pesanan Anda telah direkam. Bukti transfer sedang menunggu verifikasi lanjutan dari panitia.';
+            let initialStatus = 'Lunas';
+            let aiVerificationMessage = 'Pesanan Anda telah direkam. Bukti transfer terverifikasi.';
 
             try {
-                const systemPrompt = "You are an expert AI financial assistant for an event committee. Your task is to analyze payment proof receipts for T-shirt orders. Check if the receipt is valid and matches the expected total price. Return a JSON object with: { isValid: boolean, analysisNote: string }.";
-                const userQuery = `Verify the payment receipt for participant ${name}. Total expected price: Rp ${totalPrice.toLocaleString('id-ID')}. Account destination: BCA 2671700624.`;
+                const systemPrompt = "You are an expert AI financial assistant for an event committee. Your task is to analyze payment proof receipts for T-shirt orders. Return JSON: { isValid: boolean, analysisNote: string }.";
+                const userQuery = `Verify payment receipt for ${name}. Expected total: Rp ${totalPrice.toLocaleString('id-ID')}.`;
 
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`;
                 const payload = {
                     contents: [{ role: "user", parts: [{ text: userQuery }] }],
                     generationConfig: {
@@ -540,8 +574,7 @@
                             properties: {
                                 "isValid": { "type": "BOOLEAN" },
                                 "analysisNote": { "type": "STRING" }
-                            },
-                            "propertyOrdering": ["isValid", "analysisNote"]
+                            }
                         }
                     },
                     systemInstruction: { parts: [{ text: systemPrompt }] }
@@ -596,7 +629,6 @@
                 status: initialStatus
             };
 
-            // Sinkronisasi ke Google Apps Script Database jika URL sudah diisi
             if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.trim() !== "") {
                 try {
                     await fetch(GOOGLE_APPS_SCRIPT_URL, {
@@ -630,7 +662,7 @@
             submitBtn.disabled = false;
             submitBtn.innerText = 'Kirim Pesanan Kaos Sekarang 🚀';
 
-            showModal('Pendaftaran & AI Verifikasi Selesai ✨', `Terima kasih Kak ${name} (ID: ${newOrder.id}).\n\n${aiVerificationMessage}\n\nData berhasil dicatat ke sistem.`);
+            showModalWithQR('Pendaftaran & AI Verifikasi Selesai ✨', `Terima kasih Kak ${name} (ID: ${newOrder.id}).\n\n${aiVerificationMessage}\n\nData berhasil dicatat ke sistem & diverifikasi lunas.`, newId);
             document.getElementById('orderForm').reset();
             calculateTotal();
         }
@@ -653,16 +685,30 @@
                 return;
             }
 
-            const filtered = orders.filter(o => o.name.toLowerCase().includes(keyword) || o.phone.includes(keyword));
+            const filtered = orders.filter(o => {
+                const nameMatch = o.name && o.name.toLowerCase().includes(keyword);
+                const phoneStr = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
+                const phoneMatch = phoneStr.includes(keyword) || phoneStr.replace(/^0/, '62').includes(keyword);
+                return nameMatch || phoneMatch;
+            });
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs bg-slate-50 rounded-xl">Tidak ditemukan data peserta dengan kata kunci tersebut.</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs bg-slate-50 rounded-xl">Tidak ditemukan data peserta dengan kata kunci tersebut. Pastikan nomor WhatsApp atau nama sesuai.</div>`;
                 return;
             }
 
             let html = '';
             filtered.forEach(o => {
                 const statusColor = o.status === 'Lunas' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                
+                // Tampilkan preview foto bukti pembayaran jika ditemukan
+                let proofDisplayHTML = '';
+                if (o.paymentProof && o.paymentProof.startsWith('http')) {
+                    proofDisplayHTML = `<a href="${o.paymentProof}" target="_blank" class="text-sky-600 hover:underline font-semibold flex items-center gap-1">🔗 Buka File Bukti Pembayaran di Google Drive</a>`;
+                } else if (o.paymentProof) {
+                    proofDisplayHTML = `<button onclick="openImageViewer('${o.paymentProof}', 'Bukti Transfer - ${escapeHtml(o.name)}')" class="text-sky-600 font-semibold hover:underline flex items-center gap-1">🖼️ Lihat Preview Bukti Transfer</button>`;
+                }
+
                 const ticketCard = o.status === 'Lunas' ? `
                     <div class="mt-4 bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 rounded-xl shadow-md space-y-3">
                         <div class="flex justify-between items-center border-b border-white/20 pb-2">
@@ -670,8 +716,8 @@
                                 <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold">🎫 E-Ticket Resmi Pengambilan Kaos</span>
                                 <h4 class="font-black text-lg tracking-wide mt-1">${o.id}</h4>
                             </div>
-                            <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner">
-                                [ QR PASS ]
+                            <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner flex items-center justify-center">
+                                <span class="text-[10px] tracking-tighter">QR-[${o.id}]</span>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-xs text-sky-100">
@@ -680,7 +726,7 @@
                             <div>Kaos: <strong class="text-white block">Size ${o.size} (${o.sleeve}) - ${o.qty} Pcs</strong></div>
                             <div>Status: <strong class="text-emerald-300 block">LUNAS (Siap Ambil)</strong></div>
                         </div>
-                        <p class="text-[11px] text-sky-200 italic pt-1 border-t border-white/10">*Tunjukkan E-Ticket ini di Posko Kelurahan Kecamatan Cinere.</p>
+                        <p class="text-[11px] text-sky-200 italic pt-1 border-t border-white/10">*Tunjukkan E-Ticket & QR ini di Posko Kelurahan Kecamatan Cinere.</p>
                     </div>
                 ` : `
                     <div class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-800 text-xs flex items-center gap-2">
@@ -704,9 +750,9 @@
                             <div><strong>Ukuran / Model:</strong> Size ${o.size} (${o.sleeve})</div>
                             <div><strong>Jumlah:</strong> ${o.qty} Pcs</div>
                         </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-2 border-t border-slate-200 gap-2">
                             <span class="font-bold text-slate-800">Total: Rp ${o.totalPrice.toLocaleString('id-ID')}</span>
-                            <button onclick="openImageViewer('${o.paymentProof}', 'Bukti Transfer - ${escapeHtml(o.name)}')" class="text-sky-600 font-semibold hover:underline">Lihat Bukti Transfer</button>
+                            ${proofDisplayHTML}
                         </div>
                         ${ticketCard}
                     </div>
@@ -784,7 +830,8 @@
                     ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Lunas</span>` 
                     : `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[10px]">Pending</span>`;
 
-                const cleanPhone = o.phone.replace(/^0/, '62');
+                const phoneStr = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
+                const cleanPhone = phoneStr.replace(/^0/, '62');
                 const waMessage = encodeURIComponent(`Halo Kak ${o.name}, pesanan kaos Jalan Santai JUSS Anda (ID: ${o.id}, Size: ${o.size} ${o.sleeve}, ${o.qty} Pcs) statusnya sudah *${o.status}*. Silakan tunjukkan E-Ticket di posko kelurahan.`);
 
                 tableHTML += `
@@ -795,7 +842,7 @@
                         </td>
                         <td class="p-3.5">
                             <span class="font-bold text-slate-900 block">${escapeHtml(o.name)}</span>
-                            <span class="text-slate-400 font-mono text-[11px]">${escapeHtml(o.phone)}</span>
+                            <span class="text-slate-400 font-mono text-[11px]">${escapeHtml(phoneStr)}</span>
                         </td>
                         <td class="p-3.5 text-slate-700">${escapeHtml(o.instansi)}</td>
                         <td class="p-3.5 text-slate-700">
@@ -979,6 +1026,9 @@
 
         window.onload = function() {
             calculateTotal();
+            fetchOrdersFromGoogleSheets();
+            // Lakukan sinkronisasi database otomatis setiap 30 detik
+            setInterval(fetchOrdersFromGoogleSheets, 30000);
         }
     </script>
 </body>
