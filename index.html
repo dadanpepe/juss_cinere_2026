@@ -17,7 +17,7 @@
     <header class="relative bg-slate-900 text-white shadow-lg overflow-hidden">
         <!-- Background Image with Overlay -->
         <div class="absolute inset-0 z-0">
-            <img src="image_f15a46.jpg" alt="JUSS Banner Background" class="w-full h-full object-cover object-center opacity-85">
+            <img src="image_f15a46.jpg" alt="JUSS Banner Background" class="w-full h-full object-contain md:object-cover object-center opacity-85">
             <div class="absolute inset-0 bg-gradient-to-r from-blue-950/80 via-blue-900/60 to-indigo-950/80"></div>
         </div>
 
@@ -257,11 +257,11 @@
                 <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
-                        <p class="text-slate-800 text-xs font-semibold">Kedai Biru</p>
+                        <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
                         <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
                     </div>
-                    <a href="https://maps.google.com/?q=Jl.+Andara+Raya+No.23+Pangkalan+Jati+Baru+Cinere+Depok" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
-                        🗺️ Buka Google Maps Posko
+                    <a href="https://www.google.com/maps/place/JS+Coffee/@-6.3239398,106.8005432,17z/data=!3m1!4b1!4m6!3m5!1s0x2e69ef3e2aaa1217:0xd67f71cdbd4b2a1e!8m2!3d-6.3239451!4d106.8031181!16s%2Fg%2F11t1jz5mdc" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
+                        🗺️ Buka Google Maps (JS Coffee)
                     </a>
                 </div>
 
@@ -838,7 +838,7 @@
                     bcDiv.innerHTML = `
                         <h3 class="font-bold text-sky-900 text-sm flex items-center gap-1.5">📢 Template Pesan WhatsApp untuk Panitia & Masyarakat</h3>
                         <p class="text-xs text-slate-600">Salin template di bawah ini untuk dibagikan ke grup warga atau peserta:</p>
-                        <textarea id="waTemplateText" rows="3" class="w-full p-3 bg-white border border-sky-200 rounded-xl text-xs text-slate-700 font-mono outline-none">Halo Warga Kecamatan Cinere! 👋\nPesanan kaos Jalan Santai & Kuliner Nusantara JUSS 2026 Anda telah tercatat dan berstatus LUNAS. Informasi jadwal dan titik pengambilan kaos (Kedai Biru, Jl. Andara Raya No.23) akan segera kami infokan melalui WhatsApp ini. Terima kasih! 🙏</textarea>
+                        <textarea id="waTemplateText" rows="3" class="w-full p-3 bg-white border border-sky-200 rounded-xl text-xs text-slate-700 font-mono outline-none">Halo Warga Kecamatan Cinere! 👋\nPesanan kaos Jalan Santai & Kuliner Nusantara JUSS 2026 Anda telah tercatat dan berstatus LUNAS. Informasi jadwal dan titik pengambilan kaos (JS Coffee / Kedai Biru, Jl. Andara Raya No.23) akan segera kami infokan melalui WhatsApp ini. Terima kasih! 🙏</textarea>
                         <button onclick="copyWaTemplate()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm">📋 Salin Template Pesan WhatsApp</button>
                     `;
                     containerSec.insertBefore(bcDiv, containerSec.children[1]);
