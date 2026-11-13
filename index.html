@@ -13,6 +13,14 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
+    <!-- Scrolling Announcement Marquee -->
+    <div class="bg-amber-500 text-amber-950 font-semibold text-xs py-2 px-4 shadow-sm border-b border-amber-600 overflow-hidden flex items-center">
+        <span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-3 whitespace-nowrap">📢 Info Penting</span>
+        <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium" id="marqueeAnnouncementText">
+            Selamat datang di portal resmi pemesanan kaos Jalan Santai & Kuliner Nusantara JUSS 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23. Silakan cek status E-Ticket Anda secara berkala!
+        </marquee>
+    </div>
+
     <!-- Header Banner with Uploaded Image Background -->
     <header class="relative bg-slate-900 text-white shadow-lg overflow-hidden">
         <!-- Background Image with Overlay -->
@@ -305,6 +313,16 @@
                 </div>
             </div>
 
+            <!-- Panel Pengaturan Papan Berjalan (Marquee) oleh Panitia -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">⚙️ Kelola Papan Berjalan (Pengumuman Publik)</h3>
+                <p class="text-xs text-slate-500">Ubah teks pengumuman berjalan yang tampil di bagian atas halaman utama aplikasi untuk warga.</p>
+                <div class="flex gap-2">
+                    <input type="text" id="adminMarqueeInput" placeholder="Ketik pengumuman baru di sini..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none text-xs">
+                    <button onclick="updateMarqueeAnnouncement()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">Perbarui Pengumuman</button>
+                </div>
+            </div>
+
             <!-- Rekap Kaos Cards Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3" id="adminSizeSummaryCards"></div>
 
@@ -435,6 +453,29 @@
         ];
 
         let isAdminLoggedIn = false;
+
+        // Muat teks pengumuman dari localStorage
+        function loadMarqueeAnnouncement() {
+            const savedAnnounce = localStorage.getItem('juss_marquee_text');
+            if (savedAnnounce) {
+                const el = document.getElementById('marqueeAnnouncementText');
+                if (el) el.innerText = savedAnnounce;
+                const inputEl = document.getElementById('adminMarqueeInput');
+                if (inputEl) inputEl.value = savedAnnounce;
+            }
+        }
+
+        function updateMarqueeAnnouncement() {
+            const val = document.getElementById('adminMarqueeInput').value.trim();
+            if (!val) {
+                showModal('Peringatan ⚠️', 'Teks pengumuman tidak boleh kosong.', '⚠️');
+                return;
+            }
+            localStorage.setItem('juss_marquee_text', val);
+            const el = document.getElementById('marqueeAnnouncementText');
+            if (el) el.innerText = val;
+            showModal('Berhasil ✨', 'Pengumuman papan berjalan berhasil diperbarui dan langsung tampil ke publik.', '✓');
+        }
 
         // Sinkronisasi otomatis real-time data dari Google Sheets database
         async function fetchOrdersFromGoogleSheets() {
@@ -1013,6 +1054,7 @@
 
         window.onload = function() {
             calculateTotal();
+            loadMarqueeAnnouncement();
             fetchOrdersFromGoogleSheets();
             // Lakukan sinkronisasi database otomatis setiap 30 detik
             setInterval(fetchOrdersFromGoogleSheets, 30000);
