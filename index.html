@@ -1168,27 +1168,27 @@
             const locationGuide = document.getElementById('locationGuideContainer');
 
             if (!keyword || keyword.length < 3) {
-                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 border border-amber-200 rounded-xl">⚠️ Masukkan minimal 3 karakter nama lengkap atau nomor WhatsApp untuk melakukan pencarian yang valid.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 border border-amber-200 rounded-xl">⚠️ Jika nama tidak lengkap sesuai database maka pencarian tidak bisa dilanjutkan.</div>`;
                 locationGuide.classList.add('hidden');
                 return;
             }
 
+            // Validasi ketat: Nama harus sesuai secara utuh atau lengkap dengan database
             const filteredKaos = orders.filter(o => {
                 const name = String(o.name || "").toLowerCase();
                 const phone = String(o.phone || "");
-                return name === keyword || name.includes(keyword) || phone.includes(keyword);
+                return name === keyword || phone === keyword;
             });
             
             const filteredMewarnai = mewarnaiRegistrations.filter(m => {
                 const namaAnak = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
                 const ortu = String(m.ortu || m["Nama Orang Tua"] || "").toLowerCase();
                 const phone = String(m.phone || m["No HP / WhatsApp"] || "");
-                const sekolah = String(m.asalSekolah || m["Asal Sekolah"] || "").toLowerCase();
-                return namaAnak === keyword || namaAnak.includes(keyword) || ortu.includes(keyword) || phone.includes(keyword) || sekolah.includes(keyword);
+                return namaAnak === keyword || ortu === keyword || phone === keyword;
             });
 
             if (filteredKaos.length === 0 && filteredMewarnai.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ Data Tidak Ditemukan</strong><p>Kata kunci pencarian tidak sesuai atau tidak lengkap dengan database peserta. Mohon pastikan nama lengkap atau nomor HP sudah benar.</p></div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ Pencarian Gagal</strong><p>Jika nama tidak lengkap sesuai database maka pencarian tidak bisa dilanjutkan. Mohon masukkan nama lengkap secara akurat.</p></div>`;
                 locationGuide.classList.add('hidden');
                 return;
             }
