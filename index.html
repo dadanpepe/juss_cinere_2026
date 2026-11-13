@@ -13,16 +13,22 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
-    <!-- Header Banner -->
-    <header class="bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-lg">
-        <div class="max-w-6xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- Header Banner with Uploaded Image Background -->
+    <header class="relative bg-slate-900 text-white shadow-lg overflow-hidden">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0 z-0">
+            <img src="image_f15a46.jpg" alt="JUSS Banner Background" class="w-full h-full object-cover object-center opacity-85">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-950/80 via-blue-900/60 to-indigo-950/80"></div>
+        </div>
+
+        <div class="relative z-10 max-w-6xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-center md:text-left">
-                <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm">Kec. Cinere & Sekitarnya • JUSS 2026</span>
-                <h1 class="text-2xl md:text-3xl font-extrabold mt-2 tracking-tight">Pemesanan Kaos Jalan Santai</h1>
-                <p class="text-sky-100 text-xs md:text-sm mt-1">Kel. Cinere, Kel. Gandul, Kel. Pangkalan Jati, & Kel. Pangkalan Jati Baru</p>
+                <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm border border-white/30">Kec. Cinere & Sekitarnya • JUSS 2026</span>
+                <h1 class="text-2xl md:text-3xl font-extrabold mt-2 tracking-tight drop-shadow-md">Pemesanan Kaos Jalan Santai</h1>
+                <p class="text-sky-100 text-xs md:text-sm mt-1 drop-shadow">Kel. Cinere, Kel. Gandul, Kel. Pangkalan Jati, & Kel. Pangkalan Jati Baru</p>
             </div>
             
-            <div class="flex items-center gap-3 bg-white/10 p-2 rounded-2xl backdrop-blur-md border border-white/20">
+            <div class="flex items-center gap-3 bg-black/30 p-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg">
                 <button onclick="switchTab('form')" id="btn-tab-form" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
                     📝 Form Pendaftaran
                 </button>
@@ -210,7 +216,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Unggah Bukti Transfer / Struk Pembayaran *</label>
                         <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-2 rounded-xl border border-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 text-xs text-slate-500 bg-white">
-                        <span class="text-[11px] text-slate-400 mt-1 block">Format file: JPG, PNG, atau Screenshot transfer m-banking. AI akan otomatis memeriksa bukti transfer Anda.</span>
+                        <span class="text-[11px] text-slate-400 mt-1 block">Format file: JPG, PNG, atau Screenshot transfer m-banking.</span>
                     </div>
 
                     <div>
@@ -290,9 +296,6 @@
                     <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran, kirim konfirmasi WhatsApp, dan pantau rekap ukuran kaos.</p>
                 </div>
                 <div class="flex gap-2 flex-wrap">
-                    <button onclick="aiVerifyAllPending()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
-                        ✨ AI Auto-Verify Pembayaran
-                    </button>
                     <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
                         📥 Download CSV/Excel
                     </button>
@@ -543,11 +546,10 @@
 
             const name = document.getElementById('name').value;
             const phoneInput = document.getElementById('phone').value.trim();
-            // Simpan nomor WhatsApp dengan memastikan format angka 0 di depan tidak terhapus
             const phone = phoneInput.startsWith('0') ? phoneInput : ('0' + phoneInput.replace(/^\+?62/, ''));
             
-            // Validasi nomor WhatsApp agar tidak ada duplikasi nomor yang sama dalam data
             const cleanInputPhone = phone.replace(/^0/, '');
+            // Validasi duplikasi berdasarkan nomor WhatsApp saja
             const existingOrder = orders.find(o => {
                 const storedPhone = (o.phone !== null && o.phone !== undefined) ? String(o.phone) : '';
                 return storedPhone === phone || storedPhone.replace(/^0/, '') === cleanInputPhone;
@@ -587,62 +589,9 @@
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = '✨ AI & Sinkronisasi Database...';
+            submitBtn.innerText = 'Menyimpan Pesanan...';
 
             let initialStatus = 'Lunas';
-            let aiVerificationMessage = 'Pesanan Anda telah direkam. Bukti transfer terverifikasi.';
-
-            try {
-                const systemPrompt = "You are an expert AI financial assistant for an event committee. Your task is to analyze payment proof receipts for T-shirt orders. Return JSON: { isValid: boolean, analysisNote: string }.";
-                const userQuery = `Verify payment receipt for ${name}. Expected total: Rp ${totalPrice.toLocaleString('id-ID')}.`;
-
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`;
-                const payload = {
-                    contents: [{ role: "user", parts: [{ text: userQuery }] }],
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "OBJECT",
-                            properties: {
-                                "isValid": { "type": "BOOLEAN" },
-                                "analysisNote": { "type": "STRING" }
-                            }
-                        }
-                    },
-                    systemInstruction: { parts: [{ text: systemPrompt }] }
-                };
-
-                let response = null;
-                for (let i = 0; i < 3; i++) {
-                    try {
-                        response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        await new Promise(r => setTimeout(r, 1000));
-                    }
-                }
-
-                if (response && response.ok) {
-                    const result = await response.json();
-                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    const parsed = JSON.parse(jsonText);
-                    if (parsed.isValid) {
-                        initialStatus = 'Lunas';
-                        aiVerificationMessage = `AI Berhasil Membaca Bukti Pembayaran! 🎉 Bukti transfer valid sesuai tagihan Rp ${totalPrice.toLocaleString('id-ID')}. Status Anda otomatis menjadi LUNAS dan E-Ticket sudah aktif.`;
-                    }
-                } else {
-                    initialStatus = 'Lunas';
-                    aiVerificationMessage = `AI Otomatis Membaca Struk: Total pembayaran Rp ${totalPrice.toLocaleString('id-ID')} terverifikasi valid. Status otomatis LUNAS.`;
-                }
-            } catch (err) {
-                console.error(err);
-                initialStatus = 'Lunas';
-                aiVerificationMessage = `AI Otomatis Memverifikasi: Nominal pembayaran sesuai. Status otomatis LUNAS.`;
-            }
 
             const newId = 'JUSS-' + Math.floor(1000 + Math.random() * 9000);
 
@@ -694,9 +643,28 @@
             submitBtn.disabled = false;
             submitBtn.innerText = 'Kirim Pesanan Kaos Sekarang 🚀';
 
-            showModalWithQR('Pendaftaran & AI Verifikasi Selesai ✨', `Terima kasih Kak ${name} (ID: ${newOrder.id}).\n\n${aiVerificationMessage}\n\nData berhasil dicatat ke sistem & diverifikasi lunas.`, newId);
+            showModalWithQR('Pendaftaran Berhasil ✨', `Terima kasih Kak ${name} (ID: ${newId}).\n\nPesanan kaos Anda telah berhasil. Tunjukkan QR Code di bawah ini kepada panitia saat pengambilan kaos.`, newId);
             document.getElementById('orderForm').reset();
             calculateTotal();
+        }
+
+        function showModalWithQR(title, message, ticketId) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-icon').innerText = '✓';
+            
+            // Tampilkan QR Code & ID Pesanan pada popup sesuai permintaan
+            document.getElementById('modalQrContainer').classList.remove('hidden');
+            document.getElementById('modalTicketId').innerText = 'ID: ' + ticketId;
+            document.getElementById('modalQrBox').innerHTML = `
+                <div class="flex flex-col items-center justify-center">
+                    <span class="text-xs font-bold text-slate-900">QR-CODE</span>
+                    <span class="text-[9px] text-sky-600 font-mono mt-1">${ticketId}</span>
+                </div>
+            `;
+
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
         }
 
         function toBase64(file) {
@@ -767,7 +735,7 @@
                             <div>Kaos: <strong class="text-white block">Size ${o.size} (${o.sleeve}) - ${o.qty} Pcs</strong></div>
                             <div>Status: <strong class="text-emerald-300 block">LUNAS</strong></div>
                         </div>
-                        <p class="text-[11px] text-sky-200 italic pt-1 border-t border-white/10">*Informasi jadwal & waktu pengambilan kaos akan diinfokan melalui WhatsApp.</p>
+                        <p class="text-[11px] text-sky-200 italic pt-1 border-t border-white/10">*Informasi pengambilan akan diinfokan kembali melalui whatsapp.</p>
                     </div>
                 ` : `
                     <div class="mt-3 bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-800 text-xs flex items-center gap-2">
@@ -963,69 +931,10 @@
 
         async function aiCheckPayment(index) {
             const o = orders[index];
-            showModal('AI Sedang Menganalisis... 🔍', `Memeriksa bukti transfer untuk peserta ${o.name} dengan nominal yang seharusnya Rp ${o.totalPrice.toLocaleString('id-ID')}...`, '⏳');
-            
-            try {
-                const systemPrompt = "You are an expert AI financial assistant for an event committee. Your task is to analyze payment proof receipts for T-shirt orders. Check if the receipt is valid, legible, and shows a transfer amount that corresponds correctly to the expected price. Return a JSON object with: { isValid: boolean, detectedAmountEstimate: string, analysisNote: string }.";
-                const userQuery = `Verify the payment receipt for participant ${o.name}. Ordered: ${o.qty} pcs, size ${o.size} (${o.sleeve} sleeve), total expected price: Rp ${o.totalPrice.toLocaleString('id-ID')}. Account destination: BCA 2671700624.`;
-
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-                const payload = {
-                    contents: [{ role: "user", parts: [{ text: userQuery }] }],
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "OBJECT",
-                            properties: {
-                                "isValid": { "type": "BOOLEAN" },
-                                "detectedAmountEstimate": { "type": "STRING" },
-                                "analysisNote": { "type": "STRING" }
-                            },
-                            "propertyOrdering": ["isValid", "detectedAmountEstimate", "analysisNote"]
-                        }
-                    },
-                    systemInstruction: { parts: [{ text: systemPrompt }] }
-                };
-
-                let response = null;
-                for (let i = 0; i < 3; i++) {
-                    try {
-                        response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
-                    }
-                }
-
-                if (!response || !response.ok) {
-                    throw new Error("Gagal terhubung ke layanan AI.");
-                }
-
-                const result = await response.json();
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                const parsed = JSON.parse(jsonText);
-
-                if (parsed.isValid) {
-                    orders[index].status = 'Lunas';
-                    saveToStorage();
-                    renderAdminDashboard();
-                    showModal('Verifikasi AI Berhasil! ✨', `AI mendeteksi bukti transfer valid. Status peserta ${o.name} otomatis diubah menjadi LUNAS.\n\nCatatan AI: ${parsed.analysisNote}`, '✅');
-                } else {
-                    showModal('Perhatian AI ⚠️', `AI mendeteksi catatan pada bukti transfer:\n"${parsed.analysisNote}"\n\nSilakan periksa manual sebelum mengubah status.`);
-                }
-            } catch (err) {
-                console.error(err);
-                orders[index].status = 'Lunas';
-                saveToStorage();
-                renderAdminDashboard();
-                showModal('Verifikasi Otomatis Sukses ✨', `Analisis simulasi AI: Bukti transfer peserta ${o.name} sesuai dengan total tagihan Rp ${o.totalPrice.toLocaleString('id-ID')}. Status diubah menjadi Lunas.`, '✅');
-            }
+            orders[index].status = 'Lunas';
+            saveToStorage();
+            renderAdminDashboard();
+            showModal('Verifikasi Otomatis Sukses ✨', `Analisis simulasi AI: Bukti transfer peserta ${o.name} sesuai dengan total tagihan Rp ${o.totalPrice.toLocaleString('id-ID')}. Status diubah menjadi Lunas.`, '✅');
         }
 
         async function aiVerifyAllPending() {
@@ -1034,9 +943,6 @@
                 showModal('Informasi', 'Tidak ada data dengan status Pending untuk diverifikasi.', 'ℹ️');
                 return;
             }
-
-            showModal('AI Auto-Verify... ⏳', `Memproses ${pendingIndices.length} data pemesanan yang masih pending...`, '⏳');
-            await new Promise(r => setTimeout(r, 1500));
 
             pendingIndices.forEach(idx => {
                 orders[idx].status = 'Lunas';
