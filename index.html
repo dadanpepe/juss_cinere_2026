@@ -31,7 +31,7 @@
             <div class="text-center md:text-left">
                 <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm border border-white/30">Kec. Cinere & Sekitarnya • JUSS 2026</span>
                 <h1 class="text-2xl md:text-3xl font-extrabold mt-2 tracking-tight drop-shadow-md">Jualan UMKM Sama-Sama (JUSS) Wilayah Kecamatan Cinere Kota Depok</h1>
-                <p class="text-sky-100 text-xs md:text-sm mt-1 drop-shadow">Kel. Cinere, Kel. Gandul, Kel. Pangkalan Jati, & Kel. Pangkalan Jati Baru</p>
+                <p class="text-sky-100 text-xs md:text-sm mt-1 drop-shadow">Kel. Cinere || Kel. Gandul || Kel. Pangkalan Jati || Kel. Pangkalan Jati Baru</p>
             </div>
             
             <div class="flex items-center gap-2 bg-black/30 p-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg flex-wrap justify-center">
@@ -125,6 +125,140 @@
                     <button onclick="switchTab('mewarnai')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-sm self-start">
                         Daftar Lomba Mewarnai 
                     </button>
+                </div>
+            </div>
+
+            <!-- Galeri Stan Makanan UMKM dengan Slide & Nomor Stan -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+                <div class="text-center max-w-xl mx-auto">
+                    <span class="bg-sky-100 text-sky-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Kuliner & Bazar Nusantara</span>
+                    <h3 class="text-xl font-black text-slate-900 mt-2">Galeri Stan Makanan & UMKM JUSS 2026</h3>
+                    <p class="text-slate-500 text-xs mt-1">Jelajahi berbagai pilihan kuliner lezat, minuman segar, dan kerajinan tangan lengkap dengan nomor stan resmi acara.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Kategori 1: Kuliner Nusantara -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-900 text-sm">🍛 Kuliner Nusantara</h4>
+                            <span class="bg-sky-600 text-white font-bold text-[10px] px-2.5 py-1 rounded-full shadow-sm">Stan No. 01 - 05</span>
+                        </div>
+                        
+                        <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 kuliner-slide-0 active-kuliner">
+                                <img src="https://placehold.co/500x300/0284c7/ffffff?text=Nasi+Kuning+Cinere+%2301" alt="Stan 1" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #01 • Nasi Kuning & Soto Betawi Bu Siti
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 kuliner-slide-0">
+                                <img src="https://placehold.co/500x300/0369a1/ffffff?text=Bakso+Andara+%2302" alt="Stan 2" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #02 • Bakso & Mie Ayam Andara Jaya
+                                </div>
+                            </div>
+                            <button onclick="prevCategorySlide('kuliner', 0)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
+                            <button onclick="nextCategorySlide('kuliner', 0)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
+                        </div>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan kuliner nusantara lainnya.</p>
+                    </div>
+
+                    <!-- Kategori 2: Minuman Segar -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-900 text-sm">🧋 Minuman Segar</h4>
+                            <span class="bg-cyan-600 text-white font-bold text-[10px] px-2.5 py-1 rounded-full shadow-sm">Stan No. 06 - 10</span>
+                        </div>
+                        
+                        <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 minuman-slide-1 active-minuman">
+                                <img src="https://placehold.co/500x300/0891b2/ffffff?text=Es+Kopi+Biru+%2306" alt="Stan 6" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #06 • JS Coffee & Es Kopi Kekinian
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 minuman-slide-1">
+                                <img src="https://placehold.co/500x300/0e7490/ffffff?text=Jus+Buah+Segar+%2307" alt="Stan 7" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #07 • Aneka Jus Buah & Es Kelapa Muda
+                                </div>
+                            </div>
+                            <button onclick="prevCategorySlide('minuman', 1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
+                            <button onclick="nextCategorySlide('minuman', 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
+                        </div>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan minuman segar lainnya.</p>
+                    </div>
+
+                    <!-- Kategori 3: Snack & Kue Basah -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-900 text-sm">🧁 Snack & Kue Basah</h4>
+                            <span class="bg-amber-600 text-white font-bold text-[10px] px-2.5 py-1 rounded-full shadow-sm">Stan No. 11 - 15</span>
+                        </div>
+                        
+                        <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 snack-slide-2 active-snack">
+                                <img src="https://placehold.co/500x300/d97706/ffffff?text=Kue+Subuh+Cinere+%2311" alt="Stan 11" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #11 • Aneka Kue Tradisional & Jajanan Pasar
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 snack-slide-2">
+                                <img src="https://placehold.co/500x300/b45309/ffffff?text=Keripik+UMKM+%2312" alt="Stan 12" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #12 • Keripik Singkong & Pisang Cokelat
+                                </div>
+                            </div>
+                            <button onclick="prevCategorySlide('snack', 2)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
+                            <button onclick="nextCategorySlide('snack', 2)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
+                        </div>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan snack & kue basah lainnya.</p>
+                    </div>
+
+                    <!-- Kategori 4: Kerajinan & Craft -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-900 text-sm">🎨 Kerajinan & Craft</h4>
+                            <span class="bg-indigo-600 text-white font-bold text-[10px] px-2.5 py-1 rounded-full shadow-sm">Stan No. 16 - 20</span>
+                        </div>
+                        
+                        <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 craft-slide-3 active-craft">
+                                <img src="https://placehold.co/500x300/4f46e5/ffffff?text=Souvenir+Cinere+%2316" alt="Stan 16" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #16 • Souvenir & Kerajinan Tangan Lokal
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 craft-slide-3">
+                                <img src="https://placehold.co/500x300/4338ca/ffffff?text=Fashion+UMKM+%2317" alt="Stan 17" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #17 • Tas Kain & Fashion Aksesoris Warga
+                                </div>
+                            </div>
+                            <button onclick="prevCategorySlide('craft', 3)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
+                            <button onclick="nextCategorySlide('craft', 3)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
+                        </div>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan kerajinan & craft lainnya.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logo Sponsor Partner -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center space-y-4">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Didukung Oleh Mitra & Sponsor Resmi</span>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 items-center justify-center">
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-center h-16 shadow-inner">
+                        <span class="font-extrabold text-sky-800 text-sm">JS COFFEE</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-center h-16 shadow-inner">
+                        <span class="font-extrabold text-blue-900 text-sm">KEC. CINERE</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-center h-16 shadow-inner">
+                        <span class="font-extrabold text-emerald-800 text-sm">MALL CINERE</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-center h-16 shadow-inner">
+                        <span class="font-extrabold text-amber-800 text-sm">UMKM JUSS 2026</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -328,39 +462,54 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
                 <div class="border-b border-slate-100 pb-4 mb-6">
                     <h3 class="text-lg font-bold text-slate-900">Formulir Pendaftaran Lomba Mewarnai</h3>
-                    <p class="text-slate-500 text-xs">Daftarkan buah hati Anda sekarang juga secara gratis!</p>
+                    <p class="text-slate-500 text-xs">Daftarkan buah hati Anda sekarang juga sesuai format formulir resmi!</p>
                 </div>
 
                 <form id="mewarnaiForm" onsubmit="handleMewarnaiSubmit(event)" class="space-y-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap Anak *</label>
-                            <input type="text" id="namaAnak" required placeholder="Contoh: Keisha Putri" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Usia Anak (Tahun) *</label>
-                            <input type="number" id="usiaAnak" min="3" max="12" required placeholder="Contoh: 7" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Kategori Lomba *</label>
-                            <select id="kategoriLomba" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
-                                <option value="Kategori A (PAUD / TK)">Kategori A (PAUD / TK)</option>
-                                <option value="Kategori B (SD Kelas 1-3)">Kategori B (SD Kelas 1-3)</option>
-                                <option value="Kategori C (SD Kelas 4-6)">Kategori C (SD Kelas 4-6)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Orang Tua / Pendamping </label>
-                            <input type="text" id="namaOrtu" required placeholder="Contoh: Ibu Siti" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
-                        </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap Peserta (Nama Anak) *</label>
+                        <input type="text" id="namaAnak" required placeholder="Tuliskan nama lengkap peserta" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Orang Tua *</label>
-                        <input type="text" id="phoneMewarnai" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Alamat Lengkap *</label>
+                        <textarea id="alamatAnak" rows="2" required placeholder="Tuliskan alamat lengkap domisili" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Asal Sekolah *</label>
+                        <input type="text" id="asalSekolah" required placeholder="Jika Peserta Belum Sekolah, Tuliskan 'Belum Sekolah disertai Usia Ananda', contoh: 'Belum Sekolah Usia 5 Tahun'" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        <span class="text-[10px] text-slate-400 mt-1 block">Jika belum sekolah, tuliskan 'Belum Sekolah disertai Usia Ananda', contoh: 'Belum Sekolah Usia 5 Tahun'.</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Kategori Lomba *</label>
+                        <p class="text-[11px] text-slate-500 mb-2">Jika Peserta belum sekolah pilih kategori dengan mengikuti umur Ananda, dengan ketentuan sebagai berikut:<br>1. Usia 4-5 tahun dapat memilih kategori TK A<br>2. Usia 5-6 tahun dapat memilih kategori TK B</p>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-medium">
+                                <input type="radio" name="kategoriLombaRadio" value="TK A" required class="accent-sky-600">
+                                <span>TK A (Usia 4-5 Tahun / Sesuai Ketentuan)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-medium">
+                                <input type="radio" name="kategoriLombaRadio" value="TK B" required class="accent-sky-600">
+                                <span>TK B (Usia 5-6 Tahun / Sesuai Ketentuan)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-medium">
+                                <input type="radio" name="kategoriLombaRadio" value="Kategori Lainnya / SD" required class="accent-sky-600">
+                                <span>Kategori Lainnya / SD Kelas 1-6</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-slate-100">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Orang Tua / Pendamping *</label>
+                            <input type="text" id="namaOrtu" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Orang Tua *</label>
+                            <input type="text" id="phoneMewarnai" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        </div>
                     </div>
 
                     <button type="submit" id="submitMewarnaiBtn" class="w-full bg-gradient-to-r from-sky-500 to-cyan-600 hover:from-sky-600 hover:to-cyan-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
@@ -519,7 +668,7 @@
                             <span id="mewarnaiCountBadge" class="bg-sky-100 text-sky-800 px-3 py-1 rounded-full text-xs font-bold mt-1 inline-block">0 Anak</span>
                         </div>
                         <div class="w-full md:w-72">
-                            <input type="text" id="adminSearchMewarnai" oninput="filterAdminMewarnai()" placeholder="Cari nama anak / orang tua..." class="w-full px-3 py-2 rounded-xl border border-sky-200 outline-none text-xs bg-white">
+                            <input type="text" id="adminSearchMewarnai" oninput="filterAdminMewarnai()" placeholder="Cari nama anak / sekolah / ortu..." class="w-full px-3 py-2 rounded-xl border border-sky-200 outline-none text-xs bg-white">
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -527,14 +676,15 @@
                             <thead>
                                 <tr class="bg-sky-50/50 text-slate-600 font-semibold border-b border-slate-200">
                                     <th class="p-3.5">ID / Waktu</th>
-                                    <th class="p-3.5">Nama Anak & Usia</th>
+                                    <th class="p-3.5">Nama Anak & Asal Sekolah</th>
+                                    <th class="p-3.5">Alamat Domisili</th>
                                     <th class="p-3.5">Kategori</th>
                                     <th class="p-3.5">Orang Tua / No HP</th>
                                     <th class="p-3.5 text-center">Aksi WhatsApp Lomba</th>
                                 </tr>
                             </thead>
                             <tbody id="adminMewarnaiTableBody">
-                                <tr><td colspan="5" class="text-center py-8 text-slate-400">Belum ada peserta lomba mewarnai.</td></tr>
+                                <tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada peserta lomba mewarnai.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -622,8 +772,9 @@
                 id: 'MEW-101',
                 timestamp: '13 Nov 2026, 21:00 WIB',
                 namaAnak: 'Keisha Putri',
-                usia: 7,
-                kategori: 'Kategori B (SD Kelas 1-3)',
+                alamat: 'Jl. Andara Raya No. 12',
+                asalSekolah: 'TK Islam Al-Barkah',
+                kategori: 'TK B',
                 ortu: 'Budi Santoso',
                 phone: '081234567890',
                 status: 'Terdaftar'
@@ -640,6 +791,31 @@
 
         let adminKaosSearchQuery = "";
         let adminMewarnaiSearchQuery = "";
+
+        // Slider galeri stan per kategori
+        let categorySlideIndices = { kuliner: 0, minuman: 0, snack: 0, craft: 0 };
+        const categorySlideCounts = { kuliner: 2, minuman: 2, snack: 2, craft: 2 };
+
+        function showCategorySlide(categoryName, idx) {
+            const slides = document.querySelectorAll('.' + categoryName + '-slide-' + (categoryName === 'kuliner' ? 0 : categoryName === 'minuman' ? 1 : categoryName === 'snack' ? 2 : 3));
+            if (slides.length === 0) return;
+            if (idx >= slides.length) categorySlideIndices[categoryName] = 0;
+            if (idx < 0) categorySlideIndices[categoryName] = slides.length - 1;
+
+            slides.forEach((slide, i) => {
+                slide.style.opacity = i === categorySlideIndices[categoryName] ? '1' : '0';
+            });
+        }
+
+        function nextCategorySlide(categoryName) {
+            categorySlideIndices[categoryName]++;
+            showCategorySlide(categoryName, categorySlideIndices[categoryName]);
+        }
+
+        function prevCategorySlide(categoryName) {
+            categorySlideIndices[categoryName]--;
+            showCategorySlide(categoryName, categorySlideIndices[categoryName]);
+        }
 
         function startSlideShow() {
             if (slideInterval) clearInterval(slideInterval);
@@ -869,8 +1045,12 @@
         async function handleMewarnaiSubmit(event) {
             event.preventDefault();
             const namaAnak = document.getElementById('namaAnak').value;
-            const usia = document.getElementById('usiaAnak').value;
-            const kategori = document.getElementById('kategoriLomba').value;
+            const alamat = document.getElementById('alamatAnak').value;
+            const asalSekolah = document.getElementById('asalSekolah').value;
+            
+            const selectedRadio = document.querySelector('input[name="kategoriLombaRadio"]:checked');
+            const kategori = selectedRadio ? selectedRadio.value : 'TK A';
+
             const ortu = document.getElementById('namaOrtu').value;
             const phone = document.getElementById('phoneMewarnai').value;
 
@@ -878,7 +1058,7 @@
             const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
             const newId = 'MEW-' + Math.floor(100 + Math.random() * 900);
 
-            const newReg = { id: newId, timestamp, namaAnak, usia, kategori, ortu, phone, status: 'Terdaftar' };
+            const newReg = { id: newId, timestamp, namaAnak, alamat, asalSekolah, usia: 5, kategori, ortu, phone, status: 'Terdaftar' };
 
             if (GOOGLE_APPS_SCRIPT_URL) {
                 try {
@@ -886,7 +1066,7 @@
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'mewarnai', id: newId, timestamp, namaAnak, usia, kategori, ortu, phone, status: 'Terdaftar' })
+                        body: JSON.stringify({ type: 'mewarnai', id: newId, timestamp, namaAnak, usia: asalSekolah, kategori, ortu, phone, status: 'Terdaftar' })
                     });
                 } catch (e) { console.log(e); }
             }
@@ -894,7 +1074,7 @@
             mewarnaiRegistrations.unshift(newReg);
             saveToStorage();
 
-            showModal('Pendaftaran Lomba Berhasil 🎨', `Ananda ${namaAnak} berhasil terdaftar untuk Lomba Mewarnai di Mall Cinere (28 Nov 2026)!`, '✓');
+            showModal('Pendaftaran Lomba Berhasil 🎨', `Ananda ${namaAnak} (${asalSekolah}) berhasil terdaftar untuk Lomba Mewarnai di Mall Cinere (28 Nov 2026)!`, '✓');
             document.getElementById('mewarnaiForm').reset();
         }
 
@@ -1007,7 +1187,7 @@
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-white text-sky-900 shadow-sm">${m.status}</span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-white">
-                            <div><strong>Usia:</strong> ${m.usia} Tahun</div>
+                            <div><strong>Asal Sekolah:</strong> ${escapeHtml(m.asalSekolah || 'Belum Sekolah')}</div>
                             <div><strong>Kategori:</strong> ${escapeHtml(m.kategori)}</div>
                             <div><strong>Pendamping:</strong> ${escapeHtml(maskedOrtu)}</div>
                             <div><strong>No HP:</strong> <span class="font-mono bg-sky-600 px-1.5 py-0.5 rounded text-white">${maskedPhoneMewarnai}</span></div>
@@ -1024,13 +1204,13 @@
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-xs text-white">
-                                <div>Peserta Anak: <strong class="text-white block">${escapeHtml(m.namaAnak)} (${m.usia} Thn)</strong></div>
+                                <div>Peserta Anak: <strong class="text-white block">${escapeHtml(m.namaAnak)}</strong></div>
                                 <div>Kategori: <strong class="text-white block">${escapeHtml(m.kategori)}</strong></div>
-                                <div>Pendamping: <strong class="text-white block">${escapeHtml(maskedOrtu)}</strong></div>
+                                <div>Asal Sekolah: <strong class="text-white block">${escapeHtml(m.asalSekolah || '-')}</strong></div>
                                 <div>Lokasi: <strong class="text-white block">Mall Cinere (28 Nov 2026)</strong></div>
                             </div>
                             
-                            <div class="bg-white/10 p-3 rounded-lg border border-white/20 space-y-1 text-white text-[11px]">
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/20 space-y-1 text-white text-[11px]">
                                 <strong class="block text-white font-bold">🔔 Pengingat Penting Peserta:</strong>
                                 <ul class="list-disc list-inside space-y-0.5 text-white">
                                     <li>Wajib membawa <strong class="text-white font-bold">meja lipat</strong> sendiri untuk alas mewarnai.</li>
@@ -1092,7 +1272,7 @@
             });
             document.getElementById('adminSizeSummaryCards').innerHTML = sizeSummaryHTML;
 
-            const categories = ['Kategori A (PAUD / TK)', 'Kategori B (SD Kelas 1-3)', 'Kategori C (SD Kelas 4-6)'];
+            const categories = ['TK A', 'TK B', 'Kategori Lainnya / SD'];
             let catSummaryHTML = '';
             let maxCatCount = 0;
             let topCatName = '-';
@@ -1184,6 +1364,8 @@
                 m.namaAnak.toLowerCase().includes(adminMewarnaiSearchQuery) || 
                 m.ortu.toLowerCase().includes(adminMewarnaiSearchQuery) || 
                 String(m.phone).includes(adminMewarnaiSearchQuery) ||
+                (m.asalSekolah && m.asalSekolah.toLowerCase().includes(adminMewarnaiSearchQuery)) ||
+                (m.alamat && m.alamat.toLowerCase().includes(adminMewarnaiSearchQuery)) ||
                 m.id.toLowerCase().includes(adminMewarnaiSearchQuery)
             );
 
@@ -1194,13 +1376,14 @@
             const paginatedMewarnai = filteredMewarnai.slice(startIdx, startIdx + itemsPerPage);
 
             let mewarnaiTbody = document.getElementById('adminMewarnaiTableBody');
-            mewarnaiTbody.innerHTML = paginatedMewarnai.length === 0 ? `<tr><td colspan="5" class="text-center py-8 text-slate-400">Tidak ada peserta lomba mewarnai yang cocok.</td></tr>` : paginatedMewarnai.map((m) => {
-                const waTextMewarnai = encodeURIComponent(`Halo Ayah/Bunda ${m.ortu}, pendaftaran Lomba Mewarnai JUSS 2026 untuk ananda ${m.namaAnak} (${m.usia} Tahun - ${m.kategori}) telah berhasil tercatat dengan ID: ${m.id}. Acara akan diselenggarakan pada Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Jangan lupa membawa meja lipat dan peralatan mewarnai sendiri. Terima kasih!`);
+            mewarnaiTbody.innerHTML = paginatedMewarnai.length === 0 ? `<tr><td colspan="6" class="text-center py-8 text-slate-400">Tidak ada peserta lomba mewarnai yang cocok.</td></tr>` : paginatedMewarnai.map((m) => {
+                const waTextMewarnai = encodeURIComponent(`Halo Ayah/Bunda ${m.ortu}, pendaftaran Lomba Mewarnai JUSS 2026 untuk ananda ${m.namaAnak} (${m.kategori} - ${m.asalSekolah || 'Belum Sekolah'}) telah berhasil tercatat dengan ID: ${m.id}. Acara akan diselenggarakan pada Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Jangan lupa membawa meja lipat dan peralatan mewarnai sendiri. Terima kasih!`);
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
                         <td class="p-3.5"><strong class="text-slate-800 block">${m.id}</strong><span class="text-[11px]">${m.timestamp}</span></td>
-                        <td class="p-3.5"><span class="font-bold block">${escapeHtml(m.namaAnak)}</span><span class="text-slate-500 text-[11px]">${m.usia} Tahun</span></td>
-                        <td class="p-3.5">${escapeHtml(m.kategori)}</td>
+                        <td class="p-3.5"><span class="font-bold block">${escapeHtml(m.namaAnak)}</span><span class="text-slate-500 text-[11px]">${escapeHtml(m.asalSekolah || 'Belum Sekolah')}</span></td>
+                        <td class="p-3.5"><span class="text-slate-600">${escapeHtml(m.alamat || '-')}</span></td>
+                        <td class="p-3.5"><span class="bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-bold text-[10px]">${escapeHtml(m.kategori)}</span></td>
                         <td class="p-3.5">${escapeHtml(m.ortu)}<br><span class="font-mono text-slate-400 text-[11px]">${escapeHtml(m.phone)}</span></td>
                         <td class="p-3.5 text-center"><a href="https://wa.me/${String(m.phone).replace(/^0/, '62')}?text=${waTextMewarnai}" target="_blank" class="bg-sky-600 text-white px-2.5 py-1.5 rounded text-[11px] inline-flex items-center gap-1 font-bold shadow-sm">💬 WhatsApp Mewarnai</a></td>
                     </tr>
