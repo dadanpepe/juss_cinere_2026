@@ -65,36 +65,54 @@
                 <p class="text-slate-600 text-xs md:text-sm max-w-2xl mx-auto">Saksikan dan ikuti rangkaian acara Hari Pahlawan di Event JUSS Kecamatan Cinere | pastinya akan banyak stan makanan UMKM |  Hiburan Band | Doorprize</p>
             </div>
 
-            <!-- Poster Carousel / Slider Otomatis -->
+            <!-- Poster Carousel / Slider Otomatis dengan Efek Kaca Blur di Samping -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 relative overflow-hidden">
                 <div class="relative w-full overflow-hidden rounded-xl shadow-md bg-slate-900 min-h-[350px] md:min-h-[480px] flex items-center justify-center">
                     
                     <!-- Slide 1 -->
-                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 flex flex-col items-center justify-center p-2" data-index="0">
-                        <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Poster+Utama+JUSS+2026';" class="max-h-[420px] w-auto object-contain rounded-lg cursor-pointer" onclick="openImageViewer(this.src, 'Poster Utama JUSS 2026')">
-                        <div class="absolute bottom-3 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 flex flex-col items-center justify-center p-2 overflow-hidden" data-index="0">
+                        <!-- Background Blur Layer -->
+                        <div class="absolute inset-0 z-0">
+                            <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="" class="w-full h-full object-cover filter blur-xl scale-110 opacity-50">
+                            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md"></div>
+                        </div>
+                        <!-- Main Poster Image -->
+                        <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Poster+Utama+JUSS+2026';" class="relative z-10 max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Poster Utama JUSS 2026')">
+                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
                             1 / 3 • Poster Utama Acara JUSS 2026
                         </div>
                     </div>
 
                     <!-- Slide 2 -->
-                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex flex-col items-center justify-center p-2" data-index="1">
-                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/334155/ffffff?text=Poster+Lomba+Mewarnai';" class="max-h-[420px] w-auto object-contain rounded-lg cursor-pointer" onclick="openImageViewer(this.src, 'Poster Lomba Mewarnai Anak')">
-                        <div class="absolute bottom-3 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 overflow-hidden" data-index="1">
+                        <!-- Background Blur Layer -->
+                        <div class="absolute inset-0 z-0">
+                            <img src="mewarnai.jpeg" alt="" class="w-full h-full object-cover filter blur-xl scale-110 opacity-50">
+                            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md"></div>
+                        </div>
+                        <!-- Main Poster Image -->
+                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/334155/ffffff?text=Poster+Lomba+Mewarnai';" class="relative z-10 max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Poster Lomba Mewarnai Anak')">
+                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
                             2 / 3 • Poster Lomba Mewarnai Anak Mall Cinere
                         </div>
                     </div>
 
                     <!-- Slide 3 -->
-                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex flex-col items-center justify-center p-2" data-index="2">
-                        <img src="kaos.jpeg" alt="Mockup Kaos Jalan Santai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Mockup+Kaos+Jalan+Santai';" class="max-h-[420px] w-auto object-contain rounded-lg cursor-pointer" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
-                        <div class="absolute bottom-3 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                    <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 overflow-hidden" data-index="2">
+                        <!-- Background Blur Layer -->
+                        <div class="absolute inset-0 z-0">
+                            <img src="kaos.jpeg" alt="" class="w-full h-full object-cover filter blur-xl scale-110 opacity-50">
+                            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md"></div>
+                        </div>
+                        <!-- Main Poster Image -->
+                        <img src="kaos.jpeg" alt="Mockup Kaos Jalan Santai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Mockup+Kaos+Jalan+Santai';" class="relative z-10 max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
+                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
                             3 / 3 • Mockup & Size Chart Kaos Jalan Santai
                         </div>
                     </div>
 
-                    <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❮</button>
-                    <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❯</button>
+                    <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❮</button>
+                    <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❯</button>
                 </div>
 
                 <div class="flex justify-center gap-2 mt-4" id="carouselDots">
