@@ -974,8 +974,9 @@
                             id: row["ID Pendaftaran"] || `MEW-${100 + index}`,
                             timestamp: row["Timestamp"] || '-',
                             namaAnak: row["Nama Anak"] || "Anak",
-                            usia: Number(row["Usia (Tahun)"]) || 5,
-                            kategori: row["Kategori Lomba"] || "PAUD/TK",
+                            alamat: row["Alamat"] || "-",
+                            asalSekolah: row["Asal Sekolah"] || "-",
+                            kategori: row["Kategori"] || "TK A",
                             ortu: row["Nama Orang Tua"] || "Ortu",
                             phone: row["No HP / WhatsApp"] || "-",
                             status: row["Status"] || "Terdaftar"
@@ -1122,7 +1123,17 @@
             const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
             const newId = 'MEW-' + Math.floor(100 + Math.random() * 900);
 
-            const newReg = { id: newId, timestamp, namaAnak, alamat, asalSekolah, usia: 5, kategori, ortu, phone, status: 'Terdaftar' };
+            const newReg = { 
+                id: newId, 
+                timestamp, 
+                "Nama Anak": namaAnak, 
+                "Alamat": alamat, 
+                "Asal Sekolah": asalSekolah, 
+                "Kategori": kategori, 
+                "Nama Orang Tua": ortu, 
+                "No HP / WhatsApp": phone, 
+                "Status": 'Terdaftar' 
+            };
 
             if (GOOGLE_APPS_SCRIPT_URL) {
                 try {
@@ -1130,7 +1141,7 @@
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'mewarnai', id: newId, timestamp, namaAnak, usia: asalSekolah, kategori, ortu, phone, status: 'Terdaftar' })
+                        body: JSON.stringify({ type: 'mewarnai', id: newId, timestamp, namaAnak, alamat, asalSekolah, kategori, ortu, phone, status: 'Terdaftar' })
                     });
                 } catch (e) { console.log(e); }
             }
@@ -1167,17 +1178,28 @@
             const container = document.getElementById('searchResultContainer');
             const locationGuide = document.getElementById('locationGuideContainer');
 
-            if (!keyword) {
-                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 rounded-xl">Masukkan nama atau nomor WhatsApp untuk pencarian.</div>`;
+            if (!keyword || keyword.length < 3) {
+                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 border border-amber-200 rounded-xl">⚠️ Masukkan minimal 3 karakter nama lengkap atau nomor WhatsApp untuk melakukan pencarian yang valid.</div>`;
                 locationGuide.classList.add('hidden');
                 return;
             }
 
-            const filteredKaos = orders.filter(o => o.name.toLowerCase().includes(keyword) || String(o.phone).includes(keyword));
-            const filteredMewarnai = mewarnaiRegistrations.filter(m => m.namaAnak.toLowerCase().includes(keyword) || m.ortu.toLowerCase().includes(keyword) || String(m.phone).includes(keyword));
+            const filteredKaos = orders.filter(o => {
+                const name = String(o.name || "").toLowerCase();
+                const phone = String(o.phone || "");
+                return name === keyword || name.includes(keyword) || phone.includes(keyword);
+            });
+            
+            const filteredMewarnai = mewarnaiRegistrations.filter(m => {
+                const namaAnak = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
+                const ortu = String(m.ortu || m["Nama Orang Tua"] || "").toLowerCase();
+                const phone = String(m.phone || m["No HP / WhatsApp"] || "");
+                const sekolah = String(m.asalSekolah || m["Asal Sekolah"] || "").toLowerCase();
+                return namaAnak === keyword || namaAnak.includes(keyword) || ortu.includes(keyword) || phone.includes(keyword) || sekolah.includes(keyword);
+            });
 
             if (filteredKaos.length === 0 && filteredMewarnai.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs bg-slate-50 rounded-xl">Tidak ditemukan data peserta dengan kata kunci tersebut.</div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ Data Tidak Ditemukan</strong><p>Kata kunci pencarian tidak sesuai atau tidak lengkap dengan database peserta. Mohon pastikan nama lengkap atau nomor HP sudah benar.</p></div>`;
                 locationGuide.classList.add('hidden');
                 return;
             }
@@ -1199,7 +1221,7 @@
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3">
                         <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                             <div>
-                                <span class="font-bold text-slate-900 text-sm">${escapeHtml(maskedName)} <span class="text-[10px] text-slate-400"></span></span>
+                                <span class="font-bold text-slate-900 text-sm">${escapeHtml(maskedName)}</span>
                                 <span class="text-slate-400 block">${o.id} • ${o.timestamp}</span>
                             </div>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-emerald-100 text-emerald-800">${o.status}</span>
@@ -1236,23 +1258,28 @@
             });
 
             filteredMewarnai.forEach(m => {
-                let rawOrtu = String(m.ortu || 'Orang Tua');
+                let rawOrtu = String(m.ortu || m["Nama Orang Tua"] || 'Orang Tua');
                 let maskedOrtu = rawOrtu.length > 2 ? rawOrtu[0] + '*'.repeat(rawOrtu.length - 2) + rawOrtu[rawOrtu.length - 1] : rawOrtu;
-                let rawPhoneMewarnai = String(m.phone || '');
+                let rawPhoneMewarnai = String(m.phone || m["No HP / WhatsApp"] || '');
                 let maskedPhoneMewarnai = rawPhoneMewarnai.length > 4 ? rawPhoneMewarnai.substring(0, 4) + '****' + rawPhoneMewarnai.substring(rawPhoneMewarnai.length - 2) : '****';
+                let kategoriAnak = m.kategori || m["Kategori"] || 'TK A';
+                let sekolahAnak = m.asalSekolah || m["Asal Sekolah"] || 'Belum Sekolah';
+                let alamatAnak = m.alamat || m["Alamat"] || '-';
+                let namaAnak = m.namaAnak || m["Nama Anak"] || 'Peserta Anak';
 
                 html += `
                     <div class="bg-sky-500 text-white border border-sky-400 rounded-xl p-4 text-xs space-y-3 shadow-sm">
                         <div class="flex justify-between items-center border-b border-sky-400 pb-2">
                             <div>
-                                <span class="font-bold text-white text-sm">Ananda ${escapeHtml(m.namaAnak)} <span class="text-[10px] text-white font-bold">(Lomba Mewarnai)</span></span>
-                                <span class="text-white block">${m.id} • ${m.timestamp}</span>
+                                <span class="font-bold text-white text-sm">Ananda ${escapeHtml(namaAnak)} <span class="text-[10px] text-white font-bold">(Lomba Mewarnai)</span></span>
+                                <span class="text-white block">${m.id || m["ID Pendaftaran"]} • ${m.timestamp || m["Timestamp"]}</span>
                             </div>
-                            <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-white text-sky-900 shadow-sm">${m.status}</span>
+                            <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-white text-sky-900 shadow-sm">${m.status || m["Status"] || 'Terdaftar'}</span>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-white">
-                            <div><strong>Asal Sekolah:</strong> ${escapeHtml(m.asalSekolah || 'Belum Sekolah')}</div>
-                            <div><strong>Kategori:</strong> ${escapeHtml(m.kategori)}</div>
+                            <div><strong>Asal Sekolah:</strong> ${escapeHtml(sekolahAnak)}</div>
+                            <div><strong>Kategori:</strong> ${escapeHtml(kategoriAnak)}</div>
+                            <div><strong>Alamat:</strong> ${escapeHtml(alamatAnak)}</div>
                             <div><strong>Pendamping:</strong> ${escapeHtml(maskedOrtu)}</div>
                             <div><strong>No HP:</strong> <span class="font-mono bg-sky-600 px-1.5 py-0.5 rounded text-white">${maskedPhoneMewarnai}</span></div>
                         </div>
@@ -1261,16 +1288,18 @@
                             <div class="flex justify-between items-center border-b border-white/20 pb-2">
                                 <div>
                                     <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold text-white">🎨 E-Ticket & Pengingat Lomba Mewarnai</span>
-                                    <h4 class="font-black text-lg tracking-wide mt-1 text-white">${m.id}</h4>
+                                    <h4 class="font-black text-lg tracking-wide mt-1 text-white">${m.id || m["ID Pendaftaran"]}</h4>
                                 </div>
                                 <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner flex items-center justify-center">
-                                    <span class="text-[10px]">QR-[${m.id}]</span>
+                                    <span class="text-[10px]">QR-[${m.id || m["ID Pendaftaran"]}]</span>
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-xs text-white">
-                                <div>Peserta Anak: <strong class="text-white block">${escapeHtml(m.namaAnak)}</strong></div>
-                                <div>Kategori: <strong class="text-white block">${escapeHtml(m.kategori)}</strong></div>
-                                <div>Asal Sekolah: <strong class="text-white block">${escapeHtml(m.asalSekolah || '-')}</strong></div>
+                                <div>Peserta Anak: <strong class="text-white block">${escapeHtml(namaAnak)}</strong></div>
+                                <div>Kategori: <strong class="text-white block">${escapeHtml(kategoriAnak)}</strong></div>
+                                <div>Asal Sekolah: <strong class="text-white block">${escapeHtml(sekolahAnak)}</strong></div>
+                                <div>Alamat: <strong class="text-white block">${escapeHtml(alamatAnak)}</strong></div>
+                                <div>Pendamping: <strong class="text-white block">${escapeHtml(rawOrtu)}</strong></div>
                                 <div>Lokasi: <strong class="text-white block">Mall Cinere (28 Nov 2026)</strong></div>
                             </div>
                             
