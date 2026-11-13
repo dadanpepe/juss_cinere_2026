@@ -1148,7 +1148,7 @@
 
             let tbody = document.getElementById('adminTableBody');
             tbody.innerHTML = paginatedOrders.length === 0 ? `<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada data pemesanan kaos yang cocok.</td></tr>` : paginatedOrders.map((o) => {
-                const waText = encodeURIComponent(`Halo Bpk/Ibu ${o.name}, terima kasih telah memesan Kaos Jalan Santai & Kuliner Nusantara JUSS 2026 (ID: ${o.id}). Pesanan ${o.qty} Pcs (Size ${o.size}, Lengan ${o.sleeve}) senilai Rp ${o.totalPrice.toLocaleString('id-ID')} telah ${o.status}. Pengambilan kaos dapat dilakukan di JS Coffee (Kedai Biru), Jl. Andara Raya No.23 dengan menunjukkan E-Ticket di portal ini. Salam UMKM Cinere!`);
+                const waText = encodeURIComponent(`Halo Kak ${o.name}, terima kasih telah memesan Kaos Jalan Santai & Kuliner Nusantara JUSS 2026 (ID: ${o.id}). Pesanan ${o.qty} Pcs (Size ${o.size}, Lengan ${o.sleeve}) senilai Rp ${o.totalPrice.toLocaleString('id-ID')} telah ${o.status}. Pengambilan kaos dapat dilakukan di JS Coffee (Kedai Biru), Jl. Andara Raya No.23 dengan menunjukkan E-Ticket di portal ini. Salam UMKM Cinere!`);
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
                         <td class="p-3.5"><strong class="text-slate-800 block">${o.id}</strong><span class="text-[11px]">${o.timestamp}</span></td>
