@@ -13,7 +13,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
     <!-- Scrolling Announcement Marquee -->
-    <div class="bg-sky-500 text-white font-semibold text-xs py-2 px-4 shadow-sm border-b border-sky-600 overflow-hidden flex items-center">
+    <div class="bg-sky-600 text-white font-semibold text-xs py-2 px-4 shadow-sm border-b border-sky-700 overflow-hidden flex items-center">
         <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-3 whitespace-nowrap">📢 Info Penting</span>
         <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white" id="marqueeAnnouncementText">
             Selamat datang di portal resmi Pemesanan Kaos & Lomba Mewarnai Hari Pahlawan JUSS UMKM Kec. Cinere 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23. Lomba mewarnai di Halaman Parkir Mall Cinere (Sabtu, 28 November 2026).
@@ -53,6 +53,30 @@
             </div>
         </div>
     </header>
+
+    <!-- Sticky Navigation Bar untuk Scroll ke Bawah -->
+    <div id="stickyNavBar" class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 shadow-lg py-2.5 px-4 hidden transition-all duration-300">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
+            <span class="text-xs font-extrabold text-white whitespace-nowrap hidden sm:inline">🚀 JUSS 2026</span>
+            <div class="flex items-center gap-1.5 flex-nowrap">
+                <button onclick="switchTab('beranda')" id="btn-sticky-beranda" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap">
+                     Beranda
+                </button>
+                <button onclick="switchTab('form')" id="btn-sticky-form" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap">
+                     Jalan Santai
+                </button>
+                <button onclick="switchTab('mewarnai')" id="btn-sticky-mewarnai" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap">
+                     Lomba Mewarnai
+                </button>
+                <button onclick="switchTab('status')" id="btn-sticky-status" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap">
+                     Cek Status & Tiket
+                </button>
+                <button onclick="openAdminModalPrompt()" id="btn-sticky-admin" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 flex items-center gap-1 whitespace-nowrap">
+                     Panitia
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Container -->
     <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
@@ -123,7 +147,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-sky-500 border border-sky-400 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
+                <div class="bg-sky-600 border border-sky-500 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
                     <div>
                         <span class="bg-white text-sky-900 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase shadow-sm">Jalan Santai</span>
                         <h3 class="text-lg font-bold text-white mt-2">Pemesanan Kaos Resmi</h3>
@@ -134,7 +158,7 @@
                     </button>
                 </div>
 
-                <div class="bg-sky-500 border border-sky-400 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
+                <div class="bg-sky-600 border border-sky-500 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
                     <div>
                         <span class="bg-white text-sky-900 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase shadow-sm">Lomba Anak</span>
                         <h3 class="text-lg font-bold text-white mt-2">Pendaftaran Lomba Mewarnai</h3>
@@ -146,12 +170,12 @@
                 </div>
             </div>
 
-            <!-- Galeri Stan Makanan UMKM dengan Slide & Nomor Stan -->
+            <!-- Galeri Stan Makanan UMKM dengan Slide & Randomisasi Gambar (Kuliner, Minuman, Snack, Kue Basah) -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
                 <div class="text-center max-w-xl mx-auto">
                     <span class="bg-sky-100 text-sky-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Kuliner & Bazar Nusantara</span>
                     <h3 class="text-xl font-black text-slate-900 mt-2">Galeri Stan Makanan & UMKM JUSS 2026</h3>
-                    <p class="text-slate-500 text-xs mt-1">Jelajahi berbagai pilihan kuliner lezat, minuman segar, dan kerajinan tangan lengkap dengan nomor stan resmi acara.</p>
+                    <p class="text-slate-500 text-xs mt-1">Jelajahi berbagai pilihan kuliner nusantara, minuman segar, snack & kue basah lengkap dengan nomor stan resmi acara.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -164,21 +188,27 @@
                         
                         <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 kuliner-slide-0 active-kuliner">
-                                <img src="https://placehold.co/500x300/0284c7/ffffff?text=Nasi+Kuning+Cinere+%2301" alt="Stan 1" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/0284c7/ffffff?text=%F0%9F%8D%9B+Kuliner+Nusantara+%2301" alt="Stan 1" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
-                                    Stan #01 • Nasi Kuning & Soto Betawi Bu Siti
+                                    Stan #01 • Nasi Kuning & Soto Betawi Andara
                                 </div>
                             </div>
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 kuliner-slide-0">
-                                <img src="https://placehold.co/500x300/0369a1/ffffff?text=Bakso+Andara+%2302" alt="Stan 2" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/0369a1/ffffff?text=%F0%9F%8D%9B+Kuliner+Nusantara+%2302" alt="Stan 2" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
-                                    Stan #02 • Bakso & Mie Ayam Andara Jaya
+                                    Stan #02 • Bakso & Mie Ayam Cinere Jaya
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 kuliner-slide-0">
+                                <img src="https://placehold.co/500x300/0f172a/ffffff?text=%F0%9F%8D%9B+Kuliner+Nusantara+%2303" alt="Stan 3" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #03 • Nasi Uduk Betawi Asli & Gorengan
                                 </div>
                             </div>
                             <button onclick="prevCategorySlide('kuliner', 0)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
                             <button onclick="nextCategorySlide('kuliner', 0)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
                         </div>
-                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan kuliner nusantara lainnya.</p>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan Kuliner Nusantara lainnya.</p>
                     </div>
 
                     <!-- Kategori 2: Minuman Segar -->
@@ -190,21 +220,27 @@
                         
                         <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 minuman-slide-1 active-minuman">
-                                <img src="https://placehold.co/500x300/0891b2/ffffff?text=Es+Kopi+Biru+%2306" alt="Stan 6" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/0891b2/ffffff?text=%F0%9F%A7%8B+Minuman+Segar+%2306" alt="Stan 6" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
-                                    Stan #06 • JS Coffee & Es Kopi Kekinian
+                                    Stan #06 • Es Kopi Kekinian & Teh Tarik
                                 </div>
                             </div>
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 minuman-slide-1">
-                                <img src="https://placehold.co/500x300/0e7490/ffffff?text=Jus+Buah+Segar+%2307" alt="Stan 7" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/0e7490/ffffff?text=%F0%9F%A7%8B+Minuman+Segar+%2307" alt="Stan 7" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
-                                    Stan #07 • Aneka Jus Buah & Es Kelapa Muda
+                                    Stan #07 • Aneka Jus Buah Segar & Es Kelapa
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 minuman-slide-1">
+                                <img src="https://placehold.co/500x300/155e75/ffffff?text=%F0%9F%A7%8B+Minuman+Segar+%2308" alt="Stan 8" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #08 • Es Buah Segar Nusantara & Lemon Tea
                                 </div>
                             </div>
                             <button onclick="prevCategorySlide('minuman', 1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
                             <button onclick="nextCategorySlide('minuman', 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
                         </div>
-                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan minuman segar lainnya.</p>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan Minuman Segar lainnya.</p>
                     </div>
 
                     <!-- Kategori 3: Snack & Kue Basah -->
@@ -216,21 +252,27 @@
                         
                         <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 snack-slide-2 active-snack">
-                                <img src="https://placehold.co/500x300/0d9488/ffffff?text=Kue+Subuh+Cinere+%2311" alt="Stan 11" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/0d9488/ffffff?text=%F0%9F%A7%81+Snack+%26+Kue+Basah+%2311" alt="Stan 11" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
                                     Stan #11 • Aneka Kue Tradisional & Jajanan Pasar
                                 </div>
                             </div>
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 snack-slide-2">
-                                <img src="https://placehold.co/500x300/115e59/ffffff?text=Keripik+UMKM+%2312" alt="Stan 12" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/115e59/ffffff?text=%F0%9F%A7%81+Snack+%26+Kue+Basah+%2312" alt="Stan 12" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
-                                    Stan #12 • Keripik Singkong & Pisang Cokelat
+                                    Stan #12 • Kue Basah Subuh & Risoles Spesial
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 snack-slide-2">
+                                <img src="https://placehold.co/500x300/134e4a/ffffff?text=%F0%9F%A7%81+Snack+%26+Kue+Basah+%2313" alt="Stan 13" class="w-full h-full object-cover rounded-lg">
+                                <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
+                                    Stan #13 • Keripik Singkong Renyah & Pisang Cokelat
                                 </div>
                             </div>
                             <button onclick="prevCategorySlide('snack', 2)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
                             <button onclick="nextCategorySlide('snack', 2)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
                         </div>
-                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan snack & kue basah lainnya.</p>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan Snack & Kue Basah lainnya.</p>
                     </div>
 
                     <!-- Kategori 4: Kerajinan & Craft -->
@@ -242,13 +284,13 @@
                         
                         <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-48 flex items-center justify-center group">
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center p-2 craft-slide-3 active-craft">
-                                <img src="https://placehold.co/500x300/4f46e5/ffffff?text=Souvenir+Cinere+%2316" alt="Stan 16" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/4f46e5/ffffff?text=%F0%9F%8E%A8+Kerajinan+%26+Craft+%2316" alt="Stan 16" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
                                     Stan #16 • Souvenir & Kerajinan Tangan Lokal
                                 </div>
                             </div>
                             <div class="absolute inset-0 transition-opacity duration-500 ease-in-out opacity-0 flex flex-col items-center justify-center p-2 craft-slide-3">
-                                <img src="https://placehold.co/500x300/4338ca/ffffff?text=Fashion+UMKM+%2317" alt="Stan 17" class="w-full h-full object-cover rounded-lg">
+                                <img src="https://placehold.co/500x300/4338ca/ffffff?text=%F0%9F%8E%A8+Kerajinan+%26+Craft+%2317" alt="Stan 17" class="w-full h-full object-cover rounded-lg">
                                 <div class="absolute bottom-2 bg-black/70 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm">
                                     Stan #17 • Tas Kain & Fashion Aksesoris Warga
                                 </div>
@@ -256,16 +298,15 @@
                             <button onclick="prevCategorySlide('craft', 3)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❮</button>
                             <button onclick="nextCategorySlide('craft', 3)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs backdrop-blur-sm transition">❯</button>
                         </div>
-                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan kerajinan & craft lainnya.</p>
+                        <p class="text-[11px] text-slate-500 text-center">Geser untuk melihat stan Kerajinan & Craft lainnya.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Logo Sponsor Partner -->
+            <!-- Logo Sponsor Partner (JS Coffee & Kedai Biru diubah warnanya menjadi hijau tosca) -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center space-y-4">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Didukung Oleh Mitra & Sponsor Resmi</span>
                 
-                <!-- Sponsor Container dengan Deteksi Otomatis Lebih dari 5 Logo -->
                 <div class="relative w-full overflow-hidden rounded-xl bg-slate-50 py-5 px-2 border border-slate-200 shadow-inner flex items-center" id="sponsorContainerWrapper">
                     <div id="sponsorTrack" class="flex gap-8 items-center whitespace-nowrap w-full overflow-x-auto scrollbar-none py-2">
                         <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
@@ -288,9 +329,10 @@
                             <img src="https://placehold.co/100x100/0284c7/ffffff?text=UMKM+Depok" alt="UMKM Depok" class="max-h-16 w-auto object-contain cursor-pointer rounded-lg">
                             <span class="font-bold text-slate-700 text-xs mt-1">UMKM Juara Depok</span>
                         </div>
+                        <!-- Diubah menjadi Hijau Tosca (bg-teal-600) sesuai permintaan -->
                         <div class="flex flex-col items-center justify-center shrink-0 px-4 sponsor-item">
-                            <img src="https://placehold.co/100x100/d97706/ffffff?text=JS+Coffee" alt="JS Coffee" class="max-h-16 w-auto object-contain cursor-pointer rounded-lg">
-                            <span class="font-bold text-slate-700 text-xs mt-1">JS Coffee & Kedai Biru</span>
+                            <img src="https://placehold.co/100x100/0d9488/ffffff?text=JS+Coffee" alt="JS Coffee & Kedai Biru" class="max-h-16 w-auto object-contain cursor-pointer rounded-lg">
+                            <span class="font-bold text-teal-700 text-xs mt-1">JS Coffee & Kedai Biru</span>
                         </div>
                     </div>
                 </div>
@@ -466,28 +508,28 @@
         <!-- TAB 2: LOMBA MEWARNAI -->
         <section id="tab-mewarnai" class="space-y-6 max-w-3xl mx-auto hidden">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-4">
-                <span class="bg-sky-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Lomba Anak • Hari Pahlawan 2026</span>
+                <span class="bg-sky-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Lomba Anak • Hari Pahlawan 2026</span>
                 <h2 class="text-2xl font-extrabold text-slate-900">Lomba Mewarnai JUSS 2026</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                    <div class="bg-sky-500 text-white p-4 rounded-xl border border-sky-600 shadow-sm space-y-1">
+                    <div class="bg-sky-600 text-white p-4 rounded-xl border border-sky-700 shadow-sm space-y-1">
                         <strong class="text-white block text-sm">📅 Waktu Acara:</strong>
                         <p class="text-white font-semibold text-sm">Sabtu, 28 November 2026</p>
                     </div>
-                    <div class="bg-sky-500 text-white p-4 rounded-xl border border-sky-600 shadow-sm space-y-1">
+                    <div class="bg-sky-600 text-white p-4 rounded-xl border border-sky-700 shadow-sm space-y-1">
                         <strong class="text-white block text-sm">📍 Alamat Acara:</strong>
                         <p class="text-white font-semibold">Halaman Parkir Mall Cinere</p>
                     </div>
                 </div>
 
-                <div class="bg-sky-500 text-white border border-sky-400 rounded-xl p-4 text-xs space-y-2 shadow-sm">
+                <div class="bg-sky-600 text-white border border-sky-500 rounded-xl p-4 text-xs space-y-2 shadow-sm">
                     <strong class="text-white block font-bold">📋 Syarat dan Ketentuan:</strong>
                     <ol class="list-decimal list-inside space-y-1 text-white">
                         <li>Peserta diwajibkan membawa peralatan mewarnai sendiri.</li>
                         <li>Peserta diwajibkan membawa meja lipat untuk alas mewarnai sendiri.</li>
                         <li>Periode Pendaftaran online: <strong class="text-white">13–23 November 2026</strong>.</li>
                     </ol>
-                    <div class="pt-2 border-t border-sky-400 text-white">
+                    <div class="pt-2 border-t border-sky-500 text-white">
                         📞 Untuk informasi lebih lanjut hubungi kami di: <strong class="text-white font-bold">0813-8778-3916 (Amanda)</strong>
                     </div>
                 </div>
@@ -546,7 +588,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="submitMewarnaiBtn" class="w-full bg-gradient-to-r from-sky-500 to-cyan-600 hover:from-sky-600 hover:to-cyan-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
+                    <button type="submit" id="submitMewarnaiBtn" class="w-full bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
                         Daftar Lomba Mewarnai Sekarang 🎨
                     </button>
                 </form>
@@ -574,13 +616,13 @@
             <div id="locationGuideContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4 hidden">
                 <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">📦 Alur & Titik Lokasi Pengambilan Kaos Warga Cinere</h4>
                 
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="bg-teal-50 border border-teal-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <span class="text-amber-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
+                        <span class="text-teal-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
                         <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
                         <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
                     </div>
-                    <a href="https://www.google.com/search?q=kedai+biru+andara&oq=kedai&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MggIARBFGCcYOzIGCAIQRRg5MgYIAxAjGCcyDQgEEAAYkgMYgAQYigUyBggFEEUYPTIGCAYQRRg9MgYIBxBFGDzSAQgxMTAzajBqN6gCALACAA&sourceid=chrome&source=chrome.ob&ie=UTF-8" target="_blank" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
+                    <a href="https://www.google.com/search?q=kedai+biru+andara&oq=kedai&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MggIARBFGCcYOzIGCAIQRRg5MgYIAxAjGCcyDQgEEAAYkgMYgAQYigUyBggFEEUYPTIGCAYQRRg9MgYIBxBFGDzSAQgxMTAzajBqN6gCALACAA&sourceid=chrome&source=chrome.ob&ie=UTF-8" target="_blank" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
                         🗺️ Buka Google Maps (JS Coffee)
                     </a>
                 </div>
@@ -591,7 +633,7 @@
         <section id="tab-admin" class="space-y-6 hidden">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Panel Khusus Panitia</span>
+                    <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Panel Khusus Panitia</span>
                     <h2 class="text-xl font-bold text-slate-900 mt-2">Rekapitulasi Pemesanan & Pendaftaran</h2>
                     <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran kaos dan rekap peserta lomba mewarnai anak secara terpisah.</p>
                 </div>
@@ -734,6 +776,11 @@
         <p>© 2026 Panitia Jalan Santai & Jualan UMKM Sama-Sama (Kecamatan Cinere). All rights reserved.</p>
     </footer>
 
+    <!-- Tombol Kembali ke Atas (Scroll to Top) -->
+    <button id="scrollToTopBtn" onclick="scrollToTop()" class="fixed bottom-6 right-6 z-50 bg-sky-600 hover:bg-sky-700 text-white w-12 h-12 rounded-full shadow-2xl flex items-center justify-center text-xl transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4" title="Kembali ke atas">
+        ↑
+    </button>
+
     <!-- Admin PIN Modal -->
     <div id="adminModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl">
@@ -863,9 +910,8 @@
         let adminKaosSearchQuery = "";
         let adminMewarnaiSearchQuery = "";
 
-        // Slider galeri stan per kategori
+        // Slider galeri stan per kategori (Kuliner Nusantara, Minuman Segar, Snack & Kue Basah, Kerajinan & Craft)
         let categorySlideIndices = { kuliner: 0, minuman: 0, snack: 0, craft: 0 };
-        const categorySlideCounts = { kuliner: 2, minuman: 2, snack: 2, craft: 2 };
 
         function showCategorySlide(categoryName, idx) {
             const slides = document.querySelectorAll('.' + categoryName + '-slide-' + (categoryName === 'kuliner' ? 0 : categoryName === 'minuman' ? 1 : categoryName === 'snack' ? 2 : 3));
@@ -1005,22 +1051,30 @@
             ['beranda', 'form', 'mewarnai', 'status', 'admin'].forEach(t => {
                 const sec = document.getElementById('tab-' + t);
                 if (sec) sec.classList.add('hidden');
+                
                 const btn = document.getElementById('btn-tab-' + t);
                 if (btn) btn.className = 'px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
+
+                const stickyBtn = document.getElementById('btn-sticky-' + t);
+                if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap';
             });
 
             if (tabName === 'beranda') {
                 document.getElementById('tab-beranda').classList.remove('hidden');
-                document.getElementById('btn-tab-beranda').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-tab-beranda')) document.getElementById('btn-tab-beranda').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-beranda')) document.getElementById('btn-sticky-beranda').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
             } else if (tabName === 'form') {
                 document.getElementById('tab-form').classList.remove('hidden');
-                document.getElementById('btn-tab-form').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-tab-form')) document.getElementById('btn-tab-form').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-form')) document.getElementById('btn-sticky-form').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
             } else if (tabName === 'mewarnai') {
                 document.getElementById('tab-mewarnai').classList.remove('hidden');
-                document.getElementById('btn-tab-mewarnai').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-tab-mewarnai')) document.getElementById('btn-tab-mewarnai').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-mewarnai')) document.getElementById('btn-sticky-mewarnai').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
             } else if (tabName === 'status') {
                 document.getElementById('tab-status').classList.remove('hidden');
-                document.getElementById('btn-tab-status').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-tab-status')) document.getElementById('btn-tab-status').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-status')) document.getElementById('btn-sticky-status').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
                 fetchOrdersFromGoogleSheets();
             } else if (tabName === 'admin') {
                 if (!isAdminLoggedIn) {
@@ -1029,9 +1083,11 @@
                     return;
                 }
                 document.getElementById('tab-admin').classList.remove('hidden');
-                document.getElementById('btn-tab-admin').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-tab-admin')) document.getElementById('btn-tab-admin').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-admin')) document.getElementById('btn-sticky-admin').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
                 fetchOrdersFromGoogleSheets().then(() => renderAdminDashboard());
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function switchAdminSubTab(subTabName) {
@@ -1186,12 +1242,11 @@
             const locationGuide = document.getElementById('locationGuideContainer');
 
             if (!keyword || keyword.length < 3) {
-                container.innerHTML = `<div class="text-center py-6 text-amber-600 text-xs bg-amber-50 border border-amber-200 rounded-xl">⚠️ Jika nama tidak lengkap sesuai database maka pencarian tidak bisa dilanjutkan.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-teal-700 text-xs bg-teal-50 border border-teal-200 rounded-xl">⚠️ Jika nama tidak lengkap sesuai database maka pencarian tidak bisa dilanjutkan.</div>`;
                 locationGuide.classList.add('hidden');
                 return;
             }
 
-            // Validasi ketat: Nama harus sesuai secara utuh atau lengkap dengan database
             const filteredKaos = orders.filter(o => {
                 const name = String(o.name || "").toLowerCase();
                 const phone = String(o.phone || "");
@@ -1274,8 +1329,8 @@
                 let namaAnak = m.namaAnak || m["Nama Anak"] || 'Peserta Anak';
 
                 html += `
-                    <div class="bg-sky-500 text-white border border-sky-400 rounded-xl p-4 text-xs space-y-3 shadow-sm">
-                        <div class="flex justify-between items-center border-b border-sky-400 pb-2">
+                    <div class="bg-sky-600 text-white border border-sky-500 rounded-xl p-4 text-xs space-y-3 shadow-sm">
+                        <div class="flex justify-between items-center border-b border-sky-500 pb-2">
                             <div>
                                 <span class="font-bold text-white text-sm">Ananda ${escapeHtml(namaAnak)} <span class="text-[10px] text-white font-bold">(Lomba Mewarnai)</span></span>
                                 <span class="text-white block">${m.id || m["ID Pendaftaran"]} • ${m.timestamp || m["Timestamp"]}</span>
@@ -1287,10 +1342,10 @@
                             <div><strong>Kategori:</strong> ${escapeHtml(kategoriAnak)}</div>
                             <div><strong>Alamat:</strong> ${escapeHtml(alamatAnak)}</div>
                             <div><strong>Pendamping:</strong> ${escapeHtml(rawOrtu)}</div>
-                            <div><strong>No HP:</strong> <span class="font-mono bg-sky-600 px-1.5 py-0.5 rounded text-white">${maskedPhoneMewarnai}</span></div>
+                            <div><strong>No HP:</strong> <span class="font-mono bg-sky-700 px-1.5 py-0.5 rounded text-white">${maskedPhoneMewarnai}</span></div>
                         </div>
                         
-                        <div class="mt-4 bg-sky-600 text-white p-4 rounded-xl shadow-md space-y-3 border border-sky-400">
+                        <div class="mt-4 bg-sky-700 text-white p-4 rounded-xl shadow-md space-y-3 border border-sky-500">
                             <div class="flex justify-between items-center border-b border-white/20 pb-2">
                                 <div>
                                     <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold text-white">🎨 E-Ticket & Pengingat Lomba Mewarnai</span>
@@ -1542,9 +1597,31 @@
             document.getElementById('imageViewerModal').classList.add('hidden');
         }
 
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function escapeHtml(str) {
             return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
+
+        window.onscroll = function() {
+            const stickyBar = document.getElementById('stickyNavBar');
+            const scrollTopBtn = document.getElementById('scrollToTopBtn');
+            if (window.scrollY > 280) {
+                if (stickyBar) stickyBar.classList.remove('hidden');
+                if (scrollTopBtn) {
+                    scrollTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    scrollTopBtn.classList.add('opacity-100', 'translate-y-0');
+                }
+            } else {
+                if (stickyBar) stickyBar.classList.add('hidden');
+                if (scrollTopBtn) {
+                    scrollTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    scrollTopBtn.classList.remove('opacity-100', 'translate-y-0');
+                }
+            }
+        };
 
         window.onload = function() {
             calculateTotal();
@@ -1553,7 +1630,6 @@
             showSlide(0);
             startSlideShow();
 
-            // Cek jumlah item sponsor (jika lebih dari 5, aktifkan animasi papan berjalan otomatis)
             const sponsorTrack = document.getElementById('sponsorTrack');
             if (sponsorTrack) {
                 const sponsorItems = sponsorTrack.querySelectorAll('.sponsor-item');
@@ -1570,7 +1646,6 @@
                 }
             }
 
-            // Sinkronisasi otomatis dengan database Google Sheets secara real-time setiap 10 detik
             setInterval(() => {
                 fetchOrdersFromGoogleSheets();
             }, 10000);
