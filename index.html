@@ -710,11 +710,11 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
                 <div class="text-center max-w-md mx-auto mb-6">
                     <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket Terpadu</h3>
-                    <p class="text-slate-500 text-xs mt-1">Masukkan Nomor WhatsApp atau Nama lengkap Anda untuk memeriksa status verifikasi dan menampilkan seluruh E-Ticket (Kaos, Jalan Santai, & Lomba Mewarnai) beserta informasi pengambilan kaos secara lengkap.</p>
+                    <p class="text-slate-500 text-xs mt-1">Masukkan <strong>Nama Lengkap</strong> peserta (sesuai database pendaftaran) untuk memeriksa status verifikasi dan menampilkan seluruh E-Ticket.</p>
                 </div>
 
                 <div class="flex gap-2 max-w-md mx-auto mb-6">
-                    <input type="text" id="searchKeyword" placeholder="Cari No WhatsApp atau Nama..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                    <input type="text" id="searchKeyword" placeholder="Masukkan Nama Lengkap Sesuai Database..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
                     <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari Tiket</button>
                 </div>
 
@@ -1321,11 +1321,13 @@
             const submitBtnText = document.getElementById('submitBtnText');
             const submitBtnSpinner = document.getElementById('submitBtnSpinner');
 
+            // Kunci tombol agar tidak bisa diklik dobel saat proses penyimpanan
             submitBtn.disabled = true;
-            submitBtnText.innerText = 'Mengirim Pesanan...';
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitBtnText.innerText = 'Menyimpan ke Database...';
             submitBtnSpinner.classList.remove('hidden');
 
-            const name = document.getElementById('name').value;
+            const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const instansi = document.getElementById('instansi').value;
             const size = document.getElementById('size').value;
@@ -1363,7 +1365,9 @@
             orders.unshift(newOrder);
             saveToStorage();
 
+            // Lepas kunci tombol setelah selesai
             submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             submitBtnText.innerText = 'Kirim Pesanan Kaos Sekarang 🚀';
             submitBtnSpinner.classList.add('hidden');
 
@@ -1378,11 +1382,13 @@
             const submitBtnText = document.getElementById('submitJalanBtnText');
             const submitBtnSpinner = document.getElementById('submitJalanBtnSpinner');
 
+            // Kunci tombol agar tidak bisa diklik dobel saat proses penyimpanan
             submitBtn.disabled = true;
-            submitBtnText.innerText = 'Mendaftarkan...';
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitBtnText.innerText = 'Menyimpan ke Database...';
             submitBtnSpinner.classList.remove('hidden');
 
-            const name = document.getElementById('jsName').value;
+            const name = document.getElementById('jsName').value.trim();
             const gender = document.getElementById('jsGender').value;
             const isUnderage = document.getElementById('jsUnderageCheck').checked;
             const ktp = isUnderage ? 'Anak di Bawah Umur' : document.getElementById('jsKtp').value.trim();
@@ -1423,7 +1429,9 @@
             jalanRegistrations.unshift(newReg);
             saveToStorage();
 
+            // Lepas kunci tombol setelah selesai
             submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             submitBtnText.innerText = 'Daftar Jalan Santai Sekarang 🚶‍♂️🏃‍♀️';
             submitBtnSpinner.classList.add('hidden');
 
@@ -1440,19 +1448,21 @@
             const submitBtnText = document.getElementById('submitMewarnaiBtnText');
             const submitBtnSpinner = document.getElementById('submitMewarnaiBtnSpinner');
 
+            // Kunci tombol agar tidak bisa diklik dobel saat proses penyimpanan
             submitBtn.disabled = true;
-            submitBtnText.innerText = 'Mendaftarkan Lomba...';
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitBtnText.innerText = 'Menyimpan ke Database...';
             submitBtnSpinner.classList.remove('hidden');
 
-            const namaAnak = document.getElementById('namaAnak').value;
+            const namaAnak = document.getElementById('namaAnak').value.trim();
             const alamat = document.getElementById('alamatAnak').value;
             const asalSekolah = document.getElementById('asalSekolah').value;
             
             const selectedRadio = document.querySelector('input[name="kategoriLombaRadio"]:checked');
             const kategori = selectedRadio ? selectedRadio.value : 'TK A';
 
-            const ortu = document.getElementById('namaOrtu').value;
-            const phone = document.getElementById('phoneMewarnai').value;
+            const ortu = document.getElementById('namaOrtu').value.trim();
+            const phone = document.getElementById('phoneMewarnai').value.trim();
 
             const now = new Date();
             const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
@@ -1484,7 +1494,9 @@
             mewarnaiRegistrations.unshift(newReg);
             saveToStorage();
 
+            // Lepas kunci tombol setelah selesai
             submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             submitBtnText.innerText = 'Daftar Lomba Mewarnai Sekarang 🎨';
             submitBtnSpinner.classList.add('hidden');
 
@@ -1517,43 +1529,41 @@
             const container = document.getElementById('searchResultContainer');
 
             if (!keyword || keyword.length < 3) {
-                container.innerHTML = `<div class="text-center py-6 text-teal-700 text-xs bg-teal-50 border border-teal-200 rounded-xl">⚠️ Mohon masukkan minimal 3 karakter (Nomor WhatsApp atau Nama lengkap) untuk pencarian E-Ticket.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-teal-700 text-xs bg-teal-50 border border-teal-200 rounded-xl">⚠️ Mohon masukkan Nama Lengkap peserta (minimal 3 karakter) sesuai database.</div>`;
                 return;
             }
 
-            // Validasi pencarian dan pemisahan tiket Kaos, Jalan Santai, serta Lomba Mewarnai
+            // Validasi pencarian STRICT berdasarkan Nama Lengkap yang tersimpan di database
             const filteredKaos = orders.filter(o => {
-                const name = String(o.name || "").toLowerCase();
-                const phone = String(o.phone || "").trim();
-                return name.includes(keyword) || phone.includes(keyword);
+                const name = String(o.name || "").trim().toLowerCase();
+                return name === keyword || name.includes(keyword);
             });
 
-            // Validasi data anak/peserta jalan santai: Pastikan jika didaftarkan jalan santai tanpa inputan di kaos, tidak tercampur ke eticket kaos
+            // Validasi pencarian peserta jalan santai berdasarkan Nama Lengkap
             const filteredJalan = jalanRegistrations.filter(j => {
-                const name = String(j.name || "").toLowerCase();
-                const phone = String(j.phone || "").trim();
-                return name.includes(keyword) || phone.includes(keyword);
+                const name = String(j.name || "").trim().toLowerCase();
+                return name === keyword || name.includes(keyword);
             });
             
+            // Validasi pencarian lomba mewarnai berdasarkan Nama Anak Lengkap
             const filteredMewarnai = mewarnaiRegistrations.filter(m => {
-                const namaAnak = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
-                const ortu = String(m.ortu || m["Nama Orang Tua"] || "").toLowerCase();
-                const phone = String(m.phone || m["No HP / WhatsApp"] || "").trim();
-                return namaAnak.includes(keyword) || ortu.includes(keyword) || phone.includes(keyword);
+                const namaAnak = String(m.namaAnak || m["Nama Anak"] || "").trim().toLowerCase();
+                const ortu = String(m.ortu || m["Nama Orang Tua"] || "").trim().toLowerCase();
+                return namaAnak === keyword || namaAnak.includes(keyword) || ortu === keyword;
             });
 
             if (filteredKaos.length === 0 && filteredJalan.length === 0 && filteredMewarnai.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ E-Ticket Tidak Ditemukan</strong><p>Pastikan Nomor WhatsApp atau Nama yang Anda masukkan sudah sesuai dengan data pendaftaran.</p></div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ E-Ticket Tidak Ditemukan</strong><p>Nama Lengkap "${escapeHtml(keyword)}" tidak ditemukan di database pendaftaran. Pastikan penulisan nama lengkap sudah sesuai.</p></div>`;
                 return;
             }
 
             let html = `
                 <div class="bg-sky-50 border border-sky-200 p-3.5 rounded-xl text-xs text-sky-900 font-medium mb-3">
-                    ✨ Ditemukan ${filteredKaos.length + filteredJalan.length + filteredMewarnai.length} E-Ticket terdaftar untuk kata kunci: <strong class="underline">${escapeHtml(keyword)}</strong>
+                    ✨ Ditemukan ${filteredKaos.length + filteredJalan.length + filteredMewarnai.length} E-Ticket untuk nama: <strong class="underline">${escapeHtml(keyword)}</strong>
                 </div>
             `;
 
-            // 1. Render E-Ticket Pembelian Kaos (Disertai Alur & Titik Lokasi Pengambilan Kaos di JS Coffee)
+            // 1. Render E-Ticket Pembelian Kaos (Hanya jika terdaftar di kaos)
             filteredKaos.forEach(o => {
                 let rawPhone = String(o.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
@@ -1602,14 +1612,14 @@
                 `;
             });
 
-            // 2. Render E-Ticket Jalan Santai (Menambahkan informasi jika anak juga mengikuti lomba mewarnai)
+            // 2. Render E-Ticket Jalan Santai (Validasi ketat: Data anak pada pendaftaran jalan santai tidak dimasukkan ke eticket kaos jika di form kaos tidak diinputkan)
             filteredJalan.forEach(j => {
                 let rawPhone = String(j.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
                 let rawName = String(j.name || 'Peserta');
                 let isUnderageParticipant = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur';
 
-                // Cek apakah peserta jalan santai ini juga terdaftar di lomba mewarnai dengan mencocokkan nama atau nomor WhatsApp
+                // Cek apakah peserta jalan santai ini juga terdaftar di lomba mewarnai
                 let matchingMewarnai = mewarnaiRegistrations.filter(m => {
                     let mName = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
                     let mPhone = String(m.phone || m["No HP / WhatsApp"] || "").trim();
@@ -1623,7 +1633,7 @@
                     coloringInfoHTML = `
                         <div class="col-span-2 bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900 space-y-1">
                             🎨 <strong>Informasi Tambahan Lomba Mewarnai:</strong><br>
-                            Peserta/keluarga ini juga terdaftar dalam <strong>Lomba Mewarnai Anak Mall Cinere</strong> (Sabtu, 28 November 2026):<br>
+                            Peserta ini juga terdaftar dalam <strong>Lomba Mewarnai Anak Mall Cinere</strong> (Sabtu, 28 November 2026):<br>
                             ${colorDetails}<br>
                             <span class="text-[10px] text-amber-800 block mt-1">⚠️ Wajib membawa meja lipat dan alat mewarnai sendiri.</span>
                         </div>
@@ -1662,7 +1672,7 @@
                 `;
             });
 
-            // 3. Render E-Ticket Lomba Mewarnai (Mandiri & Eksklusif)
+            // 3. Render E-Ticket Lomba Mewarnai
             filteredMewarnai.forEach(m => {
                 let rawOrtu = String(m.ortu || m["Nama Orang Tua"] || 'Orang Tua');
                 let rawPhoneMewarnai = String(m.phone || m["No HP / WhatsApp"] || '');
