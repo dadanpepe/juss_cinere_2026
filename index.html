@@ -710,11 +710,11 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
                 <div class="text-center max-w-md mx-auto mb-6">
                     <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket Terpadu</h3>
-                    <p class="text-slate-500 text-xs mt-1">Masukkan <strong>Nama Lengkap</strong> peserta (sesuai database pendaftaran) untuk memeriksa status verifikasi dan menampilkan seluruh E-Ticket.</p>
+                    <p class="text-slate-500 text-xs mt-1">Masukkan <strong>Nama Lengkap</strong> atau <strong>Nomor WhatsApp</strong> yang terdaftar di database untuk memeriksa status verifikasi dan menampilkan seluruh E-Ticket.</p>
                 </div>
 
                 <div class="flex gap-2 max-w-md mx-auto mb-6">
-                    <input type="text" id="searchKeyword" placeholder="Masukkan Nama Lengkap Sesuai Database..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                    <input type="text" id="searchKeyword" placeholder="Cari Nama Lengkap / Nomor WhatsApp..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
                     <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari Tiket</button>
                 </div>
 
@@ -1529,37 +1529,40 @@
             const container = document.getElementById('searchResultContainer');
 
             if (!keyword || keyword.length < 3) {
-                container.innerHTML = `<div class="text-center py-6 text-teal-700 text-xs bg-teal-50 border border-teal-200 rounded-xl">⚠️ Mohon masukkan Nama Lengkap peserta (minimal 3 karakter) sesuai database.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-teal-700 text-xs bg-teal-50 border border-teal-200 rounded-xl">⚠️ Mohon masukkan Nama Lengkap atau Nomor WhatsApp peserta (minimal 3 karakter) sesuai database.</div>`;
                 return;
             }
 
-            // Validasi pencarian STRICT berdasarkan Nama Lengkap yang tersimpan di database
+            // Validasi pencarian berdasarkan Nama Lengkap atau Nomor WhatsApp yang tersimpan di database
             const filteredKaos = orders.filter(o => {
                 const name = String(o.name || "").trim().toLowerCase();
-                return name === keyword || name.includes(keyword);
+                const phone = String(o.phone || "").trim().toLowerCase();
+                return name === keyword || name.includes(keyword) || phone === keyword || phone.includes(keyword);
             });
 
-            // Validasi pencarian peserta jalan santai berdasarkan Nama Lengkap
+            // Validasi pencarian peserta jalan santai berdasarkan Nama Lengkap atau Nomor WhatsApp
             const filteredJalan = jalanRegistrations.filter(j => {
                 const name = String(j.name || "").trim().toLowerCase();
-                return name === keyword || name.includes(keyword);
+                const phone = String(j.phone || "").trim().toLowerCase();
+                return name === keyword || name.includes(keyword) || phone === keyword || phone.includes(keyword);
             });
             
-            // Validasi pencarian lomba mewarnai berdasarkan Nama Anak Lengkap
+            // Validasi pencarian lomba mewarnai berdasarkan Nama Anak, Nama Ortu, atau Nomor WhatsApp
             const filteredMewarnai = mewarnaiRegistrations.filter(m => {
                 const namaAnak = String(m.namaAnak || m["Nama Anak"] || "").trim().toLowerCase();
                 const ortu = String(m.ortu || m["Nama Orang Tua"] || "").trim().toLowerCase();
-                return namaAnak === keyword || namaAnak.includes(keyword) || ortu === keyword;
+                const phone = String(m.phone || m["No HP / WhatsApp"] || "").trim().toLowerCase();
+                return namaAnak === keyword || namaAnak.includes(keyword) || ortu === keyword || ortu.includes(keyword) || phone === keyword || phone.includes(keyword);
             });
 
             if (filteredKaos.length === 0 && filteredJalan.length === 0 && filteredMewarnai.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ E-Ticket Tidak Ditemukan</strong><p>Nama Lengkap "${escapeHtml(keyword)}" tidak ditemukan di database pendaftaran. Pastikan penulisan nama lengkap sudah sesuai.</p></div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ E-Ticket Tidak Ditemukan</strong><p>Nama Lengkap atau Nomor WhatsApp "${escapeHtml(keyword)}" tidak ditemukan di database pendaftaran. Pastikan penulisan data sudah sesuai.</p></div>`;
                 return;
             }
 
             let html = `
                 <div class="bg-sky-50 border border-sky-200 p-3.5 rounded-xl text-xs text-sky-900 font-medium mb-3">
-                    ✨ Ditemukan ${filteredKaos.length + filteredJalan.length + filteredMewarnai.length} E-Ticket untuk nama: <strong class="underline">${escapeHtml(keyword)}</strong>
+                    ✨ Ditemukan ${filteredKaos.length + filteredJalan.length + filteredMewarnai.length} E-Ticket untuk kata kunci: <strong class="underline">${escapeHtml(keyword)}</strong>
                 </div>
             `;
 
@@ -1612,14 +1615,13 @@
                 `;
             });
 
-            // 2. Render E-Ticket Jalan Santai (Validasi ketat: Data anak pada pendaftaran jalan santai tidak dimasukkan ke eticket kaos jika di form kaos tidak diinputkan)
+            // 2. Render E-Ticket Jalan Santai
             filteredJalan.forEach(j => {
                 let rawPhone = String(j.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
                 let rawName = String(j.name || 'Peserta');
                 let isUnderageParticipant = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur';
 
-                // Cek apakah peserta jalan santai ini juga terdaftar di lomba mewarnai
                 let matchingMewarnai = mewarnaiRegistrations.filter(m => {
                     let mName = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
                     let mPhone = String(m.phone || m["No HP / WhatsApp"] || "").trim();
