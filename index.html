@@ -12,7 +12,7 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
-    <!-- Scrolling Announcement Marquee -->
+    <!-- Scrolling Announcement Marquee (Original Top View) -->
     <div class="bg-sky-600 text-white font-semibold text-xs py-2 px-4 shadow-sm border-b border-sky-700 overflow-hidden flex items-center">
         <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-3 whitespace-nowrap">📢 Info Penting</span>
         <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white" id="marqueeAnnouncementText">
@@ -54,9 +54,19 @@
         </div>
     </header>
 
-    <!-- Sticky Navigation Bar untuk Scroll ke Bawah -->
-    <div id="stickyNavBar" class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 shadow-lg py-2.5 px-4 hidden transition-all duration-300">
-        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
+    <!-- Sticky Header Gabungan: Papan Pengumuman & Tab Navigasi Melayang saat Scroll ke Bawah -->
+    <div id="stickyNavBar" class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 shadow-lg hidden transition-all duration-300">
+        <!-- Marquee Sticky dengan render ulang elemen agar tidak berhenti (freeze) saat di-append ke sticky container -->
+        <div class="bg-sky-600 text-white font-semibold text-xs py-1.5 px-4 border-b border-sky-700 overflow-hidden flex items-center">
+            <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-3 whitespace-nowrap">📢 Info Penting</span>
+            <div class="overflow-hidden w-full">
+                <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white block w-full" id="stickyMarqueeText">
+                    Selamat datang di portal resmi Pemesanan Kaos & Lomba Mewarnai Hari Pahlawan JUSS UMKM Kec. Cinere 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23.
+                </marquee>
+            </div>
+        </div>
+        <!-- Tab Navigasi Sticky -->
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2 py-2.5 px-4 overflow-x-auto scrollbar-none">
             <span class="text-xs font-extrabold text-white whitespace-nowrap hidden sm:inline">🚀 JUSS 2026</span>
             <div class="flex items-center gap-1.5 flex-nowrap">
                 <button onclick="switchTab('beranda')" id="btn-sticky-beranda" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap">
@@ -977,6 +987,11 @@
             if (savedAnnounce) {
                 const el = document.getElementById('marqueeAnnouncementText');
                 if (el) el.innerText = savedAnnounce;
+                const stickyContainer = document.getElementById('stickyMarqueeText');
+                if (stickyContainer) {
+                    // Memastikan marquee DOM di-recreate agar animasi berjalan lancar dan tidak terhenti saat sticky aktif
+                    stickyContainer.outerHTML = `<marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white block w-full" id="stickyMarqueeText">${escapeHtml(savedAnnounce)}</marquee>`;
+                }
                 const inputEl = document.getElementById('adminMarqueeInput');
                 if (inputEl) inputEl.value = savedAnnounce;
             }
@@ -986,7 +1001,12 @@
             const val = document.getElementById('adminMarqueeInput').value.trim();
             if (!val) return;
             localStorage.setItem('juss_marquee_text', val);
-            document.getElementById('marqueeAnnouncementText').innerText = val;
+            const el = document.getElementById('marqueeAnnouncementText');
+            if (el) el.innerText = val;
+            const stickyContainer = document.getElementById('stickyMarqueeText');
+            if (stickyContainer) {
+                stickyContainer.outerHTML = `<marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white block w-full" id="stickyMarqueeText">${escapeHtml(val)}</marquee>`;
+            }
             showModal('Berhasil ✨', 'Pengumuman berhasil diperbarui.', '✓');
         }
 
