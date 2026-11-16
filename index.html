@@ -519,8 +519,12 @@
                         <textarea id="notes" rows="2" placeholder="Contoh: Titip ambil di posko kelurahan..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
-                        Kirim Pesanan Kaos Sekarang 🚀
+                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+                        <span id="submitBtnText">Kirim Pesanan Kaos Sekarang 🚀</span>
+                        <svg id="submitBtnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                     </button>
                 </form>
             </div>
@@ -596,8 +600,12 @@
                         <input type="text" id="jsPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
                     </div>
 
-                    <button type="submit" id="submitJalanBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
-                        Daftar Jalan Santai Sekarang 🚶‍♂️🏃‍♀️
+                    <button type="submit" id="submitJalanBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+                        <span id="submitJalanBtnText">Daftar Jalan Santai Sekarang 🚶‍♂️🏃‍♀️</span>
+                        <svg id="submitJalanBtnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                     </button>
                 </form>
             </div>
@@ -686,8 +694,12 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="submitMewarnaiBtn" class="w-full bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
-                        Daftar Lomba Mewarnai Sekarang 🎨
+                    <button type="submit" id="submitMewarnaiBtn" class="w-full bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+                        <span id="submitMewarnaiBtnText">Daftar Lomba Mewarnai Sekarang 🎨</span>
+                        <svg id="submitMewarnaiBtnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                     </button>
                 </form>
             </div>
@@ -1320,6 +1332,14 @@
 
         async function handleFormSubmit(event) {
             event.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const submitBtnSpinner = document.getElementById('submitBtnSpinner');
+
+            submitBtn.disabled = true;
+            submitBtnText.innerText = 'Mengirim Pesanan...';
+            submitBtnSpinner.classList.remove('hidden');
+
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value.trim();
             const instansi = document.getElementById('instansi').value;
@@ -1358,6 +1378,10 @@
             orders.unshift(newOrder);
             saveToStorage();
 
+            submitBtn.disabled = false;
+            submitBtnText.innerText = 'Kirim Pesanan Kaos Sekarang 🚀';
+            submitBtnSpinner.classList.add('hidden');
+
             showModalWithQR('Pendaftaran Berhasil ✨', `Terima kasih ${name} (ID: ${newId}). Pesanan kaos berhasil dicatat.`, newId);
             document.getElementById('orderForm').reset();
             calculateTotal();
@@ -1365,6 +1389,14 @@
 
         async function handleJalanSantaiSubmit(event) {
             event.preventDefault();
+            const submitBtn = document.getElementById('submitJalanBtn');
+            const submitBtnText = document.getElementById('submitJalanBtnText');
+            const submitBtnSpinner = document.getElementById('submitJalanBtnSpinner');
+
+            submitBtn.disabled = true;
+            submitBtnText.innerText = 'Mendaftarkan...';
+            submitBtnSpinner.classList.remove('hidden');
+
             const name = document.getElementById('jsName').value;
             const gender = document.getElementById('jsGender').value;
             const isUnderage = document.getElementById('jsUnderageCheck').checked;
@@ -1406,6 +1438,10 @@
             jalanRegistrations.unshift(newReg);
             saveToStorage();
 
+            submitBtn.disabled = false;
+            submitBtnText.innerText = 'Daftar Jalan Santai Sekarang 🚶‍♂️🏃‍♀️';
+            submitBtnSpinner.classList.add('hidden');
+
             showModal('Pendaftaran Jalan Santai Berhasil 🚶‍♂️', `Terima kasih ${name} (ID: ${newId}). Pendaftaran Peserta Jalan Santai Kecamatan Cinere berhasil dicatat!`, '✓');
             document.getElementById('jalanSantaiForm').reset();
             document.getElementById('jsParentContainer').classList.add('hidden');
@@ -1415,6 +1451,14 @@
 
         async function handleMewarnaiSubmit(event) {
             event.preventDefault();
+            const submitBtn = document.getElementById('submitMewarnaiBtn');
+            const submitBtnText = document.getElementById('submitMewarnaiBtnText');
+            const submitBtnSpinner = document.getElementById('submitMewarnaiBtnSpinner');
+
+            submitBtn.disabled = true;
+            submitBtnText.innerText = 'Mendaftarkan Lomba...';
+            submitBtnSpinner.classList.remove('hidden');
+
             const namaAnak = document.getElementById('namaAnak').value;
             const alamat = document.getElementById('alamatAnak').value;
             const asalSekolah = document.getElementById('asalSekolah').value;
@@ -1455,6 +1499,10 @@
             mewarnaiRegistrations.unshift(newReg);
             saveToStorage();
 
+            submitBtn.disabled = false;
+            submitBtnText.innerText = 'Daftar Lomba Mewarnai Sekarang 🎨';
+            submitBtnSpinner.classList.add('hidden');
+
             showModal('Pendaftaran Lomba Berhasil 🎨', `Ananda ${namaAnak} (${asalSekolah}) berhasil terdaftar untuk Lomba Mewarnai di Mall Cinere (28 Nov 2026)!`, '✓');
             document.getElementById('mewarnaiForm').reset();
         }
@@ -1490,13 +1538,14 @@
                 return;
             }
 
-            // Pencarian terpisah dan akurat berdasarkan Nomor WhatsApp atau Nama
+            // Validasi pencarian dan pemisahan tiket Kaos, Jalan Santai, serta Lomba Mewarnai
             const filteredKaos = orders.filter(o => {
                 const name = String(o.name || "").toLowerCase();
                 const phone = String(o.phone || "").trim();
                 return name.includes(keyword) || phone.includes(keyword);
             });
 
+            // Validasi data anak/peserta jalan santai: Pastikan jika didaftarkan jalan santai tanpa inputan di kaos, tidak tercampur ke eticket kaos
             const filteredJalan = jalanRegistrations.filter(j => {
                 const name = String(j.name || "").toLowerCase();
                 const phone = String(j.phone || "").trim();
@@ -1564,12 +1613,29 @@
                 `;
             });
 
-            // 2. Render E-Ticket Jalan Santai
+            // 2. Render E-Ticket Jalan Santai (Menambahkan informasi jika anak juga mengikuti lomba mewarnai)
             filteredJalan.forEach(j => {
                 let rawPhone = String(j.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
                 let rawName = String(j.name || 'Peserta');
                 let isUnderageParticipant = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur';
+
+                // Cek apakah peserta anak ini juga terdaftar di lomba mewarnai dengan nama atau nomor HP yang sama
+                let matchingMewarnai = mewarnaiRegistrations.filter(m => {
+                    let mName = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
+                    let mPhone = String(m.phone || m["No HP / WhatsApp"] || "").trim();
+                    let mOrtu = String(m.ortu || m["Nama Orang Tua"] || "").toLowerCase();
+                    return mName.includes(rawName.toLowerCase()) || mOrtu.includes(rawName.toLowerCase()) || (rawPhone && mPhone === rawPhone);
+                });
+
+                let coloringInfoHTML = "";
+                if (matchingMewarnai.length > 0) {
+                    coloringInfoHTML = `
+                        <div class="col-span-2 bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-amber-900">
+                            🎨 <strong>Informasi Tambahan Lomba Mewarnai:</strong> Peserta ini juga terdaftar dalam Lomba Mewarnai Mall Cinere (28 Nov 2026). Pastikan membawa meja lipat & alat warna sendiri!
+                        </div>
+                    `;
+                }
 
                 html += `
                     <div class="bg-white border-2 border-sky-500 rounded-2xl p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
@@ -1590,6 +1656,7 @@
                             <div><strong>Kelurahan:</strong> ${escapeHtml(j.kelurahan)}</div>
                             <div><strong>No WhatsApp:</strong> <span class="font-mono bg-white px-2 py-0.5 rounded text-slate-800">${maskedPhone}</span></div>
                             <div class="col-span-2"><strong>Alamat Domisili:</strong> ${escapeHtml(j.alamat)}</div>
+                            ${coloringInfoHTML}
                         </div>
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
                             <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE PESERTA JALAN SANTAI KEC. CINERE</span>
@@ -1633,13 +1700,16 @@
                             <div><strong>Orang Tua / Wali:</strong> ${escapeHtml(rawOrtu)}</div>
                             <div><strong>No WhatsApp:</strong> <span class="font-mono bg-white px-2 py-0.5 rounded text-slate-800">${maskedPhoneMewarnai}</span></div>
                             <div class="col-span-2"><strong>Alamat Domisili:</strong> ${escapeHtml(alamatAnak)}</div>
+                            <div class="col-span-2 bg-white p-2 rounded border border-amber-200 text-amber-900 font-medium">
+                                ℹ️ Informasi Lomba Mewarnai: Diselenggarakan hari Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Wajib membawa meja lipat dan alat warna sendiri.
+                            </div>
                         </div>
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
                             <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE LOMBA MEWARNAI - MALL CINERE</span>
                             <div class="w-24 h-24 bg-white border border-slate-300 rounded-lg flex items-center justify-center font-mono text-[10px] font-bold text-slate-800 text-center shadow-inner">
                                 [QR MEWARNAI]<br>${idMewarnai}
                             </div>
-                            <span class="text-[10px] text-amber-700 font-semibold mt-1">Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Jangan lupa membawa meja lipat & alat warna sendiri!</span>
+                            <span class="text-[10px] text-amber-700 font-semibold mt-1">Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere.</span>
                         </div>
                     </div>
                 `;
