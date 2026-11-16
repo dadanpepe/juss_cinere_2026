@@ -716,7 +716,13 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
                 <div class="text-center max-w-md mx-auto mb-6">
                     <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket Terpadu</h3>
-                    <p class="text-slate-500 text-xs mt-1">Masukkan <strong>Nama Lengkap</strong> atau <strong>Nomor WhatsApp</strong> yang terdaftar di database untuk memeriksa status verifikasi dan menampilkan seluruh E-Ticket.</p>
+                    <p class="text-slate-500 text-xs mt-1">Masukkan <strong>Nama Lengkap</strong> yang sesuai persis dengan saat pendaftaran atau <strong>Nomor WhatsApp</strong> yang terdaftar di database.</p>
+                </div>
+
+                <!-- Informasi Kebijakan Privasi Data Peserta -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-600 mb-6 space-y-1.5 shadow-sm">
+                    <strong class="text-slate-900 font-bold flex items-center gap-1">🔒 Kebijakan Privasi & Keamanan Data Peserta:</strong>
+                    <p>Panitia JUSS 2026 berkomitmen untuk melindungi kerahasiaan dan keamanan data pribadi seluruh peserta. Informasi nomor KTP, alamat, serta nomor kontak Anda hanya digunakan untuk keperluan verifikasi acara Jalan Santai dan Lomba Mewarnai serta tidak akan dibagikan kepada pihak ketiga.</p>
                 </div>
 
                 <div class="flex gap-2 max-w-md mx-auto mb-6">
@@ -1539,44 +1545,38 @@
                 return;
             }
 
-            // Validasi pencarian berdasarkan Nama Lengkap atau Nomor WhatsApp yang tersimpan di database
+            // Validasi pencarian ketat: harus Nama Lengkap yang cocok (exact match ignoring case) atau Nomor WhatsApp yang sesuai
             const filteredKaos = orders.filter(o => {
                 const name = String(o.name || "").trim().toLowerCase();
                 const phone = String(o.phone || "").trim().toLowerCase();
-                return name === keyword || name.includes(keyword) || phone === keyword || phone.includes(keyword);
+                return name === keyword || phone === keyword;
             });
 
-            // Validasi pencarian peserta jalan santai berdasarkan Nama Lengkap atau Nomor WhatsApp
             const filteredJalan = jalanRegistrations.filter(j => {
                 const name = String(j.name || "").trim().toLowerCase();
                 const phone = String(j.phone || "").trim().toLowerCase();
-                return name === keyword || name.includes(keyword) || phone === keyword || phone.includes(keyword);
+                return name === keyword || phone === keyword;
             });
             
-            // Validasi pencarian lomba mewarnai berdasarkan Nama Anak, Nama Ortu, atau Nomor WhatsApp
             const filteredMewarnai = mewarnaiRegistrations.filter(m => {
                 const namaAnak = String(m.namaAnak || m["Nama Anak"] || "").trim().toLowerCase();
                 const ortu = String(m.ortu || m["Nama Orang Tua"] || "").trim().toLowerCase();
                 const phone = String(m.phone || m["No HP / WhatsApp"] || "").trim().toLowerCase();
-                return namaAnak === keyword || namaAnak.includes(keyword) || ortu === keyword || ortu.includes(keyword) || phone === keyword || phone.includes(keyword);
+                return namaAnak === keyword || ortu === keyword || phone === keyword;
             });
 
             if (filteredKaos.length === 0 && filteredJalan.length === 0 && filteredMewarnai.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ E-Ticket Tidak Ditemukan</strong><p>Nama Lengkap atau Nomor WhatsApp "${escapeHtml(keyword)}" tidak ditemukan di database pendaftaran. Pastikan penulisan data sudah sesuai.</p></div>`;
+                container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ E-Ticket Tidak Ditemukan</strong><p>Nama Lengkap atau Nomor WhatsApp "${escapeHtml(keyword)}" tidak ditemukan atau penulisan nama tidak lengkap sesuai database. Pastikan penulisan Nama Lengkap sudah benar.</p></div>`;
                 return;
             }
 
-            let html = `
-                <div class="bg-sky-50 border border-sky-200 p-3.5 rounded-xl text-xs text-sky-900 font-medium mb-3">
-                    ✨ Ditemukan ${filteredKaos.length + filteredJalan.length + filteredMewarnai.length} E-Ticket untuk kata kunci: <strong class="underline">${escapeHtml(keyword)}</strong>
-                </div>
-            `;
+            let html = ``;
 
             // 1. Render E-Ticket Pembelian Kaos (Hanya jika terdaftar di kaos)
             filteredKaos.forEach(o => {
                 let rawPhone = String(o.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
-                let rawName = String(o.name || 'Peserta');
+                let maskedName = maskName(String(o.name || 'Peserta'));
 
                 html += `
                     <div class="bg-white border-2 border-emerald-500 rounded-2xl p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
@@ -1585,7 +1585,7 @@
                         </div>
                         <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                             <div>
-                                <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(rawName)}</span>
+                                <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(maskedName)}</span>
                                 <span class="text-slate-400 font-mono text-[11px]">ID Pesanan: ${o.id} • ${o.timestamp}</span>
                             </div>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-emerald-100 text-emerald-800">${o.status}</span>
@@ -1630,19 +1630,19 @@
             filteredJalan.forEach(j => {
                 let rawPhone = String(j.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
-                let rawName = String(j.name || 'Peserta');
+                let maskedName = maskName(String(j.name || 'Peserta'));
                 let isUnderageParticipant = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur';
 
                 let matchingMewarnai = mewarnaiRegistrations.filter(m => {
                     let mName = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
                     let mPhone = String(m.phone || m["No HP / WhatsApp"] || "").trim();
                     let mOrtu = String(m.ortu || m["Nama Orang Tua"] || "").toLowerCase();
-                    return mName.includes(rawName.toLowerCase()) || rawName.toLowerCase().includes(mName) || mOrtu.includes(rawName.toLowerCase()) || (rawPhone && mPhone === rawPhone);
+                    return mName.includes(String(j.name || "").toLowerCase()) || String(j.name || "").toLowerCase().includes(mName) || mOrtu.includes(String(j.name || "").toLowerCase()) || (rawPhone && mPhone === rawPhone);
                 });
 
                 let coloringInfoHTML = "";
                 if (matchingMewarnai.length > 0) {
-                    let colorDetails = matchingMewarnai.map(cm => `• Ananda <strong>${escapeHtml(cm.namaAnak || cm["Nama Anak"])}</strong> (Kategori: ${escapeHtml(cm.kategori || cm["Kategori"])}, Sekolah: ${escapeHtml(cm.asalSekolah || cm["Asal Sekolah"] || 'Belum Sekolah')})`).join('<br>');
+                    let colorDetails = matchingMewarnai.map(cm => `• Ananda <strong>${escapeHtml(maskName(cm.namaAnak || cm["Nama Anak"]))}</strong> (Kategori: ${escapeHtml(cm.kategori || cm["Kategori"])}, Sekolah: ${escapeHtml(cm.asalSekolah || cm["Asal Sekolah"] || 'Belum Sekolah')})`).join('<br>');
                     coloringInfoHTML = `
                         <div class="col-span-2 bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900 space-y-1">
                             🎨 <strong>Informasi Tambahan Lomba Mewarnai:</strong><br>
@@ -1660,7 +1660,7 @@
                         </div>
                         <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                             <div>
-                                <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(rawName)}</span>
+                                <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(maskedName)}</span>
                                 <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran Jalan Santai: ${j.id} • ${j.timestamp}</span>
                             </div>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-sky-100 text-sky-800">${j.status}</span>
@@ -1668,7 +1668,7 @@
                         <div class="grid grid-cols-2 gap-3 text-slate-700 bg-sky-50/50 p-3 rounded-xl">
                             <div><strong>Gender:</strong> ${escapeHtml(j.gender)}</div>
                             <div><strong>Status KTP:</strong> ${isUnderageParticipant ? '<span class="text-amber-700 font-bold">Anak di Bawah Umur</span>' : 'KTP Valid'}</div>
-                            ${isUnderageParticipant ? `<div class="col-span-2"><strong>Nama Orang Tua / Wali:</strong> ${escapeHtml(j.parentName || '-')}</div>` : `<div class="col-span-2"><strong>Nomor KTP:</strong> <span class="font-mono">${escapeHtml(j.ktp)}</span></div>`}
+                            ${isUnderageParticipant ? `<div class="col-span-2"><strong>Nama Orang Tua / Wali:</strong> ${escapeHtml(maskName(j.parentName || '-'))}</div>` : `<div class="col-span-2"><strong>Nomor KTP:</strong> <span class="font-mono">****${String(j.ktp).slice(-4)}</span></div>`}
                             <div><strong>Kelurahan:</strong> ${escapeHtml(j.kelurahan)}</div>
                             <div><strong>No WhatsApp:</strong> <span class="font-mono bg-white px-2 py-0.5 rounded text-slate-800">${maskedPhone}</span></div>
                             <div class="col-span-2"><strong>Alamat Domisili:</strong> ${escapeHtml(j.alamat)}</div>
@@ -2083,6 +2083,15 @@
 
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function maskName(str) {
+            if (!str) return 'Peserta';
+            const parts = str.trim().split(' ');
+            return parts.map(part => {
+                if (part.length <= 2) return part[0] + '*';
+                return part.substring(0, 2) + '*'.repeat(part.length - 2);
+            }).join(' ');
         }
 
         function escapeHtml(str) {
