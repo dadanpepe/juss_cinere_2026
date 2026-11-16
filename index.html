@@ -710,7 +710,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
                 <div class="text-center max-w-md mx-auto mb-6">
                     <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket Terpadu</h3>
-                    <p class="text-slate-500 text-xs mt-1">Masukkan Nomor WhatsApp atau Nama lengkap Anda untuk memeriksa status verifikasi dan menampilkan seluruh E-Ticket (Kaos, Jalan Santai, & Lomba Mewarnai) yang terdaftar pada data tersebut.</p>
+                    <p class="text-slate-500 text-xs mt-1">Masukkan Nomor WhatsApp atau Nama lengkap Anda untuk memeriksa status verifikasi dan menampilkan seluruh E-Ticket (Kaos, Jalan Santai, & Lomba Mewarnai) beserta informasi pengambilan kaos secara lengkap.</p>
                 </div>
 
                 <div class="flex gap-2 max-w-md mx-auto mb-6">
@@ -720,21 +720,6 @@
 
                 <div id="searchResultContainer" class="space-y-4">
                     <div class="text-center py-8 text-slate-400 text-xs">Belum ada pencarian atau data tidak ditemukan.</div>
-                </div>
-            </div>
-
-            <div id="locationGuideContainer" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4 hidden">
-                <h4 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">📦 Alur & Titik Lokasi Pengambilan Kaos Warga Cinere</h4>
-                
-                <div class="bg-teal-50 border border-teal-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <span class="text-teal-900 font-bold text-xs block mb-1">📍 Titik Lokasi Pengambilan Utama:</span>
-                        <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
-                        <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
-                    </div>
-                    <a href="https://www.google.com/search?q=kedai+biru+andara&oq=kedai&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MggIARBFGCcYOzIGCAIQRRg5MgYIAxAjGCcyDQgEEAAYkgMYgAQYigUyBggFEEUYPTIGCAYQRRg9MgYIBxBFGDzSAQgxMTAzajBqN6gCALACAA&sourceid=chrome&source=chrome.ob&ie=UTF-8" target="_blank" class="bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap inline-flex items-center gap-1.5">
-                        🗺️ Buka Google Maps (JS Coffee)
-                    </a>
                 </div>
             </div>
         </section>
@@ -1530,11 +1515,9 @@
         function searchParticipantStatus() {
             const keyword = document.getElementById('searchKeyword').value.trim().toLowerCase();
             const container = document.getElementById('searchResultContainer');
-            const locationGuide = document.getElementById('locationGuideContainer');
 
             if (!keyword || keyword.length < 3) {
                 container.innerHTML = `<div class="text-center py-6 text-teal-700 text-xs bg-teal-50 border border-teal-200 rounded-xl">⚠️ Mohon masukkan minimal 3 karakter (Nomor WhatsApp atau Nama lengkap) untuk pencarian E-Ticket.</div>`;
-                locationGuide.classList.add('hidden');
                 return;
             }
 
@@ -1561,14 +1544,7 @@
 
             if (filteredKaos.length === 0 && filteredJalan.length === 0 && filteredMewarnai.length === 0) {
                 container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ E-Ticket Tidak Ditemukan</strong><p>Pastikan Nomor WhatsApp atau Nama yang Anda masukkan sudah sesuai dengan data pendaftaran.</p></div>`;
-                locationGuide.classList.add('hidden');
                 return;
-            }
-
-            if (filteredKaos.length > 0 || filteredJalan.length > 0) {
-                locationGuide.classList.remove('hidden');
-            } else {
-                locationGuide.classList.add('hidden');
             }
 
             let html = `
@@ -1577,7 +1553,7 @@
                 </div>
             `;
 
-            // 1. Render E-Ticket Pembelian Kaos
+            // 1. Render E-Ticket Pembelian Kaos (Disertai Alur & Titik Lokasi Pengambilan Kaos di JS Coffee)
             filteredKaos.forEach(o => {
                 let rawPhone = String(o.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
@@ -1602,12 +1578,25 @@
                             <div><strong>Jumlah Pesanan:</strong> ${o.qty} Pcs</div>
                             <div class="col-span-2"><strong>Total Transfer:</strong> Rp ${o.totalPrice.toLocaleString('id-ID')} (Lunas)</div>
                         </div>
+
+                        <!-- Informasi Alur & Titik Lokasi Pengambilan Kaos -->
+                        <div class="bg-teal-50 border border-teal-200 rounded-xl p-3.5 space-y-2 text-teal-900">
+                            <span class="font-bold block text-teal-900 flex items-center gap-1">📍 Titik Lokasi Pengambilan Kaos:</span>
+                            <p class="text-slate-800 font-semibold">JS Coffee (Kedai Biru)</p>
+                            <p class="text-slate-700">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
+                            <div class="pt-1">
+                                <a href="https://www.google.com/search?q=kedai+biru+andara&oq=kedai&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MggIARBFGCcYOzIGCAIQRRg5MgYIAxAjGCcyDQgEEAAYkgMYgAQYigUyBggFEEUYPTIGCAYQRRg9MgYIBxBFGDzSAQgxMTAzajBqN6gCALACAA&sourceid=chrome&source=chrome.ob&ie=UTF-8" target="_blank" class="bg-teal-700 hover:bg-teal-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow-sm inline-flex items-center gap-1">
+                                    🗺️ Buka Google Maps (JS Coffee)
+                                </a>
+                            </div>
+                        </div>
+
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
                             <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE PENGAMBILAN KAOS DI JS COFFEE</span>
                             <div class="w-24 h-24 bg-white border border-slate-300 rounded-lg flex items-center justify-center font-mono text-[10px] font-bold text-slate-800 text-center shadow-inner">
                                 [QR KAOS]<br>${o.id}
                             </div>
-                            <span class="text-[10px] text-sky-700 font-semibold mt-1">Tunjukkan E-Ticket ini saat mengambil kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23</span>
+                            <span class="text-[10px] text-sky-700 font-semibold mt-1">Tunjukkan E-Ticket ini saat mengambil kaos di JS Coffee (Kedai Biru).</span>
                         </div>
                     </div>
                 `;
@@ -1620,19 +1609,23 @@
                 let rawName = String(j.name || 'Peserta');
                 let isUnderageParticipant = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur';
 
-                // Cek apakah peserta anak ini juga terdaftar di lomba mewarnai dengan nama atau nomor HP yang sama
+                // Cek apakah peserta jalan santai ini juga terdaftar di lomba mewarnai dengan mencocokkan nama atau nomor WhatsApp
                 let matchingMewarnai = mewarnaiRegistrations.filter(m => {
                     let mName = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
                     let mPhone = String(m.phone || m["No HP / WhatsApp"] || "").trim();
                     let mOrtu = String(m.ortu || m["Nama Orang Tua"] || "").toLowerCase();
-                    return mName.includes(rawName.toLowerCase()) || mOrtu.includes(rawName.toLowerCase()) || (rawPhone && mPhone === rawPhone);
+                    return mName.includes(rawName.toLowerCase()) || rawName.toLowerCase().includes(mName) || mOrtu.includes(rawName.toLowerCase()) || (rawPhone && mPhone === rawPhone);
                 });
 
                 let coloringInfoHTML = "";
                 if (matchingMewarnai.length > 0) {
+                    let colorDetails = matchingMewarnai.map(cm => `• Ananda <strong>${escapeHtml(cm.namaAnak || cm["Nama Anak"])}</strong> (Kategori: ${escapeHtml(cm.kategori || cm["Kategori"])}, Sekolah: ${escapeHtml(cm.asalSekolah || cm["Asal Sekolah"] || 'Belum Sekolah')})`).join('<br>');
                     coloringInfoHTML = `
-                        <div class="col-span-2 bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-amber-900">
-                            🎨 <strong>Informasi Tambahan Lomba Mewarnai:</strong> Peserta ini juga terdaftar dalam Lomba Mewarnai Mall Cinere (28 Nov 2026). Pastikan membawa meja lipat & alat warna sendiri!
+                        <div class="col-span-2 bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900 space-y-1">
+                            🎨 <strong>Informasi Tambahan Lomba Mewarnai:</strong><br>
+                            Peserta/keluarga ini juga terdaftar dalam <strong>Lomba Mewarnai Anak Mall Cinere</strong> (Sabtu, 28 November 2026):<br>
+                            ${colorDetails}<br>
+                            <span class="text-[10px] text-amber-800 block mt-1">⚠️ Wajib membawa meja lipat dan alat mewarnai sendiri.</span>
                         </div>
                     `;
                 }
@@ -1645,7 +1638,7 @@
                         <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                             <div>
                                 <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(rawName)}</span>
-                                <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran: ${j.id} • ${j.timestamp}</span>
+                                <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran Jalan Santai: ${j.id} • ${j.timestamp}</span>
                             </div>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-sky-100 text-sky-800">${j.status}</span>
                         </div>
@@ -1663,13 +1656,13 @@
                             <div class="w-24 h-24 bg-white border border-slate-300 rounded-lg flex items-center justify-center font-mono text-[10px] font-bold text-slate-800 text-center shadow-inner">
                                 [QR JALAN]<br>${j.id}
                             </div>
-                            <span class="text-[10px] text-sky-700 font-semibold mt-1">Tunjukkan E-Ticket ini saat registrasi ulang dan doorprize Jalan Santai JUSS 2026.</span>
+                            <span class="text-[10px] text-sky-700 font-semibold mt-1">Tunjukkan E-Ticket Jalan Santai ini saat registrasi ulang dan doorprize JUSS 2026.</span>
                         </div>
                     </div>
                 `;
             });
 
-            // 3. Render E-Ticket Lomba Mewarnai
+            // 3. Render E-Ticket Lomba Mewarnai (Mandiri & Eksklusif)
             filteredMewarnai.forEach(m => {
                 let rawOrtu = String(m.ortu || m["Nama Orang Tua"] || 'Orang Tua');
                 let rawPhoneMewarnai = String(m.phone || m["No HP / WhatsApp"] || '');
@@ -1690,7 +1683,7 @@
                         <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                             <div>
                                 <span class="font-extrabold text-slate-900 text-base block">Ananda ${escapeHtml(namaAnak)}</span>
-                                <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran: ${idMewarnai} • ${timeMewarnai}</span>
+                                <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran Lomba Mewarnai: ${idMewarnai} • ${timeMewarnai}</span>
                             </div>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-amber-100 text-amber-800">${statusMewarnai}</span>
                         </div>
@@ -1700,8 +1693,8 @@
                             <div><strong>Orang Tua / Wali:</strong> ${escapeHtml(rawOrtu)}</div>
                             <div><strong>No WhatsApp:</strong> <span class="font-mono bg-white px-2 py-0.5 rounded text-slate-800">${maskedPhoneMewarnai}</span></div>
                             <div class="col-span-2"><strong>Alamat Domisili:</strong> ${escapeHtml(alamatAnak)}</div>
-                            <div class="col-span-2 bg-white p-2 rounded border border-amber-200 text-amber-900 font-medium">
-                                ℹ️ Informasi Lomba Mewarnai: Diselenggarakan hari Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Wajib membawa meja lipat dan alat warna sendiri.
+                            <div class="col-span-2 bg-white p-2.5 rounded border border-amber-200 text-amber-900 font-medium">
+                                ℹ️ <strong>Ketentuan Lomba Mewarnai:</strong> Diselenggarakan hari Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Wajib membawa meja lipat dan alat warna sendiri.
                             </div>
                         </div>
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
