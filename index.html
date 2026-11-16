@@ -381,6 +381,12 @@
                         </ul>
                     </div>
 
+                    <!-- Informasi Tambahan Doorprize & QR-Code pada Form Pembelian Kaos -->
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs space-y-1 text-amber-900">
+                        <strong class="font-bold flex items-center gap-1">🎁 Informasi Kupon & Doorprize Pembelian Kaos:</strong>
+                        <p class="text-amber-800">Setiap pembelian kaos resmi akan mendapatkan <strong>Nomor Undian Doorprize</strong> yang tersemat otomatis pada <strong>QR-Code Peserta</strong> di E-Ticket Anda. Harap simpan dan jangan hilangkan E-Ticket ini. Anda dapat memeriksa dan menunjukkan kembali QR-Code kapan saja melalui menu <strong>Cek Status & Tiket</strong>.</p>
+                    </div>
+
                     <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-xs space-y-1">
                         <strong class="text-slate-900 font-bold block">💳 Rekening Pembayaran Transfer:</strong>
                         <p class="text-slate-700">BCA: <strong class="text-slate-900 font-mono text-sm">2671600624</strong></p>
@@ -1510,7 +1516,7 @@
             document.getElementById('modal-icon').innerText = '✓';
             document.getElementById('modalQrContainer').classList.remove('hidden');
             document.getElementById('modalTicketId').innerText = 'ID: ' + ticketId;
-            document.getElementById('modalQrBox').innerHTML = `<div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-slate-900">QR-CODE</span><span class="text-[9px] text-sky-600 font-mono mt-1">${ticketId}</span></div>`;
+            document.getElementById('modalQrBox').innerHTML = `<div class="flex flex-col items-center justify-center"><span class="text-xs font-bold text-slate-900">QR-CODE & DOORPRIZE</span><span class="text-[9px] text-sky-600 font-mono mt-1">${ticketId}</span></div>`;
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal').classList.add('flex');
         }
@@ -1592,7 +1598,7 @@
                             <div class="col-span-2"><strong>Total Transfer:</strong> Rp ${o.totalPrice.toLocaleString('id-ID')} (Lunas)</div>
                         </div>
 
-                        <!-- Informasi Alur & Titik Lokasi Pengambilan Kaos -->
+                        <!-- Informasi Alur & Titik Lokasi Pengambilan Kaos serta Doorprize -->
                         <div class="bg-teal-50 border border-teal-200 rounded-xl p-3.5 space-y-2 text-teal-900">
                             <span class="font-bold block text-teal-900 flex items-center gap-1">📍 Titik Lokasi Pengambilan Kaos:</span>
                             <p class="text-slate-800 font-semibold">JS Coffee (Kedai Biru)</p>
@@ -1604,12 +1610,17 @@
                             </div>
                         </div>
 
+                        <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900 space-y-1">
+                            🎟️ <strong>Informasi Nomor Undian Doorprize:</strong><br>
+                            QR-Code di bawah ini resmi berlaku sebagai <strong>Nomor Undian Doorprize Pembelian Kaos</strong>. Diharapkan untuk <strong>tidak menghilangkan E-Ticket ini</strong>. Jika E-Ticket Anda terhapus atau hilang, Anda dapat memeriksanya kembali kapan saja melalui menu <strong>Cek Status & Tiket</strong> di portal ini.
+                        </div>
+
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
-                            <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE PENGAMBILAN KAOS DI JS COFFEE</span>
+                            <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE PENGAMBILAN KAOS & DOORPRIZE</span>
                             <div class="w-24 h-24 bg-white border border-slate-300 rounded-lg flex items-center justify-center font-mono text-[10px] font-bold text-slate-800 text-center shadow-inner">
                                 [QR KAOS]<br>${o.id}
                             </div>
-                            <span class="text-[10px] text-sky-700 font-semibold mt-1">Tunjukkan E-Ticket ini saat mengambil kaos di JS Coffee (Kedai Biru).</span>
+                            <span class="text-[10px] text-sky-700 font-semibold mt-1">Tunjukkan E-Ticket ini saat mengambil kaos di JS Coffee dan pengundian doorprize.</span>
                         </div>
                     </div>
                 `;
