@@ -39,7 +39,10 @@
                      Beranda
                 </button>
                 <button onclick="switchTab('form')" id="btn-tab-form" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
-                     Jalan Santai
+                     Pembelian Kaos Jalan Santai
+                </button>
+                <button onclick="switchTab('pendaftaran-jalan')" id="btn-tab-pendaftaran-jalan" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                     Pendaftaran Jalan Santai
                 </button>
                 <button onclick="switchTab('mewarnai')" id="btn-tab-mewarnai" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
                      Lomba Mewarnai
@@ -56,7 +59,7 @@
 
     <!-- Sticky Header Gabungan: Papan Pengumuman & Tab Navigasi Melayang saat Scroll ke Bawah -->
     <div id="stickyNavBar" class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 shadow-lg hidden transition-all duration-300">
-        <!-- Marquee Sticky dengan render ulang elemen agar tidak berhenti (freeze) saat di-append ke sticky container -->
+        <!-- Marquee Sticky -->
         <div class="bg-sky-600 text-white font-semibold text-xs py-1.5 px-4 border-b border-sky-700 overflow-hidden flex items-center">
             <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-3 whitespace-nowrap">📢 Info Penting</span>
             <div class="overflow-hidden w-full">
@@ -73,7 +76,10 @@
                      Beranda
                 </button>
                 <button onclick="switchTab('form')" id="btn-sticky-form" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap">
-                     Jalan Santai
+                     Pembelian Kaos
+                </button>
+                <button onclick="switchTab('pendaftaran-jalan')" id="btn-sticky-pendaftaran-jalan" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap">
+                     Pendaftaran Jalan Santai
                 </button>
                 <button onclick="switchTab('mewarnai')" id="btn-sticky-mewarnai" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap">
                      Lomba Mewarnai
@@ -160,12 +166,17 @@
                 <div class="bg-sky-600 border border-sky-500 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
                     <div>
                         <span class="bg-white text-sky-900 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase shadow-sm">Jalan Santai</span>
-                        <h3 class="text-lg font-bold text-white mt-2">Pemesanan Kaos Resmi</h3>
-                        <p class="text-xs text-white mt-1 font-medium">Dapatkan kaos eksklusif Jalan Santai & Kuliner Nusantara JUSS 2026. Tersedia berbagai ukuran lengkap dengan opsi lengan panjang.</p>
+                        <h3 class="text-lg font-bold text-white mt-2">Pendaftaran & Pembelian Kaos</h3>
+                        <p class="text-xs text-white mt-1 font-medium">Dapatkan kaos eksklusif Jalan Santai & Kuliner Nusantara JUSS 2026 serta daftarkan diri Anda pada acara jalan santai.</p>
                     </div>
-                    <button onclick="switchTab('form')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-sm self-start">
-                        Pesan Kaos Sekarang 
-                    </button>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="switchTab('pendaftaran-jalan')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2 px-3 rounded-xl text-xs transition shadow-sm">
+                            Daftar Jalan Santai
+                        </button>
+                        <button onclick="switchTab('form')" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-3 rounded-xl text-xs transition border border-white/30">
+                            Beli Kaos
+                        </button>
+                    </div>
                 </div>
 
                 <div class="bg-sky-600 border border-sky-500 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
@@ -349,9 +360,9 @@
             </div>
         </section>
 
-        <!-- TAB 1: JALAN SANTAI -->
+        <!-- TAB 1: PEMBELIAN KAOS JALAN SANTAI -->
         <section id="tab-form" class="space-y-6 max-w-4xl mx-auto hidden">
-            <!-- Top Banner Card Info Kaos dengan Mockup di Sebelah Kanan Judul Jalan Santai & Kuliner Nusantara -->
+            <!-- Top Banner Card Info Kaos -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 flex flex-col lg:flex-row gap-8 items-center justify-between">
                 <div class="flex-1 space-y-4">
                     <div>
@@ -515,6 +526,83 @@
             </div>
         </section>
 
+        <!-- TAB 1.5: PENDAFTARAN JALAN SANTAI -->
+        <section id="tab-pendaftaran-jalan" class="space-y-6 max-w-3xl mx-auto hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-4">
+                <span class="bg-sky-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Warga Kecamatan Cinere • JUSS 2026</span>
+                <h2 class="text-2xl font-extrabold text-slate-900">Pendaftaran Peserta Jalan Santai</h2>
+                <p class="text-slate-600 text-xs">Formulir pendaftaran resmi peserta Jalan Santai & Kuliner Nusantara Kecamatan Cinere 2026.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h3 class="text-lg font-bold text-slate-900">Formulir Data Diri Peserta Jalan Santai</h3>
+                    <p class="text-slate-500 text-xs">Silakan isi data diri Anda secara lengkap dan akurat.</p>
+                </div>
+
+                <form id="jalanSantaiForm" onsubmit="handleJalanSantaiSubmit(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap & Gelar *</label>
+                        <input type="text" id="jsName" required placeholder="Contoh: Siti Aminah, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Gender (Jenis Kelamin) *</label>
+                        <select id="jsGender" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                            <option value="">Pilih Jenis Kelamin</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+
+                    <div id="jsKtpContainer">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor KTP (16 Digit) *</label>
+                        <input type="text" id="jsKtp" maxlength="16" pattern="\d{16}" placeholder="Masukkan 16 digit Nomor KTP" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm font-mono">
+                        <span class="text-[10px] text-slate-400 mt-1 block">Harus tepat 16 digit angka.</span>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
+                        <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                            <input type="checkbox" id="jsUnderageCheck" onchange="toggleUnderageFields()" class="w-4 h-4 accent-sky-600 rounded">
+                            <span>Peserta Anak di Bawah Umur (Belum Memiliki KTP)</span>
+                        </label>
+                    </div>
+
+                    <div id="jsParentContainer" class="hidden space-y-4 bg-sky-50/70 border border-sky-100 p-4 rounded-xl">
+                        <div>
+                            <label class="block text-xs font-semibold text-sky-900 mb-1.5">Nama Orang Tua / Pendamping *</label>
+                            <input type="text" id="jsParentName" placeholder="Contoh: Budi Santoso (Orang Tua / Wali)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Kelurahan di Kec. Cinere *</label>
+                        <select id="jsKelurahan" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                            <option value="Kelurahan Cinere">Kelurahan Cinere</option>
+                            <option value="Kelurahan Gandul">Kelurahan Gandul</option>
+                            <option value="Kelurahan Pangkalan Jati">Kelurahan Pangkalan Jati</option>
+                            <option value="Kelurahan Pangkalan Jati Baru">Kelurahan Pangkalan Jati Baru</option>
+                            <option value="Lainnya di luar Kec. Cinere">Lainnya / Luar Kec. Cinere</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Alamat Lengkap *</label>
+                        <textarea id="jsAlamat" rows="2" required placeholder="Tuliskan nama jalan, RT/RW, nomor rumah" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Aktif *</label>
+                        <input type="text" id="jsPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                    </div>
+
+                    <button type="submit" id="submitJalanBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
+                        Daftar Jalan Santai Sekarang 🚶‍♂️🏃‍♀️
+                    </button>
+                </form>
+            </div>
+        </section>
+
         <!-- TAB 2: LOMBA MEWARNAI -->
         <section id="tab-mewarnai" class="space-y-6 max-w-3xl mx-auto hidden">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-4">
@@ -645,7 +733,7 @@
                 <div>
                     <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Panel Khusus Panitia</span>
                     <h2 class="text-xl font-bold text-slate-900 mt-2">Rekapitulasi Pemesanan & Pendaftaran</h2>
-                    <p class="text-slate-500 text-xs">Kelola verifikasi pembayaran kaos dan rekap peserta lomba mewarnai anak secara terpisah.</p>
+                    <p class="text-slate-500 text-xs">Kelola verifikasi pembelian kaos dan pendaftaran peserta jalan santai serta lomba mewarnai anak.</p>
                 </div>
                 <div class="flex gap-2 flex-wrap">
                     <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm">
@@ -666,13 +754,16 @@
                 </div>
             </div>
 
-            <!-- Sub-Tab Panitia Selector -->
-            <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl max-w-md">
-                <button onclick="switchAdminSubTab('kaos')" id="btn-subadmin-kaos" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
-                     Pemesanan Kaos Jalan Santai
+            <!-- Sub-Tab Panitia Selector (3 Sub-Tab: Kaos, Jalan Santai, Mewarnai) -->
+            <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl max-w-xl overflow-x-auto">
+                <button onclick="switchAdminSubTab('kaos')" id="btn-subadmin-kaos" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm whitespace-nowrap">
+                     Pembelian Kaos
                 </button>
-                <button onclick="switchAdminSubTab('mewarnai')" id="btn-subadmin-mewarnai" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900">
-                     Lomba Mewarnai Anak
+                <button onclick="switchAdminSubTab('jalan')" id="btn-subadmin-jalan" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap">
+                     Peserta Jalan Santai
+                </button>
+                <button onclick="switchAdminSubTab('mewarnai')" id="btn-subadmin-mewarnai" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap">
+                     Lomba Mewarnai
                 </button>
             </div>
 
@@ -698,7 +789,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                         <div>
-                            <h3 class="font-bold text-slate-900 text-base">Daftar Pemesanan Kaos Jalan Santai JUSS 2026</h3>
+                            <h3 class="font-bold text-slate-900 text-base">Daftar Pembelian Kaos Jalan Santai JUSS 2026</h3>
                             <span id="tableCountBadge" class="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold mt-1 inline-block">0 Data</span>
                         </div>
                         <div class="w-full md:w-72">
@@ -728,7 +819,64 @@
                 </div>
             </div>
 
-            <!-- SUB-TAB CONTENT 2: MEWARNAI -->
+            <!-- SUB-TAB CONTENT 2: PESERTA JALAN SANTAI -->
+        <div id="subadmin-content-jalan" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Total Peserta Jalan Santai</span>
+                    <span id="statTotalJalan" class="text-2xl font-black text-sky-600">0 Peserta</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Peserta Anak di Bawah Umur</span>
+                    <span id="statTotalUnderage" class="text-2xl font-black text-amber-600">0 Anak</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Kelurahan Terbanyak</span>
+                    <span id="statTopKelurahanJalan" class="text-sm font-bold text-slate-800">-</span>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">Lokasi & Acara</span>
+                    <span class="text-sm font-bold text-slate-800">Kecamatan Cinere 2026</span>
+                </div>
+            </div>
+
+            <!-- Rekap Jumlah Pendaftar Per Kelurahan (Termasuk anak di bawah umur) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="adminJalanKelurahanCards"></div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-sky-50">
+                    <div>
+                        <h3 class="font-bold text-sky-900 text-base">🚶‍♂️ Daftar Peserta Jalan Santai (Termasuk Anak di Bawah Umur)</h3>
+                        <span id="jalanCountBadge" class="bg-sky-100 text-sky-800 px-3 py-1 rounded-full text-xs font-bold mt-1 inline-block">0 Peserta</span>
+                    </div>
+                    <div class="w-full md:w-72">
+                        <input type="text" id="adminSearchJalan" oninput="filterAdminJalan()" placeholder="Cari nama, kelurahan, no HP..." class="w-full px-3 py-2 rounded-xl border border-sky-200 outline-none text-xs bg-white">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-sky-50/50 text-slate-600 font-semibold border-b border-slate-200">
+                                <th class="p-3.5">ID / Waktu</th>
+                                <th class="p-3.5">Nama & Gender</th>
+                                <th class="p-3.5">No. KTP / Status</th>
+                                <th class="p-3.5">Anak Dibawah Umur & Wali</th>
+                                <th class="p-3.5">Kelurahan</th>
+                                <th class="p-3.5">Alamat</th>
+                                <th class="p-3.5">No HP / WhatsApp</th>
+                                <th class="p-3.5 text-center">Aksi WhatsApp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminJalanTableBody">
+                            <tr><td colspan="8" class="text-center py-8 text-slate-400">Belum ada peserta jalan santai.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 border-t border-slate-100 flex justify-between items-center text-xs bg-slate-50" id="jalanPaginationContainer"></div>
+            </div>
+        </div>
+
+        <!-- SUB-TAB CONTENT 3: MEWARNAI -->
             <div id="subadmin-content-mewarnai" class="space-y-6 hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -858,6 +1006,22 @@
             }
         ];
 
+        let jalanRegistrations = JSON.parse(localStorage.getItem('juss_jalan_regs')) || [
+            {
+                id: 'JLS-201',
+                timestamp: '13 Nov 2026, 21:10 WIB',
+                name: 'Budi Santoso',
+                gender: 'Laki-laki',
+                ktp: '3276011234560001',
+                isUnderage: false,
+                parentName: '',
+                kelurahan: 'Kelurahan Cinere',
+                alamat: 'Jl. Andara Raya No. 10',
+                phone: '081234567890',
+                status: 'Terdaftar'
+            }
+        ];
+
         let mewarnaiRegistrations = JSON.parse(localStorage.getItem('juss_mewarnai_regs')) || [
             {
                 id: 'MEW-101',
@@ -876,51 +1040,18 @@
         let slideIndex = 0;
         let slideInterval = null;
 
-        // Sponsor Slider State
         let sponsorSlideIndex = 0;
         let sponsorSlideInterval = null;
 
-        function startSponsorSlideShow() {
-            if (sponsorSlideInterval) clearInterval(sponsorSlideInterval);
-            sponsorSlideInterval = setInterval(() => {
-                nextSponsorSlide();
-            }, 3500);
-        }
-
-        function showSponsorSlide(n) {
-            const slides = document.querySelectorAll('.sponsor-slide');
-            if (slides.length === 0) return;
-            if (n >= slides.length) sponsorSlideIndex = 0;
-            if (n < 0) sponsorSlideIndex = slides.length - 1;
-
-            slides.forEach((slide, idx) => {
-                slide.style.opacity = idx === sponsorSlideIndex ? '1' : '0';
-                const dot = document.getElementById('sponsor-dot-' + idx);
-                if (dot) {
-                    dot.className = idx === sponsorSlideIndex ? 'w-2.5 h-2.5 rounded-full bg-sky-600 transition' : 'w-2.5 h-2.5 rounded-full bg-slate-300 transition';
-                }
-            });
-        }
-
-        function nextSponsorSlide() {
-            sponsorSlideIndex++;
-            showSponsorSlide(sponsorSlideIndex);
-        }
-
-        function currentSponsorSlide(n) {
-            sponsorSlideIndex = n;
-            showSponsorSlide(sponsorSlideIndex);
-            startSponsorSlideShow();
-        }
-
         let kaosCurrentPage = 1;
+        let jalanCurrentPage = 1;
         let mewarnaiCurrentPage = 1;
         const itemsPerPage = 10;
 
         let adminKaosSearchQuery = "";
+        let adminJalanSearchQuery = "";
         let adminMewarnaiSearchQuery = "";
 
-        // Slider galeri stan per kategori (Kuliner Nusantara, Minuman Segar, Snack & Kue Basah, Kerajinan & Craft)
         let categorySlideIndices = { kuliner: 0, minuman: 0, snack: 0, craft: 0 };
 
         function showCategorySlide(categoryName, idx) {
@@ -989,7 +1120,6 @@
                 if (el) el.innerText = savedAnnounce;
                 const stickyContainer = document.getElementById('stickyMarqueeText');
                 if (stickyContainer) {
-                    // Memastikan marquee DOM di-recreate agar animasi berjalan lancar dan tidak terhenti saat sticky aktif
                     stickyContainer.outerHTML = `<marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white block w-full" id="stickyMarqueeText">${escapeHtml(savedAnnounce)}</marquee>`;
                 }
                 const inputEl = document.getElementById('adminMarqueeInput');
@@ -1039,6 +1169,31 @@
             }
 
             try {
+                const resJalan = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getDataJalanSantai");
+                if (resJalan.ok) {
+                    const dataJalan = await resJalan.json();
+                    if (Array.isArray(dataJalan) && dataJalan.length > 0) {
+                        jalanRegistrations = dataJalan.map((row, index) => ({
+                            id: row["ID Pendaftaran"] || `JLS-${200 + index}`,
+                            timestamp: row["Timestamp"] || '-',
+                            name: row["Nama Lengkap"] || "Peserta",
+                            gender: row["Gender"] || "Laki-laki",
+                            ktp: row["No KTP"] || "-",
+                            isUnderage: String(row["Status KTP"] || "").includes("Anak") || String(row["No KTP"] || "") === "Anak di Bawah Umur",
+                            parentName: row["Nama Orang Tua / Pendamping"] || "-",
+                            kelurahan: row["Kelurahan"] || "Kelurahan Cinere",
+                            alamat: row["Alamat"] || "-",
+                            phone: row["No HP / WhatsApp"] || "-",
+                            status: row["Status"] || "Terdaftar"
+                        })).reverse();
+                        saveToStorage();
+                    }
+                }
+            } catch (e) {
+                console.log("Offline mode jalan santai", e);
+            }
+
+            try {
                 const resMewarnai = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getDataMewarnai");
                 if (resMewarnai.ok) {
                     const dataMewarnai = await resMewarnai.json();
@@ -1064,11 +1219,12 @@
 
         function saveToStorage() {
             localStorage.setItem('juss_kaos_orders', JSON.stringify(orders));
+            localStorage.setItem('juss_jalan_regs', JSON.stringify(jalanRegistrations));
             localStorage.setItem('juss_mewarnai_regs', JSON.stringify(mewarnaiRegistrations));
         }
 
         function switchTab(tabName) {
-            ['beranda', 'form', 'mewarnai', 'status', 'admin'].forEach(t => {
+            ['beranda', 'form', 'pendaftaran-jalan', 'mewarnai', 'status', 'admin'].forEach(t => {
                 const sec = document.getElementById('tab-' + t);
                 if (sec) sec.classList.add('hidden');
                 
@@ -1087,6 +1243,10 @@
                 document.getElementById('tab-form').classList.remove('hidden');
                 if (document.getElementById('btn-tab-form')) document.getElementById('btn-tab-form').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
                 if (document.getElementById('btn-sticky-form')) document.getElementById('btn-sticky-form').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
+            } else if (tabName === 'pendaftaran-jalan') {
+                document.getElementById('tab-pendaftaran-jalan').classList.remove('hidden');
+                if (document.getElementById('btn-tab-pendaftaran-jalan')) document.getElementById('btn-tab-pendaftaran-jalan').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-pendaftaran-jalan')) document.getElementById('btn-sticky-pendaftaran-jalan').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
             } else if (tabName === 'mewarnai') {
                 document.getElementById('tab-mewarnai').classList.remove('hidden');
                 if (document.getElementById('btn-tab-mewarnai')) document.getElementById('btn-tab-mewarnai').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
@@ -1112,20 +1272,29 @@
 
         function switchAdminSubTab(subTabName) {
             const contentKaos = document.getElementById('subadmin-content-kaos');
+            const contentJalan = document.getElementById('subadmin-content-jalan');
             const contentMewarnai = document.getElementById('subadmin-content-mewarnai');
             const btnKaos = document.getElementById('btn-subadmin-kaos');
+            const btnJalan = document.getElementById('btn-subadmin-jalan');
             const btnMewarnai = document.getElementById('btn-subadmin-mewarnai');
 
+            if (contentKaos) contentKaos.classList.add('hidden');
+            if (contentJalan) contentJalan.classList.add('hidden');
+            if (contentMewarnai) contentMewarnai.classList.add('hidden');
+            
+            if (btnKaos) btnKaos.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap';
+            if (btnJalan) btnJalan.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap';
+            if (btnMewarnai) btnMewarnai.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap';
+
             if (subTabName === 'kaos') {
-                contentKaos.classList.remove('hidden');
-                contentMewarnai.classList.add('hidden');
-                btnKaos.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
-                btnMewarnai.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900';
-            } else {
-                contentKaos.classList.add('hidden');
-                contentMewarnai.classList.remove('hidden');
-                btnKaos.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900';
-                btnMewarnai.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (contentKaos) contentKaos.classList.remove('hidden');
+                if (btnKaos) btnKaos.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm whitespace-nowrap';
+            } else if (subTabName === 'jalan') {
+                if (contentJalan) contentJalan.classList.remove('hidden');
+                if (btnJalan) btnJalan.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm whitespace-nowrap';
+            } else if (subTabName === 'mewarnai') {
+                if (contentMewarnai) contentMewarnai.classList.remove('hidden');
+                if (btnMewarnai) btnMewarnai.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm whitespace-nowrap';
             }
         }
 
@@ -1188,6 +1357,56 @@
             showModalWithQR('Pendaftaran Berhasil ✨', `Terima kasih ${name} (ID: ${newId}). Pesanan kaos berhasil dicatat.`, newId);
             document.getElementById('orderForm').reset();
             calculateTotal();
+        }
+
+        async function handleJalanSantaiSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('jsName').value;
+            const gender = document.getElementById('jsGender').value;
+            const isUnderage = document.getElementById('jsUnderageCheck').checked;
+            const ktp = isUnderage ? 'Anak di Bawah Umur' : document.getElementById('jsKtp').value.trim();
+            const parentName = isUnderage ? document.getElementById('jsParentName').value.trim() : '';
+            const kelurahan = document.getElementById('jsKelurahan').value;
+            const alamat = document.getElementById('jsAlamat').value;
+            const phone = document.getElementById('jsPhone').value.trim();
+
+            const now = new Date();
+            const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
+            const newId = 'JLS-' + Math.floor(200 + Math.random() * 800);
+
+            const newReg = {
+                id: newId,
+                timestamp,
+                name,
+                gender,
+                ktp,
+                isUnderage,
+                parentName,
+                kelurahan,
+                alamat,
+                phone,
+                status: 'Terdaftar'
+            };
+
+            if (GOOGLE_APPS_SCRIPT_URL) {
+                try {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'jalanSantai', id: newId, timestamp, name, gender, ktp: isUnderage ? 'Anak di Bawah Umur' : ktp, statusKtp: isUnderage ? 'Anak di Bawah Umur' : 'KTP Valid', parentName: parentName || '-', kelurahan, alamat, phone, status: 'Terdaftar' })
+                    });
+                } catch (e) { console.log(e); }
+            }
+
+            jalanRegistrations.unshift(newReg);
+            saveToStorage();
+
+            showModal('Pendaftaran Jalan Santai Berhasil 🚶‍♂️', `Terima kasih ${name} (ID: ${newId}). Pendaftaran Peserta Jalan Santai Kecamatan Cinere berhasil dicatat!`, '✓');
+            document.getElementById('jalanSantaiForm').reset();
+            document.getElementById('jsParentContainer').classList.add('hidden');
+            document.getElementById('jsKtpContainer').classList.remove('hidden');
+            document.getElementById('jsKtp').required = true;
         }
 
         async function handleMewarnaiSubmit(event) {
@@ -1272,6 +1491,12 @@
                 const phone = String(o.phone || "");
                 return name === keyword || phone === keyword;
             });
+
+            const filteredJalan = jalanRegistrations.filter(j => {
+                const name = String(j.name || "").toLowerCase();
+                const phone = String(j.phone || "");
+                return name === keyword || phone === keyword;
+            });
             
             const filteredMewarnai = mewarnaiRegistrations.filter(m => {
                 const namaAnak = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
@@ -1280,13 +1505,13 @@
                 return namaAnak === keyword || ortu === keyword || phone === keyword;
             });
 
-            if (filteredKaos.length === 0 && filteredMewarnai.length === 0) {
+            if (filteredKaos.length === 0 && filteredJalan.length === 0 && filteredMewarnai.length === 0) {
                 container.innerHTML = `<div class="text-center py-8 text-slate-600 text-xs bg-slate-50 border border-slate-200 rounded-xl space-y-1"><strong>❌ Pencarian Gagal</strong><p>Jika nama tidak lengkap sesuai database maka pencarian tidak bisa dilanjutkan. Mohon masukkan nama lengkap secara akurat.</p></div>`;
                 locationGuide.classList.add('hidden');
                 return;
             }
 
-            if (filteredKaos.length > 0) {
+            if (filteredKaos.length > 0 || filteredJalan.length > 0) {
                 locationGuide.classList.remove('hidden');
             } else {
                 locationGuide.classList.add('hidden');
@@ -1314,26 +1539,30 @@
                             <div><strong>Ukuran / Model:</strong> Size ${o.size} (${o.sleeve})</div>
                             <div><strong>Jumlah:</strong> ${o.qty} Pcs</div>
                         </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-slate-200">
-                            <span class="font-bold text-slate-800">Total: Rp ${o.totalPrice.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            });
+
+            filteredJalan.forEach(j => {
+                let rawPhone = String(j.phone || '');
+                let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
+                let rawName = String(j.name || 'Peserta');
+                let maskedName = rawName.length > 2 ? rawName[0] + '*'.repeat(rawName.length - 2) + rawName[rawName.length - 1] : rawName;
+
+                html += `
+                    <div class="bg-sky-50 border border-sky-200 rounded-xl p-4 text-xs space-y-3">
+                        <div class="flex justify-between items-center border-b border-sky-200 pb-2">
+                            <div>
+                                <span class="font-bold text-sky-900 text-sm">${escapeHtml(maskedName)} <span class="text-[10px] font-normal text-slate-600">(Jalan Santai)</span></span>
+                                <span class="text-slate-500 block">${j.id} • ${j.timestamp}</span>
+                            </div>
+                            <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-sky-600 text-white">${j.status}</span>
                         </div>
-                        
-                        <div class="mt-4 bg-gradient-to-r from-sky-600 to-blue-700 text-white p-4 rounded-xl shadow-md space-y-3">
-                            <div class="flex justify-between items-center border-b border-white/20 pb-2">
-                                <div>
-                                    <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold">🎫 E-Ticket Resmi Pengambilan Kaos</span>
-                                    <h4 class="font-black text-lg tracking-wide mt-1">${o.id}</h4>
-                                </div>
-                                <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner flex items-center justify-center">
-                                    <span class="text-[10px]">QR-[${o.id}]</span>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs text-sky-100">
-                                <div>Kelurahan: <strong class="text-white block">${escapeHtml(o.instansi)}</strong></div>
-                                <div>No HP: <strong class="text-white block">${maskedPhone}</strong></div>
-                                <div>Ukuran / Model: <strong class="text-white block">Size ${o.size} (${o.sleeve})</strong></div>
-                                <div>Jumlah: <strong class="text-white block">${o.qty} Pcs</strong></div>
-                            </div>
+                        <div class="grid grid-cols-2 gap-2 text-slate-700">
+                            <div><strong>Gender:</strong> ${escapeHtml(j.gender)}</div>
+                            <div><strong>Kelurahan:</strong> ${escapeHtml(j.kelurahan)}</div>
+                            <div class="col-span-2"><strong>Alamat:</strong> ${escapeHtml(j.alamat)}</div>
+                            <div><strong>No HP:</strong> <span class="font-mono bg-white px-1.5 py-0.5 rounded text-slate-800">${maskedPhone}</span></div>
                         </div>
                     </div>
                 `;
@@ -1363,35 +1592,6 @@
                             <div><strong>Alamat:</strong> ${escapeHtml(alamatAnak)}</div>
                             <div><strong>Pendamping:</strong> ${escapeHtml(rawOrtu)}</div>
                             <div><strong>No HP:</strong> <span class="font-mono bg-sky-700 px-1.5 py-0.5 rounded text-white">${maskedPhoneMewarnai}</span></div>
-                        </div>
-                        
-                        <div class="mt-4 bg-sky-700 text-white p-4 rounded-xl shadow-md space-y-3 border border-sky-500">
-                            <div class="flex justify-between items-center border-b border-white/20 pb-2">
-                                <div>
-                                    <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full font-bold text-white">🎨 E-Ticket & Pengingat Lomba Mewarnai</span>
-                                    <h4 class="font-black text-lg tracking-wide mt-1 text-white">${m.id || m["ID Pendaftaran"]}</h4>
-                                </div>
-                                <div class="bg-white p-2 rounded-lg text-slate-900 font-mono font-bold text-center text-xs shadow-inner flex items-center justify-center">
-                                    <span class="text-[10px]">QR-[${m.id || m["ID Pendaftaran"]}]</span>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs text-white">
-                                <div>Peserta Anak: <strong class="text-white block">${escapeHtml(namaAnak)}</strong></div>
-                                <div>Kategori: <strong class="text-white block">${escapeHtml(kategoriAnak)}</strong></div>
-                                <div>Asal Sekolah: <strong class="text-white block">${escapeHtml(sekolahAnak)}</strong></div>
-                                <div>Alamat: <strong class="text-white block">${escapeHtml(alamatAnak)}</strong></div>
-                                <div>Pendamping: <strong class="text-white block">${escapeHtml(rawOrtu)}</strong></div>
-                                <div>Lokasi: <strong class="text-white block">Mall Cinere (28 Nov 2026)</strong></div>
-                            </div>
-                            
-                            <div class="bg-white/10 p-3 rounded-xl border border-white/20 space-y-1 text-white text-[11px]">
-                                <strong class="block text-white font-bold">🔔 Pengingat Penting Peserta:</strong>
-                                <ul class="list-disc list-inside space-y-0.5 text-white">
-                                    <li>Wajib membawa <strong class="text-white font-bold">meja lipat</strong> sendiri untuk alas mewarnai.</li>
-                                    <li>Wajib membawa <strong class="text-white font-bold">peralatan mewarnai</strong> sendiri (krayon/pensil warna).</li>
-                                    <li>Harap hadir di Halaman Parkir Mall Cinere pada <strong class="text-white font-bold">Sabtu, 28 November 2026</strong> tepat waktu.</li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 `;
@@ -1431,12 +1631,34 @@
         }
 
         function renderAdminDashboard() {
-            document.getElementById('statTotalRegistrants').innerText = orders.length + ' Peserta';
-            document.getElementById('statTotalPcs').innerText = orders.reduce((s, o) => s + o.qty, 0) + ' Pcs';
-            document.getElementById('statTotalRevenue').innerText = 'Rp ' + orders.filter(o => o.status === 'Lunas').reduce((s, o) => s + o.totalPrice, 0).toLocaleString('id-ID');
-            document.getElementById('tableCountBadge').innerText = orders.length + ' Data';
-            document.getElementById('mewarnaiCountBadge').innerText = mewarnaiRegistrations.length + ' Anak';
-            document.getElementById('statTotalMewarnai').innerText = mewarnaiRegistrations.length + ' Anak';
+            const statReg = document.getElementById('statTotalRegistrants');
+            if (statReg) statReg.innerText = orders.length + ' Peserta';
+
+            const statPcs = document.getElementById('statTotalPcs');
+            if (statPcs) statPcs.innerText = orders.reduce((s, o) => s + o.qty, 0) + ' Pcs';
+
+            const statRev = document.getElementById('statTotalRevenue');
+            if (statRev) statRev.innerText = 'Rp ' + orders.filter(o => o.status === 'Lunas').reduce((s, o) => s + o.totalPrice, 0).toLocaleString('id-ID');
+            
+            const tableBadge = document.getElementById('tableCountBadge');
+            if (tableBadge) tableBadge.innerText = orders.length + ' Data';
+            
+            const jalanBadge = document.getElementById('jalanCountBadge');
+            if (jalanBadge) jalanBadge.innerText = jalanRegistrations.length + ' Peserta';
+
+            const statJalan = document.getElementById('statTotalJalan');
+            if (statJalan) statJalan.innerText = jalanRegistrations.length + ' Peserta';
+
+            // Hitung total peserta anak di bawah umur pada jalan santai
+            const totalUnderageJalan = jalanRegistrations.filter(j => j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur').length;
+            const statUnderageEl = document.getElementById('statTotalUnderage');
+            if (statUnderageEl) statUnderageEl.innerText = totalUnderageJalan + ' Anak';
+
+            const mewarnaiBadge = document.getElementById('mewarnaiCountBadge');
+            if (mewarnaiBadge) mewarnaiBadge.innerText = mewarnaiRegistrations.length + ' Anak';
+
+            const statMewarnai = document.getElementById('statTotalMewarnai');
+            if (statMewarnai) statMewarnai.innerText = mewarnaiRegistrations.length + ' Anak';
 
             const sizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
             let sizeSummaryHTML = '';
@@ -1444,40 +1666,90 @@
                 const count = orders.filter(o => o.size === sz).reduce((s, o) => s + o.qty, 0);
                 sizeSummaryHTML += `<div class="bg-white p-3 rounded-xl border border-slate-200 text-center"><span class="text-xs font-bold text-slate-400 block">Size ${sz}</span><span class="text-lg font-black text-slate-800">${count}</span><span class="text-[10px] text-slate-400 block">Pcs</span></div>`;
             });
-            document.getElementById('adminSizeSummaryCards').innerHTML = sizeSummaryHTML;
+            const sizeCards = document.getElementById('adminSizeSummaryCards');
+            if (sizeCards) sizeCards.innerHTML = sizeSummaryHTML;
 
-            const categories = ['TK A', 'TK B', 'Kategori Lainnya / SD'];
-            let catSummaryHTML = '';
-            let maxCatCount = 0;
-            let topCatName = '-';
-
-            categories.forEach(cat => {
-                const count = mewarnaiRegistrations.filter(m => m.kategori === cat).length;
-                if (count > maxCatCount) {
-                    maxCatCount = count;
-                    topCatName = cat;
+            // Hitung rekap kelurahan untuk peserta jalan santai (termasuk anak di bawah umur yang terdaftar di kelurahan tersebut)
+            let kelurahanCounts = {};
+            let kelurahanUnderageCounts = {};
+            jalanRegistrations.forEach(j => {
+                let k = j.kelurahan || 'Kelurahan Cinere';
+                kelurahanCounts[k] = (kelurahanCounts[k] || 0) + 1;
+                if (j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur') {
+                    kelurahanUnderageCounts[k] = (kelurahanUnderageCounts[k] || 0) + 1;
                 }
-                catSummaryHTML += `
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
-                        <div>
-                            <span class="text-xs font-bold text-slate-500 block">${cat}</span>
-                            <span class="text-xl font-black text-sky-700 mt-1 block">${count} Anak</span>
-                        </div>
-                        <span class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-lg">🎨</span>
+            });
+            
+            let topKelurahan = '-';
+            let maxKelCount = 0;
+            for (let k in kelurahanCounts) {
+                if (kelurahanCounts[k] > maxKelCount) {
+                    maxKelCount = kelurahanCounts[k];
+                    topKelurahan = k;
+                }
+            }
+            const topKelEl = document.getElementById('statTopKelurahanJalan');
+            if (topKelEl) topKelEl.innerText = topKelurahan + (maxKelCount > 0 ? ` (${maxKelCount})` : '');
+
+            const allKelurahans = [
+                "Kelurahan Cinere", 
+                "Kelurahan Gandul", 
+                "Kelurahan Pangkalan Jati", 
+                "Kelurahan Pangkalan Jati Baru", 
+                "Lainnya di luar Kec. Cinere"
+            ];
+            let kelurahanCardsHTML = '';
+            allKelurahans.forEach(kel => {
+                const count = kelurahanCounts[kel] || 0;
+                const underageCount = kelurahanUnderageCounts[kel] || 0;
+                kelurahanCardsHTML += `
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-center shadow-sm space-y-1">
+                        <span class="text-[11px] font-bold text-slate-600 block truncate" title="${kel}">${kel}</span>
+                        <span class="text-lg font-black text-sky-700 block">${count} <span class="text-[10px] font-normal text-slate-500">Total</span></span>
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded block">Anak: ${underageCount}</span>
                     </div>
                 `;
             });
-            document.getElementById('adminMewarnaiCategoryCards').innerHTML = catSummaryHTML;
-            document.getElementById('statTopCategory').innerText = topCatName;
+            const kelContainer = document.getElementById('adminJalanKelurahanCards');
+            if (kelContainer) kelContainer.innerHTML = kelurahanCardsHTML;
 
             renderKaosTable();
+            renderJalanTable();
             renderMewarnaiTable();
+        }
+
+        function toggleUnderageFields() {
+            const isChecked = document.getElementById('jsUnderageCheck').checked;
+            const ktpInput = document.getElementById('jsKtp');
+            const ktpContainer = document.getElementById('jsKtpContainer');
+            const parentContainer = document.getElementById('jsParentContainer');
+            const parentInput = document.getElementById('jsParentName');
+
+            if (isChecked) {
+                ktpInput.required = false;
+                ktpInput.value = '';
+                ktpContainer.classList.add('hidden');
+                parentContainer.classList.remove('hidden');
+                parentInput.required = true;
+            } else {
+                ktpInput.required = true;
+                ktpContainer.classList.remove('hidden');
+                parentContainer.classList.add('hidden');
+                parentInput.required = false;
+                parentInput.value = '';
+            }
         }
 
         function filterAdminKaos() {
             adminKaosSearchQuery = document.getElementById('adminSearchKaos').value.trim().toLowerCase();
             kaosCurrentPage = 1;
             renderKaosTable();
+        }
+
+        function filterAdminJalan() {
+            adminJalanSearchQuery = document.getElementById('adminSearchJalan').value.trim().toLowerCase();
+            jalanCurrentPage = 1;
+            renderJalanTable();
         }
 
         function filterAdminMewarnai() {
@@ -1501,7 +1773,9 @@
             const paginatedOrders = filteredOrders.slice(startIdx, startIdx + itemsPerPage);
 
             let tbody = document.getElementById('adminTableBody');
-            tbody.innerHTML = paginatedOrders.length === 0 ? `<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada data pemesanan kaos yang cocok.</td></tr>` : paginatedOrders.map((o) => {
+            if (!tbody) return;
+
+            tbody.innerHTML = paginatedOrders.length === 0 ? `<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada data pembelian kaos yang cocok.</td></tr>` : paginatedOrders.map((o) => {
                 const waText = encodeURIComponent(`Halo Kak ${o.name}, terima kasih telah memesan Kaos Jalan Santai & Kuliner Nusantara JUSS 2026 (ID: ${o.id}). Pesanan ${o.qty} Pcs (Size ${o.size}, Lengan ${o.sleeve}) senilai Rp ${o.totalPrice.toLocaleString('id-ID')} telah ${o.status}. Pengambilan kaos dapat dilakukan di JS Coffee (Kedai Biru), Jl. Andara Raya No.23 dengan menunjukkan E-Ticket di portal ini. Salam UMKM Cinere!`);
                 return `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -1533,6 +1807,60 @@
             renderKaosTable();
         }
 
+        function renderJalanTable() {
+            const tbody = document.getElementById('adminJalanTableBody');
+            if (!tbody) return;
+
+            const filteredJalan = jalanRegistrations.filter(j => 
+                j.name.toLowerCase().includes(adminJalanSearchQuery) || 
+                String(j.phone).includes(adminJalanSearchQuery) || 
+                j.kelurahan.toLowerCase().includes(adminJalanSearchQuery) ||
+                j.alamat.toLowerCase().includes(adminJalanSearchQuery) ||
+                (j.ktp && String(j.ktp).toLowerCase().includes(adminJalanSearchQuery)) ||
+                (j.parentName && String(j.parentName).toLowerCase().includes(adminJalanSearchQuery)) ||
+                j.id.toLowerCase().includes(adminJalanSearchQuery)
+            );
+
+            const totalPages = Math.ceil(filteredJalan.length / itemsPerPage) || 1;
+            if (jalanCurrentPage > totalPages) jalanCurrentPage = totalPages;
+
+            const startIdx = (jalanCurrentPage - 1) * itemsPerPage;
+            const paginatedJalan = filteredJalan.slice(startIdx, startIdx + itemsPerPage);
+
+            tbody.innerHTML = paginatedJalan.length === 0 ? `<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada data peserta jalan santai yang cocok.</td></tr>` : paginatedJalan.map((j) => {
+                const waTextJalan = encodeURIComponent(`Halo Kak ${j.name}, pendaftaran Peserta Jalan Santai & Kuliner Nusantara JUSS 2026 Anda (ID: ${j.id}, Kelurahan: ${j.kelurahan}) telah berhasil tercatat. Mari sukseskan Jalan Santai Hari Pahlawan di Kecamatan Cinere! Terima kasih.`);
+                let ktpColumnDisplay = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur' ? `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">Anak di Bawah Umur</span>` : `<span class="font-mono text-slate-700">${escapeHtml(j.ktp)}</span>`;
+                let underageColDisplay = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur' ? `<span class="text-amber-700 font-bold">Ya</span><br><span class="text-[10px] text-slate-500">Wali: ${escapeHtml(j.parentName || '-')}</span>` : `<span class="text-slate-400">Tidak (Dewasa)</span>`;
+                return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="p-3.5"><strong class="text-slate-800 block">${j.id}</strong><span class="text-[11px]">${j.timestamp}</span></td>
+                        <td class="p-3.5"><span class="font-bold block">${escapeHtml(j.name)}</span><span class="text-slate-500 text-[11px]">${escapeHtml(j.gender)}</span></td>
+                        <td class="p-3.5">${ktpColumnDisplay}</td>
+                        <td class="p-3.5">${underageColDisplay}</td>
+                        <td class="p-3.5">${escapeHtml(j.kelurahan)}</td>
+                        <td class="p-3.5">${escapeHtml(j.alamat)}</td>
+                        <td class="p-3.5 font-mono text-slate-600">${escapeHtml(j.phone)}</td>
+                        <td class="p-3.5 text-center"><a href="https://wa.me/${String(j.phone).replace(/^0/, '62')}?text=${waTextJalan}" target="_blank" class="bg-sky-600 text-white px-2.5 py-1.5 rounded text-[11px] inline-flex items-center gap-1 font-bold shadow-sm">💬 WhatsApp</a></td>
+                    </tr>
+                `;
+            }).join('');
+
+            let paginationHTML = `<span>Menampilkan ${filteredJalan.length > 0 ? startIdx + 1 : 0} - ${Math.min(startIdx + itemsPerPage, filteredJalan.length)} dari ${filteredJalan.length} data</span>`;
+            paginationHTML += `<div class="flex gap-1">`;
+            paginationHTML += `<button onclick="changeJalanPage(${jalanCurrentPage - 1})" ${jalanCurrentPage === 1 ? 'disabled class="px-3 py-1 rounded bg-slate-200 text-slate-400 cursor-not-allowed text-xs"' : 'class="px-3 py-1 rounded bg-sky-600 text-white text-xs hover:bg-sky-700"'}>Sebelumnya</button>`;
+            paginationHTML += `<span class="px-3 py-1 text-xs font-bold text-slate-700">Hal ${jalanCurrentPage} dari ${totalPages}</span>`;
+            paginationHTML += `<button onclick="changeJalanPage(${jalanCurrentPage + 1})" ${jalanCurrentPage >= totalPages ? 'disabled class="px-3 py-1 rounded bg-slate-200 text-slate-400 cursor-not-allowed text-xs"' : 'class="px-3 py-1 rounded bg-sky-600 text-white text-xs hover:bg-sky-700"'}>Berikutnya</button>`;
+            paginationHTML += `</div>`;
+            
+            const pagContainer = document.getElementById('jalanPaginationContainer');
+            if (pagContainer) pagContainer.innerHTML = paginationHTML;
+        }
+
+        function changeJalanPage(page) {
+            jalanCurrentPage = page;
+            renderJalanTable();
+        }
+
         function renderMewarnaiTable() {
             const filteredMewarnai = mewarnaiRegistrations.filter(m => 
                 m.namaAnak.toLowerCase().includes(adminMewarnaiSearchQuery) || 
@@ -1550,6 +1878,8 @@
             const paginatedMewarnai = filteredMewarnai.slice(startIdx, startIdx + itemsPerPage);
 
             let mewarnaiTbody = document.getElementById('adminMewarnaiTableBody');
+            if (!mewarnaiTbody) return;
+
             mewarnaiTbody.innerHTML = paginatedMewarnai.length === 0 ? `<tr><td colspan="6" class="text-center py-8 text-slate-400">Tidak ada peserta lomba mewarnai yang cocok.</td></tr>` : paginatedMewarnai.map((m) => {
                 const waTextMewarnai = encodeURIComponent(`Halo Ayah/Bunda ${m.ortu}, pendaftaran Lomba Mewarnai JUSS 2026 untuk ananda ${m.namaAnak} (${m.kategori} - ${m.asalSekolah || 'Belum Sekolah'}) telah berhasil tercatat dengan ID: ${m.id}. Acara akan diselenggarakan pada Sabtu, 28 November 2026 di Halaman Parkir Mall Cinere. Jangan lupa membawa meja lipat dan peralatan mewarnai sendiri. Terima kasih!`);
                 return `
@@ -1625,23 +1955,26 @@
             return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
-        window.onscroll = function() {
-            const stickyBar = document.getElementById('stickyNavBar');
-            const scrollTopBtn = document.getElementById('scrollToTopBtn');
-            if (window.scrollY > 280) {
-                if (stickyBar) stickyBar.classList.remove('hidden');
-                if (scrollTopBtn) {
-                    scrollTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    scrollTopBtn.classList.add('opacity-100', 'translate-y-0');
+        // Sticky Header & Scroll to Top Logic
+        window.addEventListener('scroll', function() {
+            const stickyNavBar = document.getElementById('stickyNavBar');
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            const scrollY = window.scrollY;
+
+            if (scrollY > 220) {
+                if (stickyNavBar) stickyNavBar.classList.remove('hidden');
+                if (scrollToTopBtn) {
+                    scrollToTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    scrollToTopBtn.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
                 }
             } else {
-                if (stickyBar) stickyBar.classList.add('hidden');
-                if (scrollTopBtn) {
-                    scrollTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    scrollTopBtn.classList.remove('opacity-100', 'translate-y-0');
+                if (stickyNavBar) stickyNavBar.classList.add('hidden');
+                if (scrollToTopBtn) {
+                    scrollToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    scrollToTopBtn.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
                 }
             }
-        };
+        });
 
         window.onload = function() {
             calculateTotal();
@@ -1657,7 +1990,6 @@
                     sponsorTrack.style.display = 'flex';
                     sponsorTrack.style.justifyContent = 'space-around';
                     sponsorTrack.style.alignItems = 'center';
-                    sponsorTrack.classList.add('animate-marquee');
                 } else {
                     sponsorTrack.style.display = 'flex';
                     sponsorTrack.style.justifyContent = 'center';
