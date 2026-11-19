@@ -13,10 +13,23 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         /* Hide scrollbar for IE, Edge and Firefox */
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth hardware-accelerated marquee replacement */
+        @keyframes marqueeScroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marqueeScroll 28s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
     </style>
     <!-- GLOBAL SCOPE SCRIPT FIX: Ensure all functions are defined before DOM renders -->
     <script>
-        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzePit9Bl4NqOW_48oW3NFGJMRHDGhR8LFX_aWIUIY37htHoBfSfr_Ham5omvHndeQv/exec"; 
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzePit9Bl4NqOW_48oW3NFGJMRHDGhR8LFX_aWIUIY37htHoBfSfr_Ham5omvHndeQv/exec";
 
         let orders = JSON.parse(localStorage.getItem('juss_kaos_orders')) || [];
         let jalanRegistrations = JSON.parse(localStorage.getItem('juss_jalan_regs')) || [];
@@ -34,6 +47,10 @@
         let adminKaosSearchQuery = "";
         let adminJalanSearchQuery = "";
         let adminMewarnaiSearchQuery = "";
+
+        let umkmSlideIndex = 0;
+        let umkmSlideInterval = null;
+        let currentUmkmImages = [];
 
         function startSlideShow() {
             if (slideInterval) clearInterval(slideInterval);
@@ -64,10 +81,8 @@
             if (savedAnnounce) {
                 const el = document.getElementById('marqueeAnnouncementText');
                 if (el) el.innerText = savedAnnounce;
-                const stickyContainer = document.getElementById('stickyMarqueeText');
-                if (stickyContainer) {
-                    stickyContainer.outerHTML = `<marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white block w-full" id="stickyMarqueeText">${escapeHtml(savedAnnounce)}</marquee>`;
-                }
+                const stickyEl = document.getElementById('stickyMarqueeText');
+                if (stickyEl) stickyEl.innerText = savedAnnounce;
                 const inputEl = document.getElementById('adminMarqueeInput');
                 if (inputEl) inputEl.value = savedAnnounce;
             }
@@ -79,15 +94,15 @@
             localStorage.setItem('juss_marquee_text', val);
             const el = document.getElementById('marqueeAnnouncementText');
             if (el) el.innerText = val;
-            const stickyContainer = document.getElementById('stickyMarqueeText');
-            if (stickyContainer) {
-                stickyContainer.outerHTML = `<marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white block w-full" id="stickyMarqueeText">${escapeHtml(val)}</marquee>`;
-            }
+            const stickyEl = document.getElementById('stickyMarqueeText');
+            if (stickyEl) stickyEl.innerText = val;
             showModal('Berhasil ✨', 'Pengumuman berhasil diperbarui.', '✓');
         }
 
+        let isFetchingSheets = false;
         async function fetchOrdersFromGoogleSheets() {
-            if (!GOOGLE_APPS_SCRIPT_URL) return;
+            if (!GOOGLE_APPS_SCRIPT_URL || isFetchingSheets) return;
+            isFetchingSheets = true;
             try {
                 const response = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getDataKaos");
                 if (response.ok) {
@@ -110,9 +125,7 @@
                         saveToStorage();
                     }
                 }
-            } catch (e) { console.log("Offline mode kaos", e); }
 
-            try {
                 const resJalan = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getDataJalanSantai");
                 if (resJalan.ok) {
                     const dataJalan = await resJalan.json();
@@ -133,9 +146,7 @@
                         saveToStorage();
                     }
                 }
-            } catch (e) { console.log("Offline mode jalan santai", e); }
 
-            try {
                 const resMewarnai = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getDataMewarnai");
                 if (resMewarnai.ok) {
                     const dataMewarnai = await resMewarnai.json();
@@ -155,7 +166,11 @@
                         saveToStorage();
                     }
                 }
-            } catch (e) { console.log("Offline mode mewarnai", e); }
+            } catch (e) {
+                console.log("Offline mode", e);
+            } finally {
+                isFetchingSheets = false;
+            }
         }
 
         function saveToStorage() {
@@ -170,7 +185,7 @@
                 if (sec) sec.classList.add('hidden');
                 
                 const btn = document.getElementById('btn-tab-' + t);
-                if (btn) btn.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 text-center';
+                if (btn) btn.className = 'px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20';
 
                 const stickyBtn = document.getElementById('btn-sticky-' + t);
                 if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-200 hover:bg-white/10 whitespace-nowrap';
@@ -180,66 +195,40 @@
             });
 
             if (tabName === 'beranda') {
-                const sec = document.getElementById('tab-beranda');
-                if (sec) sec.classList.remove('hidden');
-                const btn = document.getElementById('btn-tab-beranda');
-                if (btn) btn.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm text-center';
-                const stickyBtn = document.getElementById('btn-sticky-beranda');
-                if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
-                const bottomBtn = document.getElementById('btn-bottom-beranda');
-                if (bottomBtn) bottomBtn.className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
+                document.getElementById('tab-beranda').classList.remove('hidden');
+                if (document.getElementById('btn-tab-beranda')) document.getElementById('btn-tab-beranda').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-beranda')) document.getElementById('btn-sticky-beranda').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
+                if (document.getElementById('btn-bottom-beranda')) document.getElementById('btn-bottom-beranda').className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
             } else if (tabName === 'form') {
-                const sec = document.getElementById('tab-form');
-                if (sec) sec.classList.remove('hidden');
-                const btn = document.getElementById('btn-tab-form');
-                if (btn) btn.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm text-center';
-                const stickyBtn = document.getElementById('btn-sticky-form');
-                if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
-                const bottomBtn = document.getElementById('btn-bottom-form');
-                if (bottomBtn) bottomBtn.className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
+                document.getElementById('tab-form').classList.remove('hidden');
+                if (document.getElementById('btn-tab-form')) document.getElementById('btn-tab-form').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-form')) document.getElementById('btn-sticky-form').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
+                if (document.getElementById('btn-bottom-form')) document.getElementById('btn-bottom-form').className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
             } else if (tabName === 'pendaftaran-jalan') {
-                const sec = document.getElementById('tab-pendaftaran-jalan');
-                if (sec) sec.classList.remove('hidden');
-                const btn = document.getElementById('btn-tab-pendaftaran-jalan');
-                if (btn) btn.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm text-center';
-                const stickyBtn = document.getElementById('btn-sticky-pendaftaran-jalan');
-                if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
-                const bottomBtn = document.getElementById('btn-bottom-pendaftaran-jalan');
-                if (bottomBtn) bottomBtn.className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
+                document.getElementById('tab-pendaftaran-jalan').classList.remove('hidden');
+                if (document.getElementById('btn-tab-pendaftaran-jalan')) document.getElementById('btn-tab-pendaftaran-jalan').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-pendaftaran-jalan')) document.getElementById('btn-sticky-pendaftaran-jalan').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
+                if (document.getElementById('btn-bottom-pendaftaran-jalan')) document.getElementById('btn-bottom-pendaftaran-jalan').className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
             } else if (tabName === 'mewarnai') {
-                const sec = document.getElementById('tab-mewarnai');
-                if (sec) sec.classList.remove('hidden');
-                const btn = document.getElementById('btn-tab-mewarnai');
-                if (btn) btn.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm text-center';
-                const stickyBtn = document.getElementById('btn-sticky-mewarnai');
-                if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
-                const bottomBtn = document.getElementById('btn-bottom-mewarnai');
-                if (bottomBtn) bottomBtn.className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
+                document.getElementById('tab-mewarnai').classList.remove('hidden');
+                if (document.getElementById('btn-tab-mewarnai')) document.getElementById('btn-tab-mewarnai').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-mewarnai')) document.getElementById('btn-sticky-mewarnai').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
+                if (document.getElementById('btn-bottom-mewarnai')) document.getElementById('btn-bottom-mewarnai').className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
             } else if (tabName === 'status') {
-                const sec = document.getElementById('tab-status');
-                if (sec) sec.classList.remove('hidden');
-                const btn = document.getElementById('btn-tab-status');
-                if (btn) btn.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm text-center';
-                const stickyBtn = document.getElementById('btn-sticky-status');
-                if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
-                const bottomBtn = document.getElementById('btn-bottom-status');
-                if (bottomBtn) bottomBtn.className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
+                document.getElementById('tab-status').classList.remove('hidden');
+                if (document.getElementById('btn-tab-status')) document.getElementById('btn-tab-status').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-status')) document.getElementById('btn-sticky-status').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
+                if (document.getElementById('btn-bottom-status')) document.getElementById('btn-bottom-status').className = 'flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition';
                 fetchOrdersFromGoogleSheets();
             } else if (tabName === 'admin') {
                 if (!isAdminLoggedIn) {
-                    const adminModal = document.getElementById('adminModal');
-                    if (adminModal) {
-                        adminModal.classList.remove('hidden');
-                        adminModal.classList.add('flex');
-                    }
+                    document.getElementById('adminModal').classList.remove('hidden');
+                    document.getElementById('adminModal').classList.add('flex');
                     return;
                 }
-                const sec = document.getElementById('tab-admin');
-                if (sec) sec.classList.remove('hidden');
-                const btn = document.getElementById('btn-tab-admin');
-                if (btn) btn.className = 'px-3 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm text-center';
-                const stickyBtn = document.getElementById('btn-sticky-admin');
-                if (stickyBtn) stickyBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
+                document.getElementById('tab-admin').classList.remove('hidden');
+                if (document.getElementById('btn-tab-admin')) document.getElementById('btn-tab-admin').className = 'px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm';
+                if (document.getElementById('btn-sticky-admin')) document.getElementById('btn-sticky-admin').className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap';
                 fetchOrdersFromGoogleSheets().then(() => renderAdminDashboard());
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -485,15 +474,6 @@
             });
         }
 
-        function maskName(nameStr) {
-            if (!nameStr) return "***";
-            let parts = nameStr.trim().split(" ");
-            return parts.map(p => {
-                if (p.length <= 2) return p[0] + "*";
-                return p.substring(0, 2) + "*".repeat(p.length - 2);
-            }).join(" ");
-        }
-
         function maskAddress(addressStr) {
             if (!addressStr) return "Jl. *****";
             if (addressStr.length <= 6) return "Jl. ******";
@@ -535,24 +515,25 @@
 
             let html = '';
 
+            // 1. Render E-Ticket Pembelian Kaos
             filteredKaos.forEach(o => {
                 let rawPhone = String(o.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
                 let fullName = String(o.name || 'Peserta');
 
                 html += `
-                    <div class="bg-white border-2 border-emerald-500 rounded-2xl p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-emerald-500 text-white font-bold px-3 py-1 rounded-bl-xl text-[10px] uppercase tracking-wider">
-                            👕 E-TICKET PEMBELIAN KAOS
-                        </div>
-                        <div class="flex justify-between items-start border-b border-slate-100 pb-3">
-                            <div>
-                                <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(fullName)}</span>
-                                <span class="text-slate-400 font-mono text-[11px]">ID Pesanan: ${o.id} • ${o.timestamp}</span>
-                            </div>
+                    <div class="bg-white border-2 border-emerald-500 rounded-2xl p-4 sm:p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
+                        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3 pt-1">
+                            <span class="bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] uppercase tracking-wider">
+                                👕 E-TICKET PEMBELIAN KAOS
+                            </span>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-emerald-100 text-emerald-800">${o.status}</span>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700 bg-emerald-50/50 p-3.5 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(fullName)}</span>
+                            <span class="text-slate-400 font-mono text-[11px]">ID Pesanan: ${o.id} • ${o.timestamp}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-slate-700 bg-emerald-50/50 p-3 rounded-xl">
                             <div><strong>Kelurahan / Wilayah:</strong> ${escapeHtml(o.instansi)}</div>
                             <div><strong>No WhatsApp:</strong> <span class="font-mono bg-white px-2 py-0.5 rounded text-slate-800">${maskedPhone}</span></div>
                             <div><strong>Ukuran Kaos:</strong> Size ${o.size} (${o.sleeve})</div>
@@ -560,83 +541,79 @@
                             <div class="sm:col-span-2"><strong>Tanggal & Waktu:</strong> Jumat, 27 November 2026 (Pukul 06.00 WIB)</div>
                             <div class="sm:col-span-2"><strong>Total Transfer:</strong> Rp ${o.totalPrice.toLocaleString('id-ID')} (Lunas)</div>
                         </div>
+
                         <div class="bg-teal-50 border border-teal-200 rounded-xl p-3 space-y-2">
                             <span class="text-teal-900 font-bold text-xs block">📦 Titik Lokasi Pengambilan Kaos Warga Cinere:</span>
                             <p class="text-slate-800 text-xs font-semibold">JS Coffee (Kedai Biru)</p>
                             <p class="text-slate-700 text-xs">Jl. Andara Raya No.23, Pangkalan Jati Baru, Kec. Cinere, Kota Depok, Jawa Barat 16513</p>
                             <div class="pt-1">
-                                <a href="https://www.google.com/maps/place/JS+Coffee/data=!4m2!3m1!1s0x0:0xd67f71cdbd4b2a1e?sa=X&ved=1t:2428&ictx=111" target="_blank" class="inline-flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm transition">
+                                <a href="https://www.google.com/maps/place/JS+Coffee/data=!4m2!3m1!1s0x0:0xd67f71cdbd4b2a1e?sa=X&ved=1t:2428&ictx=111" target="_blank" class="inline-flex items-center justify-center w-full sm:w-auto gap-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold px-3.5 py-2 rounded-lg text-xs shadow-sm transition">
                                     🗺️ Buka Lokasi di Google Maps
                                 </a>
                             </div>
                         </div>
+
                         <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 text-center font-medium">
                             🎟️ <strong>Informasi Doorprize:</strong> QR-Code pembelian kaos ini sekaligus berfungsi sebagai nomor undian doorprize Anda. Diharapkan tidak menghilangkan E-Ticket ini dan dapat mengeceknya kembali melalui menu Cek Status.
                         </div>
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE PENGAMBILAN KAOS & DOORPRIZE</span>
                             <div class="w-28 h-28 bg-white border border-slate-300 rounded-lg flex items-center justify-center font-mono text-[10px] font-bold text-slate-800 text-center shadow-inner">
                                 [QR KAOS & DOORPRIZE]<br>${o.id}
                             </div>
-                            <span class="text-[10px] text-emerald-700 font-semibold mt-1">Tunjukkan E-Ticket ini saat pengambilan kaos di JS Coffee (Kedai Biru).</span>
+                            <span class="text-[10px] text-emerald-700 font-semibold mt-1.5">Tunjukkan E-Ticket ini saat pengambilan kaos di JS Coffee (Kedai Biru).</span>
                         </div>
                     </div>
                 `;
             });
 
+            // 2. Render E-Ticket Jalan Santai
             filteredJalan.forEach(j => {
                 let rawPhone = String(j.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
                 let fullName = String(j.name || 'Peserta');
+                let maskedAlamat = maskAddress(j.alamat || '-');
                 let isUnderageParticipant = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur';
 
-                let matchingMewarnai = mewarnaiRegistrations.filter(m => {
-                    let mName = String(m.namaAnak || m["Nama Anak"] || "").toLowerCase();
-                    let mPhone = String(m.phone || m["No HP / WhatsApp"] || "").trim();
-                    let mOrtu = String(m.ortu || m["Nama Orang Tua"] || "").toLowerCase();
-                    return mName.includes(String(j.name || "").toLowerCase()) || String(j.name || "").toLowerCase().includes(mName) || mOrtu.includes(String(j.name || "").toLowerCase()) || (rawPhone && mPhone === rawPhone);
-                });
-
-                let coloringInfoHTML = "";
-                if (matchingMewarnai.length > 0) {
-                    coloringInfoHTML = `<div class="col-span-2 bg-teal-50 border border-teal-200 p-2.5 rounded text-teal-900 font-medium">
-                        🎨 <strong>Informasi Lomba Mewarnai Terkait:</strong> Peserta ini juga terdaftar dalam Lomba Mewarnai Anak (Sabtu, 28 November 2026 pukul 09.00 WIB di Halaman Parkir Mall Cinere). Wajib membawa meja lipat & alat warna sendiri.
-                    </div>`;
+                let parentRowHTML = "";
+                if (j.parentName && j.parentName.trim() !== "" && j.parentName.trim() !== "-") {
+                    parentRowHTML = `<div><strong>Orang Tua / Pendamping:</strong> ${escapeHtml(j.parentName)}</div>`;
                 }
 
                 html += `
-                    <div class="bg-white border-2 border-sky-500 rounded-2xl p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-sky-600 text-white font-bold px-3 py-1 rounded-bl-xl text-[10px] uppercase tracking-wider">
-                            🚶‍♂️ E-TICKET JALAN SANTAI
-                        </div>
-                        <div class="flex justify-between items-start border-b border-slate-100 pb-3">
-                            <div>
-                                <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(fullName)}</span>
-                                <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran: ${j.id} • ${j.timestamp}</span>
-                            </div>
+                    <div class="bg-white border-2 border-sky-500 rounded-2xl p-4 sm:p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
+                        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3 pt-1">
+                            <span class="bg-sky-600 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] uppercase tracking-wider">
+                                🚶‍♂️ E-TICKET JALAN SANTAI
+                            </span>
                             <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-sky-100 text-sky-800">${j.status}</span>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700 bg-sky-50/50 p-3.5 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(fullName)}</span>
+                            <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran: ${j.id} • ${j.timestamp}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-slate-700 bg-sky-50/50 p-3 rounded-xl">
                             <div><strong>Kelurahan:</strong> ${escapeHtml(j.kelurahan)}</div>
                             <div><strong>No WhatsApp:</strong> <span class="font-mono bg-white px-2 py-0.5 rounded text-slate-800">${maskedPhone}</span></div>
                             <div><strong>Gender:</strong> ${escapeHtml(j.gender)}</div>
                             <div><strong>Status Peserta:</strong> ${isUnderageParticipant ? 'Anak di Bawah Umur' : 'Dewasa (KTP)'}</div>
-                            ${(j.parentName && j.parentName !== '-') ? `<div class="sm:col-span-2"><strong>Nama Orang Tua / Pendamping:</strong> ${escapeHtml(j.parentName)}</div>` : ''}
+                            ${parentRowHTML}
                             <div class="sm:col-span-2"><strong>Tanggal & Waktu:</strong> Jumat, 27 November 2026 (Pukul 06.00 WIB)</div>
-                            <div class="sm:col-span-2"><strong>Alamat Lengkap:</strong> ${escapeHtml(maskAddress(j.alamat))}</div>
-                            ${coloringInfoHTML}
+                            <div class="sm:col-span-2"><strong>Alamat Domisili:</strong> ${escapeHtml(maskedAlamat)}</div>
                         </div>
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE JALAN SANTAI KECAMATAN CINERE</span>
                             <div class="w-24 h-24 bg-white border border-slate-300 rounded-lg flex items-center justify-center font-mono text-[10px] font-bold text-slate-800 text-center shadow-inner">
                                 [QR JALAN SANTAI]<br>${j.id}
                             </div>
-                            <span class="text-[10px] text-sky-700 font-semibold mt-1">Tunjukkan E-Ticket Jalan Santai ini saat registrasi ulang Jalan Santai 2026.</span>
+                            <span class="text-[10px] text-sky-700 font-semibold mt-1.5">Tunjukkan E-Ticket Jalan Santai ini saat registrasi ulang Jalan Santai 2026.</span>
                         </div>
                     </div>
                 `;
             });
 
+            // 3. Render E-Ticket Lomba Mewarnai
             filteredMewarnai.forEach(m => {
                 let rawOrtu = String(m.ortu || m["Nama Orang Tua"] || 'Orang Tua');
                 let rawPhoneMewarnai = String(m.phone || m["No HP / WhatsApp"] || '');
@@ -644,7 +621,7 @@
                 let kategoriAnak = m.kategori || m["Kategori"] || 'TK A';
                 let sekolahAnak = m.asalSekolah || m["Asal Sekolah"] || 'Belum Sekolah';
                 let alamatAnak = maskAddress(m.alamat || m["Alamat"] || '-');
-                let namaAnak = String(m.namaAnak || m["Nama Anak"] || 'Peserta Anak');
+                let fullNamaAnak = String(m.namaAnak || m["Nama Anak"] || 'Peserta Anak');
                 let fullOrtu = rawOrtu;
                 let idMewarnai = m.id || m["ID Pendaftaran"] || 'MEW-000';
                 let timeMewarnai = m.timestamp || m["Timestamp"] || '-';
@@ -665,26 +642,26 @@
                 }
 
                 html += `
-                    <div class="bg-white border-2 border-teal-500 rounded-2xl p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
-                        <div class="absolute top-0 right-0 bg-teal-600 text-white font-bold px-3 py-1 rounded-bl-xl text-[10px] uppercase tracking-wider">
-                            🎨 E-TICKET LOMBA MEWARNAI
+                    <div class="bg-white border-2 border-teal-500 rounded-2xl p-4 sm:p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
+                        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3 pt-1">
+                            <span class="bg-teal-600 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] uppercase tracking-wider">
+                                🎨 E-TICKET LOMBA MEWARNAI
+                            </span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px] bg-teal-100 text-teal-800">${statusMewarnai}</span>
+                                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${isHadir ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${isHadir ? '✅ Hadir' : '⏳ Belum Hadir'}</span>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-start border-b border-slate-100 pb-3">
-                            <div>
-                                <span class="font-extrabold text-slate-900 text-base block">Ananda ${escapeHtml(namaAnak)}</span>
-                                <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran Lomba Mewarnai: ${idMewarnai} • ${timeMewarnai}</span>
-                            </div>
-                            <div class="flex flex-col items-end gap-1">
-                                <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-teal-100 text-teal-800">${statusMewarnai}</span>
-                                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${isHadir ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${isHadir ? '✅ Hadir di Acara' : '⏳ Belum Hadir'}</span>
-                            </div>
+                        <div>
+                            <span class="font-extrabold text-slate-900 text-base block">Ananda ${escapeHtml(fullNamaAnak)}</span>
+                            <span class="text-slate-400 font-mono text-[11px]">ID Pendaftaran: ${idMewarnai} • ${timeMewarnai}</span>
                         </div>
 
                         <div class="bg-teal-50 border border-teal-200 p-3 rounded-xl text-teal-900 text-center font-medium">
                             ${countdownText}
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700 bg-teal-50/50 p-3.5 rounded-xl">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-slate-700 bg-teal-50/50 p-3 rounded-xl">
                             <div><strong>Asal Sekolah:</strong> ${escapeHtml(sekolahAnak)}</div>
                             <div><strong>Kategori Lomba:</strong> <span class="font-bold text-teal-800">${escapeHtml(kategoriAnak)}</span></div>
                             <div><strong>Orang Tua / Wali:</strong> ${escapeHtml(fullOrtu)}</div>
@@ -694,12 +671,12 @@
                                 ℹ️ <strong>Ketentuan Lomba Mewarnai:</strong> Diselenggarakan hari Sabtu, 28 November 2026 pukul <strong>09.00 WIB</strong> di Halaman Parkir Mall Cinere. Wajib membawa meja lipat dan alat warna sendiri.
                             </div>
                         </div>
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center text-center">
                             <span class="text-[10px] font-bold text-slate-500 mb-1">QR CODE LOMBA MEWARNAI - MALL CINERE</span>
                             <div class="w-24 h-24 bg-white border border-slate-300 rounded-lg flex items-center justify-center font-mono text-[10px] font-bold text-slate-800 text-center shadow-inner">
                                 [QR MEWARNAI]<br>${idMewarnai}
                             </div>
-                            <span class="text-[10px] text-teal-700 font-semibold mt-1">Tunjukkan E-Ticket Lomba Mewarnai ini saat registrasi ulang Lomba Mewarnai 2026.</span>
+                            <span class="text-[10px] text-teal-700 font-semibold mt-1.5">Tunjukkan E-Ticket Lomba Mewarnai ini saat registrasi ulang Lomba Mewarnai 2026.</span>
                         </div>
                     </div>
                 `;
@@ -1064,6 +1041,34 @@
             document.body.removeChild(link);
         }
 
+        function exportJalanToCSV() {
+            let csv = "ID,Timestamp,Nama,Gender,NoKTP,StatusAnak,NamaWali,Kelurahan,Alamat,NoHP,Status\n";
+            jalanRegistrations.forEach(j => {
+                const isAnak = j.isUnderage ? "Ya" : "Tidak";
+                csv += `"${j.id}","${j.timestamp}","${j.name}","${j.gender}","${j.ktp}","${isAnak}","${j.parentName || '-'}","${j.kelurahan}","${String(j.alamat).replace(/"/g, '""')}","${j.phone}","${j.status}"\n`;
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + csv));
+            link.setAttribute("download", "rekap_jalan_santai_juss.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportMewarnaiToCSV() {
+            let csv = "ID,Timestamp,NamaAnak,AsalSekolah,Kategori,NamaOrtu,NoHP,Alamat,Status,Kehadiran\n";
+            mewarnaiRegistrations.forEach(m => {
+                const hadirStr = (m.hadir === true || m.hadir === "true") ? "Hadir" : "Belum Hadir";
+                csv += `"${m.id}","${m.timestamp}","${m.namaAnak}","${m.asalSekolah}","${m.kategori}","${m.ortu}","${m.phone}","${String(m.alamat).replace(/"/g, '""')}","${m.status}","${hadirStr}"\n`;
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + csv));
+            link.setAttribute("download", "rekap_lomba_mewarnai_juss.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         function showModal(title, message, icon = "✓") {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-message').innerText = message;
@@ -1090,60 +1095,11 @@
             document.getElementById('imageViewerModal').classList.add('hidden');
         }
 
-        // Data Kuliner & UMKM dengan dukungan multiple photos (Slider Otomatis)
         const culinaryData = {
             'Tradisional': {
-                title: 'KULINERIA',
+                title: 'KULINERIA • UMKM CINERE',
                 badge: 'UMKM CINERE • Stan No. 01 - 10',
                 items: [
-                    { 
-                        name: 'Gado-Gado Ibu Iren', 
-                        stan: 'Stan No. 01', 
-                        desc: 'Gado-Gado bumbu kacang segar ulek dadakan & Buah Potong segar.', 
-                        images: [
-                            'https://placehold.co/600x400/7c3aed/ffffff?text=Gado-Gado+Ibu+Iren+1',
-                            'https://placehold.co/600x400/5b21b6/ffffff?text=Buah+Potong+Segar+2'
-                        ]
-                    },
-                    { 
-                        name: 'Ketoprak & Gado-Gado Bu Siti', 
-                        stan: 'Stan No. 02', 
-                        desc: 'Ketoprak bumbu kacang asli dengan lontong pulen dan kerupuk melimpah.', 
-                        images: [
-                            'https://placehold.co/600x400/0284c7/ffffff?text=Ketoprak+Bu+Siti'
-                        ]
-                    },
-                    { 
-                        name: 'Kue Serabi & Kue Cubit Bandung', 
-                        stan: 'Stan No. 03', 
-                        desc: 'Jajanan pasar hangat dengan berbagai pilihan toping keju, cokelat & green tea.', 
-                        images: [
-                            'https://placehold.co/600x400/0d9488/ffffff?text=Serabi+Hangat+1',
-                            'https://placehold.co/600x400/0f766e/ffffff?text=Kue+Cubit+Lumer+2'
-                        ]
-                    },
-                    { 
-                        name: 'Kerak Telor Betawi Asli', 
-                        stan: 'Stan No. 04', 
-                        desc: 'Kuliner legendaris khas Betawi dengan aroma ebi sangrai & bawang goreng renyah.', 
-                        images: [
-                            'https://placehold.co/600x400/7c3aed/ffffff?text=Kerak+Telor+Betawi'
-                        ]
-                    }
-                ]
-            },
-            'Minuman': {
-                title: 'KULINERIA',
-                badge: 'UMKM GANDUL • Stan No. 11 - 20',
-                items: [
-                    { 
-                        name: 'Gado-Gado Jakarta', 
-                        stan: 'Stan No. 11', 
-                        desc: 'Gado-gado asli Jakarta dengan sayuran segar pilihan dan kerupuk udang.', 
-                        images: [
-                            'logogado.jpeg'
-                        ]
-                    },
                     { 
                         name: 'Dapur turah', 
                         stan: 'Stan No. 12', 
@@ -1151,7 +1107,7 @@
                         images: [
                             'logodapurturah.jpeg',
                             'turah1.jpeg',
-                            'turah2.jpeg'
+                            'turah2.jpeg',
                             'turah3.jpeg'
                         ]
                     },
@@ -1169,23 +1125,89 @@
                         stan: 'Stan No. 14', 
                         desc: 'Menyediakan berbagai jenis kue kering premium, nastar lumer, kastengel keju, dan cookies kekinian.', 
                         images: [
-                            'aikocookies.jpeg',
+                            'aikocookies.jpeg'
                         ]
                     },
                     { 
-                        name: 'ngerujak sab, rujak bangkok by zil', 
-                        stan: 'Stan No. 15', 
-                        desc: 'Rujak buah segar potong dengan bumbu rujak Bangkok pedas manis gurih yang bikin nagih.', 
+                        name: 'Ketoprak & Gado-Gado Bu Siti', 
+                        stan: 'Stan No. 02', 
+                        desc: 'Ketoprak bumbu kacang asli dengan lontong pulen.', 
                         images: [
-                            'zil_rujak.jpeg',
-                            'zil_jellydrink.jpeg',
-                            'zil_cilok.jpeg'
+                            'https://placehold.co/600x400/0284c7/ffffff?text=Ketoprak+Bu+Siti'
                         ]
                     },
                     { 
-                        name: 'rumah kuliner depok', 
+                        name: 'Kue Serabi & Kue Cubit Bandung', 
+                        stan: 'Stan No. 03', 
+                        desc: 'Jajanan pasar hangat dengan toping keju & cokelat.', 
+                        images: [
+                            'https://placehold.co/600x400/0d9488/ffffff?text=Kue+Serabi+Hangat',
+                            'https://placehold.co/600x400/f59e0b/ffffff?text=Kue+Cubit+Lumer'
+                        ]
+                    },
+                    { 
+                        name: 'Kerak Telor Betawi Asli', 
+                        stan: 'Stan No. 04', 
+                        desc: 'Kuliner legendaris Betawi aroma ebi & bawang goreng.', 
+                        images: [
+                            'https://placehold.co/600x400/7c3aed/ffffff?text=Kerak+Telor+Betawi'
+                        ]
+                    }
+                ]
+            },
+            'Minuman': {
+                title: 'KULINERIA • UMKM GANDUL',
+                badge: 'UMKM GANDUL • Stan No. 11 - 20',
+                items: [
+                    { 
+                        name: 'Gado-Gado Jakarta', 
+                        stan: 'Stan No. 11', 
+                        desc: 'Gado-gado asli Jakarta dengan kerupuk melinjo.', 
+                        images: [
+                            'https://placehold.co/600x400/0ea5e9/ffffff?text=Gado-Gado+Jakarta'
+                        ]
+                    },
+                    { 
+                        name: 'Dapur Turah', 
+                        stan: 'Stan No. 12', 
+                        desc: 'Menghidangkan berbagai makanan ikan pecak khas Betawi, nasi ulam, dan lauk pauk rumahan.', 
+                        images: [
+                            'logodapurturah.jpeg',
+                            'https://placehold.co/600x400/0d9488/ffffff?text=Pecak+Ikan+Dapur+Turah',
+                            'https://placehold.co/600x400/0284c7/ffffff?text=Menu+Spesial+Dapur+Turah'
+                        ]
+                    },
+                    { 
+                        name: 'Peyek Hits Ibu Rus', 
+                        stan: 'Stan No. 13', 
+                        desc: 'Menyediakan berbagai macam peyek kacang, peyek teri, dan peyek udang renyah.', 
+                        images: [
+                            'https://placehold.co/600x400/0f172a/ffffff?text=Peyek+Kacang+Ibu+Rus',
+                            'https://placehold.co/600x400/b45309/ffffff?text=Peyek+Teri+Renyah'
+                        ]
+                    },
+                    { 
+                        name: 'Aiko Cookies', 
+                        stan: 'Stan No. 14', 
+                        desc: 'Menyediakan berbagai jenis kue kering premium, nastar, dan cookies.', 
+                        images: [
+                            'https://placehold.co/600x400/f97316/ffffff?text=Aiko+Cookies+Premium',
+                            'https://placehold.co/600x400/db2777/ffffff?text=Nastar+Lumer+Aiko'
+                        ]
+                    },
+                    { 
+                        name: 'Ngerujak Sab & Rujak Bangkok by Zil', 
+                        stan: 'Stan No. 15', 
+                        desc: 'Rujak buah segar dengan bumbu gula merah kental & bumbu rujak Bangkok pedas manis.', 
+                        images: [
+                            'https://placehold.co/600x400/dc2626/ffffff?text=Rujak+Bangkok+by+Zil',
+                            'https://placehold.co/600x400/16a34a/ffffff?text=Ngerujak+Sab+Segar'
+                        ]
+                    },
+                    { 
+                        name: 'Rumah Kuliner Depok', 
                         stan: 'Stan No. 16', 
-                        desc: 'Menyediakan berbagai jenis hidangan kuliner nusantara dan minuman segar khas Kota Depok.', 
+                        desc: 'Menyediakan berbagai jenis hidangan kuliner nusantara dan minuman segar.', 
                         images: [
                             'https://placehold.co/600x400/2563eb/ffffff?text=Rumah+Kuliner+Depok'
                         ]
@@ -1193,13 +1215,13 @@
                 ]
             },
             'Berat': {
-                title: 'KULINERIA',
+                title: 'KULINERIA • UMKM PANGKALAN JATI',
                 badge: 'UMKM PANGKALAN JATI • Stan No. 21 - 35',
                 items: [
                     { 
                         name: 'Sate Ayam Madura Cak Mamat', 
                         stan: 'Stan No. 21', 
-                        desc: 'Sate ayam bumbu kacang kental khas Madura dengan lontong empuk.', 
+                        desc: 'Sate ayam bumbu kacang kental dan lontong empuk.', 
                         images: [
                             'https://placehold.co/600x400/7c3aed/ffffff?text=Sate+Ayam+Madura'
                         ]
@@ -1207,15 +1229,16 @@
                     { 
                         name: 'Bakso Malang & Mie Ayam Spesial', 
                         stan: 'Stan No. 22', 
-                        desc: 'Bakso urat kenyal dengan pangsit goreng renyah dan kuah kaldu gurih.', 
+                        desc: 'Bakso urat kenyal dengan pangsit goreng renyah.', 
                         images: [
-                            'https://placehold.co/600x400/ef4444/ffffff?text=Bakso+Malang+Spesial'
+                            'https://placehold.co/600x400/ef4444/ffffff?text=Bakso+Malang+Komplit',
+                            'https://placehold.co/600x400/f59e0b/ffffff?text=Mie+Ayam+Spesial'
                         ]
                     },
                     { 
                         name: 'Ayam Geprek Sambal Mercon', 
                         stan: 'Stan No. 23', 
-                        desc: 'Ayam crispy digeprek dengan sambal ulek bawang segar.', 
+                        desc: 'Ayam crispy digeprek dengan sambal ulek segar.', 
                         images: [
                             'https://placehold.co/600x400/8b5cf6/ffffff?text=Ayam+Geprek+Mercon'
                         ]
@@ -1223,7 +1246,7 @@
                     { 
                         name: 'Nasi Uduk Betawi Komplit', 
                         stan: 'Stan No. 24', 
-                        desc: 'Nasi uduk gurih santan lengkap dengan semur daging, telur balado & bihun goreng.', 
+                        desc: 'Nasi uduk gurih lengkap dengan semur daging & bihun.', 
                         images: [
                             'https://placehold.co/600x400/84cc16/ffffff?text=Nasi+Uduk+Betawi'
                         ]
@@ -1231,13 +1254,13 @@
                 ]
             },
             'Snack': {
-                title: 'KULINERIA',
+                title: 'KULINERIA • UMKM PANGKALAN JATI BARU',
                 badge: 'UMKM PANGKALAN JATI BARU • Stan No. 36 - 45',
                 items: [
                     { 
                         name: 'Keripik Singkong Balado Citra', 
                         stan: 'Stan No. 36', 
-                        desc: 'Keripik singkong renyah bumbu balado pedas manis khas UMKM Depok.', 
+                        desc: 'Keripik renyah pedas manis khas UMKM Depok.', 
                         images: [
                             'https://placehold.co/600x400/9333ea/ffffff?text=Keripik+Singkong+Balado'
                         ]
@@ -1245,15 +1268,15 @@
                     { 
                         name: 'Kue Kering & Nastar Ibu Ani', 
                         stan: 'Stan No. 37', 
-                        desc: 'Aneka kue kering homemade lezat, higienis & tanpa bahan pengawet.', 
+                        desc: 'Aneka kue kering homemade lezat dan higienis.', 
                         images: [
-                            'https://placehold.co/600x400/ec4899/ffffff?text=Nastar+Ibu+Ani'
+                            'https://placehold.co/600x400/ec4899/ffffff?text=Kue+Kering+Ibu+Ani'
                         ]
                     },
                     { 
                         name: 'Pisang Goreng Madu Bu Nanik Style', 
                         stan: 'Stan No. 38', 
-                        desc: 'Pisang raja goreng madu manis karamel di luar lembut di dalam.', 
+                        desc: 'Pisang goreng manis karamel di luar lembut di dalam.', 
                         images: [
                             'https://placehold.co/600x400/eab308/ffffff?text=Pisang+Goreng+Madu'
                         ]
@@ -1261,7 +1284,7 @@
                     { 
                         name: 'Aneka Oleh-Oleh Khas Depok', 
                         stan: 'Stan No. 39', 
-                        desc: 'Produk olahan belimbing dewa, sirup, dodol belimbing, dan suvenir khas Kota Depok.', 
+                        desc: 'Produk olahan belimbing dewi, sirup, dan suvenir khas Kota Depok.', 
                         images: [
                             'https://placehold.co/600x400/7c3aed/ffffff?text=Oleh-Oleh+Khas+Depok'
                         ]
@@ -1269,10 +1292,6 @@
                 ]
             }
         };
-
-        let currentUmkmImages = [];
-        let currentUmkmSlideIdx = 0;
-        let umkmSlideInterval = null;
 
         function openCulinaryModal(categoryKey) {
             const data = culinaryData[categoryKey];
@@ -1282,25 +1301,19 @@
             document.getElementById('culinaryModalBadge').innerText = data.badge;
 
             let html = '';
-            data.items.forEach(item => {
-                const imgs = item.images && item.images.length > 0 ? item.images : [item.img || 'https://placehold.co/300x300/0284c7/ffffff?text=UMKM'];
-                const thumbImg = imgs[0];
-                const hasMultiple = imgs.length > 1;
-                const safeName = item.name.replace(/'/g, "\\'");
-
+            data.items.forEach((item, index) => {
+                const thumbImg = (item.images && item.images.length > 0) ? item.images[0] : 'https://placehold.co/150x150/0284c7/ffffff?text=UMKM';
+                const photoBadge = (item.images && item.images.length > 1) ? `<span class="text-[10px] text-sky-700 font-semibold mt-1 inline-block">📸 ${item.images.length} Foto Produk (Klik untuk lihat)</span>` : `<span class="text-[10px] text-slate-500 mt-1 inline-block">Klik untuk detail UMKM</span>`;
                 html += `
-                    <div onclick="openUmkmDetailByName('${categoryKey}', '${safeName}')" class="flex items-center gap-4 bg-slate-50 border border-slate-200 p-3.5 rounded-xl hover:shadow-md hover:border-sky-300 cursor-pointer transition group">
-                        <div class="relative shrink-0">
-                            <img src="${thumbImg}" alt="${escapeHtml(item.name)}" onerror="this.src='https://placehold.co/150x150/0284c7/ffffff?text=Produk';" class="w-16 h-16 object-cover rounded-xl shadow-sm">
-                            ${hasMultiple ? `<span class="absolute -bottom-1 -right-1 bg-sky-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow">📷 ${imgs.length}</span>` : ''}
-                        </div>
+                    <div onclick="openUmkmDetailModal('${categoryKey}', ${index})" class="flex items-center gap-4 bg-slate-50 border border-slate-200 p-3.5 rounded-xl hover:bg-sky-50/60 hover:border-sky-300 hover:shadow-sm transition cursor-pointer">
+                        <img src="${thumbImg}" alt="${escapeHtml(item.name)}" onerror="this.src='https://placehold.co/150x150/0284c7/ffffff?text=UMKM';" class="w-16 h-16 object-cover rounded-xl shadow-sm shrink-0">
                         <div class="flex-grow">
                             <div class="flex justify-between items-start gap-2">
-                                <h4 class="font-bold text-slate-900 text-xs md:text-sm group-hover:text-sky-700 transition">${escapeHtml(item.name)}</h4>
+                                <h4 class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-700 transition">${escapeHtml(item.name)}</h4>
                                 <span class="bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded text-[10px] whitespace-nowrap">${escapeHtml(item.stan)}</span>
                             </div>
-                            <p class="text-slate-600 text-[11px] mt-1 line-clamp-2">${escapeHtml(item.desc)}</p>
-                            <span class="text-[10px] text-sky-600 font-bold mt-1.5 inline-block">Klik untuk lihat foto produk ${hasMultiple ? '(Slider Otomatis)' : ''} →</span>
+                            <p class="text-slate-600 text-[11px] mt-1">${escapeHtml(item.desc)}</p>
+                            ${photoBadge}
                         </div>
                     </div>
                 `;
@@ -1311,35 +1324,35 @@
             document.getElementById('culinaryModal').classList.add('flex');
         }
 
-        function openUmkmDetailByName(categoryKey, umkmName) {
-            const cat = culinaryData[categoryKey];
-            if (!cat) return;
-            const item = cat.items.find(i => i.name === umkmName);
-            if (!item) return;
+        function closeCulinaryModal() {
+            document.getElementById('culinaryModal').classList.remove('flex');
+            document.getElementById('culinaryModal').classList.add('hidden');
+        }
 
-            currentUmkmImages = item.images && item.images.length > 0 ? item.images : [item.img || 'https://placehold.co/600x400/0284c7/ffffff?text=Produk+UMKM'];
-            currentUmkmSlideIdx = 0;
+        function openUmkmDetailModal(categoryKey, itemIndex) {
+            const data = culinaryData[categoryKey];
+            if (!data || !data.items[itemIndex]) return;
 
+            const item = data.items[itemIndex];
             document.getElementById('umkmStanBadge').innerText = item.stan;
             document.getElementById('umkmDetailTitle').innerText = item.name;
             document.getElementById('umkmDetailDesc').innerText = item.desc;
+
+            currentUmkmImages = (item.images && item.images.length > 0) ? item.images : ['https://placehold.co/600x400/0284c7/ffffff?text=Produk+UMKM'];
+            umkmSlideIndex = 0;
 
             renderUmkmSlider();
 
             const prevBtn = document.getElementById('umkmPrevBtn');
             const nextBtn = document.getElementById('umkmNextBtn');
-
-            if (umkmSlideInterval) clearInterval(umkmSlideInterval);
-
             if (currentUmkmImages.length > 1) {
                 prevBtn.classList.remove('hidden');
                 nextBtn.classList.remove('hidden');
-                umkmSlideInterval = setInterval(() => {
-                    nextUmkmSlide();
-                }, 3500);
+                startUmkmSlideShow();
             } else {
                 prevBtn.classList.add('hidden');
                 nextBtn.classList.add('hidden');
+                if (umkmSlideInterval) clearInterval(umkmSlideInterval);
             }
 
             document.getElementById('umkmDetailModal').classList.remove('hidden');
@@ -1347,47 +1360,46 @@
         }
 
         function renderUmkmSlider() {
-            const container = document.getElementById('umkmSliderSlides');
+            const slidesContainer = document.getElementById('umkmSliderSlides');
             const indicator = document.getElementById('umkmSlideIndicator');
-            if (!container || currentUmkmImages.length === 0) return;
+            if (!slidesContainer || currentUmkmImages.length === 0) return;
 
-            const currentImg = currentUmkmImages[currentUmkmSlideIdx];
-            container.innerHTML = `
-                <div class="absolute inset-0 z-0">
-                    <img src="${currentImg}" alt="" class="w-full h-full object-cover filter blur-xl scale-110 opacity-50">
-                    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md"></div>
-                </div>
-                <img src="${currentImg}" alt="Produk UMKM" onerror="this.src='https://placehold.co/600x400/0284c7/ffffff?text=Foto+Produk+UMKM';" class="relative z-10 max-h-60 md:max-h-68 w-auto object-contain rounded-lg shadow-xl transition-all duration-500 cursor-pointer" onclick="openImageViewer('${currentImg}', 'Foto Produk UMKM')">
+            if (umkmSlideIndex >= currentUmkmImages.length) umkmSlideIndex = 0;
+            if (umkmSlideIndex < 0) umkmSlideIndex = currentUmkmImages.length - 1;
+
+            const currentSrc = currentUmkmImages[umkmSlideIndex];
+            slidesContainer.innerHTML = `
+                <img src="${currentSrc}" alt="Foto Produk UMKM" onerror="this.src='https://placehold.co/600x400/0284c7/ffffff?text=Foto+Produk+UMKM';" class="max-h-full max-w-full object-contain rounded-lg transition-opacity duration-500 cursor-pointer" onclick="openImageViewer('${currentSrc}', document.getElementById('umkmDetailTitle').innerText)">
             `;
             if (indicator) {
-                indicator.innerText = `${currentUmkmSlideIdx + 1} / ${currentUmkmImages.length}`;
+                indicator.innerText = `${umkmSlideIndex + 1} / ${currentUmkmImages.length}`;
             }
+        }
+
+        function startUmkmSlideShow() {
+            if (umkmSlideInterval) clearInterval(umkmSlideInterval);
+            umkmSlideInterval = setInterval(() => {
+                umkmSlideIndex++;
+                renderUmkmSlider();
+            }, 3500);
         }
 
         function nextUmkmSlide() {
-            if (currentUmkmImages.length <= 1) return;
-            currentUmkmSlideIdx = (currentUmkmSlideIdx + 1) % currentUmkmImages.length;
+            umkmSlideIndex++;
             renderUmkmSlider();
+            if (currentUmkmImages.length > 1) startUmkmSlideShow();
         }
 
         function prevUmkmSlide() {
-            if (currentUmkmImages.length <= 1) return;
-            currentUmkmSlideIdx = (currentUmkmSlideIdx - 1 + currentUmkmImages.length) % currentUmkmImages.length;
+            umkmSlideIndex--;
             renderUmkmSlider();
+            if (currentUmkmImages.length > 1) startUmkmSlideShow();
         }
 
         function closeUmkmDetailModal() {
-            if (umkmSlideInterval) {
-                clearInterval(umkmSlideInterval);
-                umkmSlideInterval = null;
-            }
+            if (umkmSlideInterval) clearInterval(umkmSlideInterval);
             document.getElementById('umkmDetailModal').classList.remove('flex');
             document.getElementById('umkmDetailModal').classList.add('hidden');
-        }
-
-        function closeCulinaryModal() {
-            document.getElementById('culinaryModal').classList.remove('flex');
-            document.getElementById('culinaryModal').classList.add('hidden');
         }
 
         function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -1416,58 +1428,69 @@
             }
         });
 
-    // Explicitly attach all functions to window to prevent ReferenceError
-    window.switchTab = switchTab;
-    window.switchAdminSubTab = switchAdminSubTab;
-    window.openCulinaryModal = openCulinaryModal;
-    window.openUmkmDetailByName = openUmkmDetailByName;
-    window.closeCulinaryModal = closeCulinaryModal;
-    window.closeUmkmDetailModal = closeUmkmDetailModal;
-    window.nextUmkmSlide = nextUmkmSlide;
-    window.prevUmkmSlide = prevUmkmSlide;
-    window.openAdminModalPrompt = openAdminModalPrompt;
-    window.closeAdminModal = closeAdminModal;
-    window.verifyAdminPin = verifyAdminPin;
-    window.lockAdminSession = lockAdminSession;
-    window.updateMarqueeAnnouncement = updateMarqueeAnnouncement;
-    window.handleFormSubmit = handleFormSubmit;
-    window.handleJalanSantaiSubmit = handleJalanSantaiSubmit;
-    window.handleMewarnaiSubmit = handleMewarnaiSubmit;
-    window.searchParticipantStatus = searchParticipantStatus;
-    window.calculateTotal = calculateTotal;
-    window.toggleUnderageFields = toggleUnderageFields;
-    window.filterAdminKaos = filterAdminKaos;
-    window.filterAdminJalan = filterAdminJalan;
-    window.filterAdminMewarnai = filterAdminMewarnai;
-    window.toggleMewarnaiAttendance = toggleMewarnaiAttendance;
-    window.changeKaosPage = changeKaosPage;
-    window.changeJalanPage = changeJalanPage;
-    window.changeMewarnaiPage = changeMewarnaiPage;
-    window.exportToCSV = exportToCSV;
-    window.openImageViewer = openImageViewer;
-    window.closeImageViewer = closeImageViewer;
-    window.scrollToTop = scrollToTop;
-    window.closeModal = closeModal;
-    window.nextSlide = nextSlide;
-    window.prevSlide = prevSlide;
-    window.currentSlide = currentSlide;
+        // Explicitly bind all functions to window
+        window.switchTab = switchTab;
+        window.switchAdminSubTab = switchAdminSubTab;
+        window.calculateTotal = calculateTotal;
+        window.handleFormSubmit = handleFormSubmit;
+        window.handleJalanSantaiSubmit = handleJalanSantaiSubmit;
+        window.handleMewarnaiSubmit = handleMewarnaiSubmit;
+        window.searchParticipantStatus = searchParticipantStatus;
+        window.openAdminModalPrompt = openAdminModalPrompt;
+        window.closeAdminModal = closeAdminModal;
+        window.verifyAdminPin = verifyAdminPin;
+        window.lockAdminSession = lockAdminSession;
+        window.updateMarqueeAnnouncement = updateMarqueeAnnouncement;
+        window.toggleUnderageFields = toggleUnderageFields;
+        window.filterAdminKaos = filterAdminKaos;
+        window.filterAdminJalan = filterAdminJalan;
+        window.filterAdminMewarnai = filterAdminMewarnai;
+        window.toggleMewarnaiAttendance = toggleMewarnaiAttendance;
+        window.changeKaosPage = changeKaosPage;
+        window.changeJalanPage = changeJalanPage;
+        window.changeMewarnaiPage = changeMewarnaiPage;
+        window.exportToCSV = exportToCSV;
+        window.exportJalanToCSV = exportJalanToCSV;
+        window.exportMewarnaiToCSV = exportMewarnaiToCSV;
+        window.closeModal = closeModal;
+        window.openImageViewer = openImageViewer;
+        window.closeImageViewer = closeImageViewer;
+        window.openCulinaryModal = openCulinaryModal;
+        window.closeCulinaryModal = closeCulinaryModal;
+        window.openUmkmDetailModal = openUmkmDetailModal;
+        window.nextUmkmSlide = nextUmkmSlide;
+        window.prevUmkmSlide = prevUmkmSlide;
+        window.closeUmkmDetailModal = closeUmkmDetailModal;
+        window.scrollToTop = scrollToTop;
+        window.nextSlide = nextSlide;
+        window.prevSlide = prevSlide;
+        window.currentSlide = currentSlide;
 
-    window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateTotal();
+            loadMarqueeAnnouncement();
+            fetchOrdersFromGoogleSheets();
+        });
+
+        window.onload = function() {
             calculateTotal();
             loadMarqueeAnnouncement();
             fetchOrdersFromGoogleSheets();
             showSlide(0);
             startSlideShow();
             setInterval(() => { fetchOrdersFromGoogleSheets(); }, 10000);
-        }
+        };
     </script>
+</head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between pb-20 md:pb-0 overflow-x-hidden">
-    <!-- Scrolling Announcement Marquee (Original Top View) -->
+    <!-- Scrolling Announcement Marquee (CSS Hardware Accelerated) -->
     <div class="bg-sky-600 text-white font-semibold text-xs py-2 px-3 sm:px-4 shadow-sm border-b border-sky-700 overflow-hidden flex items-center">
-        <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-2.5 whitespace-nowrap">📢 Info</span>
-        <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white" id="marqueeAnnouncementText">
-            Selamat datang di portal resmi Pemesanan Kaos & Lomba Mewarnai Hari Pahlawan JUSS UMKM Kec. Cinere 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23. Lomba mewarnai di Halaman Parkir Mall Cinere (Sabtu, 28 November 2026).
-        </marquee>
+        <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-2.5 whitespace-nowrap z-10 shadow-sm">📢 Info</span>
+        <div class="overflow-hidden w-full relative">
+            <div class="text-xs font-medium text-white animate-marquee" id="marqueeAnnouncementText">
+                Selamat datang di portal resmi Pemesanan Kaos & Lomba Mewarnai Hari Pahlawan JUSS UMKM Kec. Cinere 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23. Lomba mewarnai di Halaman Parkir Mall Cinere (Sabtu, 28 November 2026).
+            </div>
+        </div>
     </div>
 
     <!-- Header Banner -->
@@ -1477,32 +1500,31 @@
             <div class="absolute inset-0 bg-gradient-to-r from-blue-950/85 via-blue-900/70 to-indigo-950/85"></div>
         </div>
 
-        <div class="relative z-10 max-w-6xl mx-auto px-4 py-5 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="relative z-10 max-w-6xl mx-auto px-4 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="text-center md:text-left">
-                <span class="bg-white/20 text-white text-[11px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm border border-white/30">Kec. Cinere & Sekitarnya • JUSS 2026</span>
-                <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold mt-2 tracking-tight drop-shadow-md leading-snug">Jualan UMKM Sama-Sama (JUSS) Wilayah Kecamatan Cinere Kota Depok</h1>
-                <p class="text-sky-100 text-[11px] md:text-sm mt-1 drop-shadow">Kel. Cinere • Kel. Gandul • Kel. Pangkalan Jati • Kel. Pangkalan Jati Baru</p>
+                <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm border border-white/30">Kec. Cinere & Sekitarnya • JUSS 2026</span>
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold mt-2 tracking-tight drop-shadow-md">Jualan UMKM Sama-Sama (JUSS) Wilayah Kecamatan Cinere Kota Depok</h1>
+                <p class="text-sky-100 text-xs md:text-sm mt-1 drop-shadow">Kel. Cinere || Kel. Gandul || Kel. Pangkalan Jati || Kel. Pangkalan Jati Baru</p>
             </div>
             
-            <!-- Navigasi Utama: Grid 2 kolom rapi di HP, Flex di Desktop -->
-            <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 bg-black/35 p-2.5 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg w-full md:w-auto justify-center">
-                <button onclick="switchTab('beranda')" id="btn-tab-beranda" class="px-3 py-2.5 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm text-center">
-                     🏠 Beranda
+            <div class="flex items-center gap-1.5 sm:gap-2 bg-black/30 p-2 rounded-2xl backdrop-blur-md border border-white/20 shadow-lg flex-wrap justify-center">
+                <button onclick="switchTab('beranda')" id="btn-tab-beranda" class="px-3 py-2 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm">
+                     Beranda
                 </button>
-                <button onclick="switchTab('form')" id="btn-tab-form" class="px-3 py-2.5 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 text-center">
-                     👕 Beli Kaos
+                <button onclick="switchTab('form')" id="btn-tab-form" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                     Pembelian Kaos Jalan Santai
                 </button>
-                <button onclick="switchTab('pendaftaran-jalan')" id="btn-tab-pendaftaran-jalan" class="px-3 py-2.5 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 text-center">
-                     🚶‍♂️ Jalan Santai
+                <button onclick="switchTab('pendaftaran-jalan')" id="btn-tab-pendaftaran-jalan" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                     Pendaftaran Jalan Santai
                 </button>
-                <button onclick="switchTab('mewarnai')" id="btn-tab-mewarnai" class="px-3 py-2.5 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 text-center">
-                     🎨 Mewarnai
+                <button onclick="switchTab('mewarnai')" id="btn-tab-mewarnai" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                     Lomba Mewarnai
                 </button>
-                <button onclick="switchTab('status')" id="btn-tab-status" class="px-3 py-2.5 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 text-center">
-                     🎟️ Cek E-Ticket
+                <button onclick="switchTab('status')" id="btn-tab-status" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20">
+                     Cek Status & Tiket
                 </button>
-                <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-3 py-2.5 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center justify-center gap-1 text-center">
-                     🔒 Panitia
+                <button onclick="openAdminModalPrompt()" id="btn-tab-admin" class="px-3 py-2 rounded-xl text-xs font-bold transition text-white hover:bg-white/20 flex items-center gap-1">
+                     Panitia
                 </button>
             </div>
         </div>
@@ -1511,17 +1533,17 @@
     <!-- Sticky Header Gabungan: Papan Pengumuman & Tab Navigasi Melayang saat Scroll ke Bawah -->
     <div id="stickyNavBar" class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 shadow-lg hidden transition-all duration-300">
         <!-- Marquee Sticky -->
-        <div class="bg-sky-600 text-white font-semibold text-xs py-1.5 px-3 sm:px-4 border-b border-sky-700 overflow-hidden flex items-center">
-            <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-2.5 whitespace-nowrap">📢 Info</span>
-            <div class="overflow-hidden w-full">
-                <marquee behavior="scroll" direction="left" scrollamount="5" class="text-xs font-medium text-white block w-full" id="stickyMarqueeText">
-                    Selamat datang di portal resmi Pemesanan Kaos & Lomba Mewarnai Hari Pahlawan JUSS UMKM Kec. Cinere 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23.
-                </marquee>
+        <div class="bg-sky-600 text-white font-semibold text-xs py-1.5 px-4 border-b border-sky-700 overflow-hidden flex items-center">
+            <span class="bg-white text-sky-900 px-2 py-0.5 rounded text-[10px] uppercase font-bold mr-3 whitespace-nowrap z-10 shadow-sm">📢 Info</span>
+            <div class="overflow-hidden w-full relative">
+                <div class="text-xs font-medium text-white animate-marquee" id="stickyMarqueeText">
+                    Selamat datang di portal resmi Pemesanan Kaos & Lomba Mewarnai Hari Pahlawan JUSS UMKM Kec. Cinere 2026. Titik pengambilan kaos di JS Coffee (Kedai Biru), Jl. Andara Raya No.23. Lomba mewarnai di Halaman Parkir Mall Cinere (Sabtu, 28 November 2026).
+                </div>
             </div>
         </div>
-        <!-- Tab Navigasi Sticky (Tersembunyi di HP karena digantikan Bottom Bar agar lebih nyaman) -->
-        <div class="hidden md:flex max-w-6xl mx-auto items-center justify-between gap-2 py-2.5 px-4 overflow-x-auto no-scrollbar">
-            <span class="text-xs font-extrabold text-white whitespace-nowrap">JUSS Kecamatan Cinere Kota Depok Tahun 2026</span>
+        <!-- Tab Navigasi Sticky -->
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-2 py-2.5 px-4 overflow-x-auto no-scrollbar">
+            <span class="text-xs font-extrabold text-white whitespace-nowrap hidden sm:inline">JUSS Kecamatan Cinere Kota Depok Tahun 2026</span>
             <div class="flex items-center gap-1.5 flex-nowrap">
                 <button onclick="switchTab('beranda')" id="btn-sticky-beranda" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow-sm whitespace-nowrap">
                      Beranda
@@ -1546,19 +1568,19 @@
     </div>
 
     <!-- Main Container -->
-    <main class="max-w-6xl mx-auto px-3 sm:px-4 py-5 md:py-8 flex-grow w-full">
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
 
         <!-- TAB 0: BERANDA (SLIDER POSTER ACARA) -->
-        <section id="tab-beranda" class="space-y-5 md:space-y-6 max-w-4xl mx-auto">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-8 text-center space-y-2.5">
-                <span class="bg-sky-100 text-sky-800 text-[11px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block">Selamat Datang • JUSS Kec. Cinere 2026</span>
-                <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-slate-900">Jalan Santai & Lomba Mewarnai UMKM</h2>
-                <p class="text-slate-600 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">Saksikan dan ikuti rangkaian acara Hari Pahlawan di Event JUSS Kecamatan Cinere • Stan Makanan UMKM • Hiburan Band • Doorprize</p>
+        <section id="tab-beranda" class="space-y-6 max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center space-y-3">
+                <span class="bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Selamat Datang Jualan UMKM Sama-Sama (JUSS) Kecamatan Cinere Tahun 2026</span>
+                <h2 class="text-2xl md:text-3xl font-black text-slate-900">Jalan Santai & Lomba Mewarnai UMKM</h2>
+                <p class="text-slate-600 text-xs md:text-sm max-w-2xl mx-auto">Saksikan dan ikuti rangkaian acara Hari Pahlawan di Event JUSS Kecamatan Cinere | pastinya akan banyak stan makanan UMKM | Hiburan Band | Doorprize</p>
             </div>
 
-            <!-- Poster Carousel / Slider Otomatis -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3 sm:p-4 md:p-6 relative overflow-hidden">
-                <div class="relative w-full overflow-hidden rounded-xl shadow-md bg-slate-900 min-h-[280px] sm:min-h-[380px] md:min-h-[480px] flex items-center justify-center">
+            <!-- Poster Carousel / Slider Otomatis dengan Efek Kaca Blur di Samping -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 relative overflow-hidden">
+                <div class="relative w-full overflow-hidden rounded-xl shadow-md bg-slate-900 min-h-[320px] md:min-h-[480px] flex items-center justify-center">
                     
                     <!-- Slide 1 -->
                     <div class="carousel-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100 flex flex-col items-center justify-center p-2 overflow-hidden" data-index="0">
@@ -1566,8 +1588,8 @@
                             <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="" class="w-full h-full object-cover filter blur-xl scale-110 opacity-50">
                             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md"></div>
                         </div>
-                        <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Poster+Utama+JUSS+2026';" class="relative z-10 max-h-[240px] sm:max-h-[340px] md:max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Poster Utama JUSS 2026')">
-                        <div class="absolute bottom-2.5 z-20 bg-black/65 text-white px-3 py-1 rounded-full text-[11px] font-semibold backdrop-blur-sm">
+                        <img src="WhatsApp Image 2026-11-13 at 15.19.10.jpeg" alt="Poster Utama JUSS" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Poster+Utama+JUSS+2026';" class="relative z-10 max-h-[300px] md:max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Poster Utama JUSS 2026')">
+                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
                             1 / 3 • Poster Utama Acara JUSS 2026
                         </div>
                     </div>
@@ -1578,9 +1600,9 @@
                             <img src="mewarnai.jpeg" alt="" class="w-full h-full object-cover filter blur-xl scale-110 opacity-50">
                             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md"></div>
                         </div>
-                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/334155/ffffff?text=Poster+Lomba+Mewarnai';" class="relative z-10 max-h-[240px] sm:max-h-[340px] md:max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Poster Lomba Mewarnai Anak')">
-                        <div class="absolute bottom-2.5 z-20 bg-black/65 text-white px-3 py-1 rounded-full text-[11px] font-semibold backdrop-blur-sm">
-                            2 / 3 • Poster Lomba Mewarnai Anak
+                        <img src="mewarnai.jpeg" alt="Poster Lomba Mewarnai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/334155/ffffff?text=Poster+Lomba+Mewarnai';" class="relative z-10 max-h-[300px] md:max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Poster Lomba Mewarnai Anak')">
+                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                            2 / 3 • Poster Lomba Mewarnai Anak Mall Cinere
                         </div>
                     </div>
 
@@ -1590,17 +1612,17 @@
                             <img src="kaos.jpeg" alt="" class="w-full h-full object-cover filter blur-xl scale-110 opacity-50">
                             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-md"></div>
                         </div>
-                        <img src="kaos.jpeg" alt="Mockup Kaos Jalan Santai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Mockup+Kaos+Jalan+Santai';" class="relative z-10 max-h-[240px] sm:max-h-[340px] md:max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
-                        <div class="absolute bottom-2.5 z-20 bg-black/65 text-white px-3 py-1 rounded-full text-[11px] font-semibold backdrop-blur-sm">
-                            3 / 3 • Mockup & Size Chart Kaos
+                        <img src="kaos.jpeg" alt="Mockup Kaos Jalan Santai" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0284c7/ffffff?text=Mockup+Kaos+Jalan+Santai';" class="relative z-10 max-h-[300px] md:max-h-[420px] w-auto object-contain rounded-lg cursor-pointer shadow-2xl" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
+                        <div class="absolute bottom-3 z-20 bg-black/60 text-white px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm">
+                            3 / 3 • Mockup & Size Chart Kaos Jalan Santai
                         </div>
                     </div>
 
-                    <button onclick="prevSlide()" class="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg backdrop-blur-sm transition">❮</button>
-                    <button onclick="nextSlide()" class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg backdrop-blur-sm transition">❯</button>
+                    <button onclick="prevSlide()" class="absolute left-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❮</button>
+                    <button onclick="nextSlide()" class="absolute right-3 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg backdrop-blur-sm transition">❯</button>
                 </div>
 
-                <div class="flex justify-center gap-2.5 mt-3.5" id="carouselDots">
+                <div class="flex justify-center gap-2 mt-4" id="carouselDots">
                     <button onclick="currentSlide(0)" class="w-3 h-3 rounded-full bg-sky-600 transition" id="dot-0"></button>
                     <button onclick="currentSlide(1)" class="w-3 h-3 rounded-full bg-slate-300 transition" id="dot-1"></button>
                     <button onclick="currentSlide(2)" class="w-3 h-3 rounded-full bg-slate-300 transition" id="dot-2"></button>
@@ -1608,30 +1630,30 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-sky-600 border border-sky-500 p-5 sm:p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
+                <div class="bg-sky-600 border border-sky-500 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
                     <div>
                         <span class="bg-white text-sky-900 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase shadow-sm">Jalan Santai</span>
                         <h3 class="text-lg font-bold text-white mt-2">Pendaftaran & Pembelian Kaos</h3>
-                        <p class="text-xs text-white mt-1 font-medium leading-relaxed">Dapatkan kaos eksklusif Jalan Santai & Kuliner Nusantara JUSS 2026 serta daftarkan diri Anda pada acara jalan santai.</p>
+                        <p class="text-xs text-white mt-1 font-medium">Dapatkan kaos eksklusif Jalan Santai & Kuliner Nusantara JUSS 2026 serta daftarkan diri Anda pada acara jalan santai.</p>
                     </div>
-                    <div class="grid grid-cols-2 sm:flex gap-2">
-                        <button onclick="switchTab('pendaftaran-jalan')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-3 rounded-xl text-xs transition shadow-sm text-center">
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="switchTab('pendaftaran-jalan')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-3.5 rounded-xl text-xs transition shadow-sm">
                             Daftar Jalan Santai
                         </button>
-                        <button onclick="switchTab('form')" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition border border-white/30 text-center">
+                        <button onclick="switchTab('form')" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2.5 px-3.5 rounded-xl text-xs transition border border-white/30">
                             Beli Kaos
                         </button>
                     </div>
                 </div>
 
-                <div class="bg-sky-600 border border-sky-500 p-5 sm:p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
+                <div class="bg-sky-600 border border-sky-500 p-6 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
                     <div>
                         <span class="bg-white text-sky-900 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase shadow-sm">Lomba Anak</span>
                         <h3 class="text-lg font-bold text-white mt-2">Pendaftaran Lomba Mewarnai</h3>
-                        <p class="text-xs text-white mt-1 font-medium leading-relaxed">Tunjukkan bakat si kecil di Mall Cinere pada 28 November 2026. Hadiah menarik menanti!</p>
+                        <p class="text-xs text-white mt-1 font-medium">Tunjukkan bakat si kecil di Mall Cinere pada 28 November 2026. Hadiah menarik menanti!</p>
                     </div>
-                    <button onclick="switchTab('mewarnai')" class="w-full sm:w-auto bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-sm sm:self-start text-center">
-                        Daftar Lomba Mewarnai
+                    <button onclick="switchTab('mewarnai')" class="bg-white hover:bg-sky-50 text-sky-900 font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-sm self-start">
+                        Daftar Lomba Mewarnai 
                     </button>
                 </div>
             </div>
@@ -1641,7 +1663,7 @@
                 <div class="text-center max-w-2xl mx-auto space-y-2">
                     <span class="bg-violet-100 text-violet-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Bazar UMKM & Kuliner</span>
                     <h2 class="text-2xl font-black text-slate-900">Kuliner Nusantara & Stan Makanan JUSS 2026</h2>
-                    <p class="text-slate-600 text-xs">Nikmati aneka ragam kuliner khas nusantara dari pelaku UMKM terbaik Kecamatan Cinere. Klik kategori di bawah untuk melihat daftar nama stan, nomor stan, dan foto produk UMKM lengkap!</p>
+                    <p class="text-slate-600 text-xs">Nikmati aneka ragam kuliner khas nusantara dari pelaku UMKM terbaik Kecamatan Cinere. Klik kategori di bawah untuk melihat daftar nama stan, nomor stan, dan foto produk lengkap!</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -1658,7 +1680,7 @@
                         <div>
                             <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">UMKM GANDUL</span>
                             <h3 class="font-black text-base mt-2">KULINERIA</h3>
-                            <p class="text-[11px] text-teal-100 mt-1">Gado-gado, Dapur Turah, Peyek Ibu Rus, Aiko Cookies, Rujak Bangkok, dll.</p>
+                            <p class="text-[11px] text-teal-100 mt-1">Gado-gado Jakarta, Dapur Turah, Peyek Hits Ibu Rus, Aiko Cookies, Ngerujak Sab, Rujak Bangkok by Zil, Rumah Kuliner Depok.</p>
                         </div>
                         <span class="text-xs font-bold underline">Lihat Stan & Nomor →</span>
                     </div>
@@ -1683,38 +1705,38 @@
                 </div>
             </div>
 
-            <!-- Logo Sponsor Partner (Diposisikan di bagian paling bawah tab beranda) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 text-center space-y-4">
+            <!-- Logo Sponsor Partner -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center space-y-4">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Didukung Oleh Mitra & Sponsor Resmi</span>
                 
-                <div class="w-full rounded-xl bg-slate-50 py-5 px-3 sm:px-4 border border-slate-200 shadow-inner">
-                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-3 sm:gap-6 md:gap-8">
-                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full sm:w-32">
-                            <img src="kotadepok.png" alt="Logo Kota Depok" onerror="this.src='https://placehold.co/100x100/0284c7/ffffff?text=Kota+Depok';" class="max-h-12 sm:max-h-14 w-auto object-contain cursor-pointer transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Logo Kota Depok')">
+                <div class="w-full rounded-xl bg-slate-50 py-6 px-4 border border-slate-200 shadow-inner">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 justify-items-center">
+                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full max-w-[140px]">
+                            <img src="kotadepok.png" alt="Logo Kota Depok" onerror="this.src='https://placehold.co/100x100/0284c7/ffffff?text=Kota+Depok';" class="max-h-14 w-auto object-contain cursor-pointer transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Logo Kota Depok')">
                             <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">Kota Depok</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full sm:w-32">
-                            <img src="cineremall.jpg" alt="Mal Cinere" onerror="this.src='https://placehold.co/100x100/334155/ffffff?text=Mal+Cinere';" class="max-h-12 sm:max-h-14 w-auto object-contain cursor-pointer rounded-full transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Logo Mal Cinere')">
+                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full max-w-[140px]">
+                            <img src="cineremall.jpg" alt="Mal Cinere" onerror="this.src='https://placehold.co/100x100/334155/ffffff?text=Mal+Cinere';" class="max-h-14 w-auto object-contain cursor-pointer rounded-full transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Logo Mal Cinere')">
                             <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">Mal Cinere</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full sm:w-32">
-                            <img src="cinere.png" alt="Kantor Kecamatan Cinere" onerror="this.src='https://placehold.co/100x100/0f172a/ffffff?text=Kec.+Cinere';" class="max-h-12 sm:max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Kantor Kecamatan Cinere')">
+                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full max-w-[140px]">
+                            <img src="cinere.png" alt="Kantor Kecamatan Cinere" onerror="this.src='https://placehold.co/100x100/0f172a/ffffff?text=Kec.+Cinere';" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Kantor Kecamatan Cinere')">
                             <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">Kecamatan Cinere</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full sm:w-32">
-                            <img src="polsekcinere.jpg" alt="Humas Polsek Cinere" onerror="this.src='https://placehold.co/100x100/dc2626/ffffff?text=Polsek+Cinere';" class="max-h-12 sm:max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Logo Humas Polsek Cinere')">
+                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full max-w-[140px]">
+                            <img src="polsekcinere.jpg" alt="Humas Polsek Cinere" onerror="this.src='https://placehold.co/100x100/dc2626/ffffff?text=Polsek+Cinere';" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'Logo Humas Polsek Cinere')">
                             <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">Humas Polsek Cinere</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full sm:w-32">
-                            <img src="fithub.jpeg" alt="UMKM Depok" onerror="this.src='https://placehold.co/100x100/0f172a/ffffff?text=FITHUB';" class="max-h-12 sm:max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3">
+                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full max-w-[140px]">
+                            <img src="fithub.jpeg" alt="FITHUB Cinere" onerror="this.src='https://placehold.co/100x100/0284c7/ffffff?text=FITHUB';" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'FITHUB Cinere')">
                             <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">FITHUB Cinere</span>
                         </div>
-                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full sm:w-32">
-                            <img src="https://placehold.co/100x100/0284c7/ffffff?text=UMKM+Depok" alt="UMKM Depok" class="max-h-12 sm:max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3">
+                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full max-w-[140px]">
+                            <img src="https://placehold.co/100x100/0284c7/ffffff?text=UMKM+Depok" alt="UMKM Depok" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'UMKM Juara Depok')">
                             <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">UMKM Juara Depok</span>
                         </div>
-                        <div class="col-span-2 sm:col-span-1 flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-teal-300 group w-full sm:w-32">
-                            <img src="https://placehold.co/100x100/0d9488/ffffff?text=JS+Coffee" alt="JS Coffee & Kedai Biru" class="max-h-12 sm:max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3">
+                        <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-teal-300 group w-full max-w-[140px]">
+                            <img src="https://placehold.co/100x100/0d9488/ffffff?text=JS+Coffee" alt="JS Coffee & Kedai Biru" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'JS Coffee & Kedai Biru')">
                             <span class="font-bold text-teal-700 text-[11px] mt-2 group-hover:text-teal-900 transition-colors">JS Coffee & Kedai Biru</span>
                         </div>
                     </div>
@@ -1752,7 +1774,7 @@
 
                 <div class="bg-slate-50 border border-slate-200 p-6 rounded-xl flex items-center justify-center w-full lg:w-80 shadow-inner shrink-0">
                     <div class="flex flex-col items-center">
-                        <img src="kaos1.jpg" alt="Mockup Kaos" onerror="this.src='https://placehold.co/400x400/0284c7/ffffff?text=Mockup+Kaos';" class="max-h-72 w-auto object-contain rounded-lg cursor-pointer shadow-sm" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
+                        <img src="bajudoang.jpeg" alt="Mockup Kaos" onerror="this.src='https://placehold.co/400x400/0284c7/ffffff?text=Mockup+Kaos';" class="max-h-72 w-auto object-contain rounded-lg cursor-pointer shadow-sm" onclick="openImageViewer(this.src, 'Mockup Kaos Jalan Santai')">
                         <span class="text-[11px] text-slate-500 mt-3 font-medium block">Klik gambar untuk melihat detail kaos</span>
                     </div>
                 </div>
@@ -1768,7 +1790,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                     <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-center shadow-inner">
-                        <img src="WhatsApp Image 2026-11-13 at 11.46.15 (1).jpeg" alt="Size Chart Kaos" onerror="this.src='WhatsApp Image 2026-11-13 at 11.46.15 (1)';" class="max-h-72 w-auto object-contain rounded-lg cursor-pointer shadow-sm" onclick="openImageViewer(this.src, 'Size Chart Kaos JUSS 2026')">
+                        <img src="WhatsApp Image 2026-11-13 at 11.46.15 (1).jpeg" alt="Size Chart Kaos" onerror="this.src='https://placehold.co/400x300/0284c7/ffffff?text=Size+Chart+Kaos';" class="max-h-72 w-auto object-contain rounded-lg cursor-pointer shadow-sm" onclick="openImageViewer(this.src, 'Size Chart Kaos JUSS 2026')">
                     </div>
                     
                     <div class="overflow-x-auto">
@@ -1824,18 +1846,18 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap & Gelar *</label>
-                            <input type="text" id="name" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                            <input type="text" id="name" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Aktif *</label>
-                            <input type="text" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                            <input type="tel" id="phone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Asal Kelurahan / Wilayah di Kec. Cinere *</label>
-                            <select id="instansi" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                            <select id="instansi" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm bg-white">
                                 <option value="Kelurahan Cinere">Kelurahan Cinere</option>
                                 <option value="Kelurahan Gandul">Kelurahan Gandul</option>
                                 <option value="Kelurahan Pangkalan Jati">Kelurahan Pangkalan Jati</option>
@@ -1845,7 +1867,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Model Lengan Kaos *</label>
-                            <select id="sleeve" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                            <select id="sleeve" onchange="calculateTotal()" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm bg-white">
                                 <option value="Pendek">Lengan Pendek (Standar)</option>
                                 <option value="Panjang">Lengan Panjang (+ Rp 5.000)</option>
                             </select>
@@ -1855,7 +1877,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Ukuran Kaos (Size) *</label>
-                            <select id="size" onchange="calculateTotal()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                            <select id="size" onchange="calculateTotal()" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm bg-white">
                                 <option value="S">Size S (Rp 60.000)</option>
                                 <option value="M">Size M (Rp 60.000)</option>
                                 <option value="L">Size L (Rp 60.000)</option>
@@ -1867,7 +1889,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Jumlah Pesanan (Pcs) *</label>
-                            <input type="number" id="qty" min="1" value="1" onchange="calculateTotal()" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                            <input type="number" id="qty" min="1" value="1" onchange="calculateTotal()" required class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                         </div>
                     </div>
 
@@ -1876,20 +1898,20 @@
                             <span class="text-xs text-slate-600 block">Total Pembayaran yang Harus Ditransfer:</span>
                             <span id="displayTotal" class="text-xl font-extrabold text-sky-900">Rp 60.000</span>
                         </div>
-                        <div class="sm:text-right text-xs text-slate-500 border-t sm:border-t-0 pt-2 sm:pt-0 border-sky-100">
+                        <div class="sm:text-right text-xs text-slate-500">
                             Transfer ke BCA: <strong class="text-slate-800 font-mono">2671600624</strong><br>a.n. Mayarni D Anggoro
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Unggah Bukti Transfer / Struk Pembayaran *</label>
-                        <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-500 bg-white">
+                        <input type="file" id="paymentProof" accept="image/*" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs text-slate-500 bg-white">
                         <span class="text-[10px] text-slate-400 mt-1 block">Format file: JPG, PNG, atau Screenshot transfer m-banking.</span>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Catatan Tambahan (Opsional)</label>
-                        <textarea id="notes" rows="2" placeholder="Contoh: Titip ambil di posko kelurahan..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
+                        <textarea id="notes" rows="2" placeholder="Contoh: Titip ambil di posko kelurahan..." class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
                     </div>
 
                     <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
@@ -1924,12 +1946,12 @@
                 <form id="jalanSantaiForm" onsubmit="handleJalanSantaiSubmit(event)" class="space-y-5">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap & Gelar *</label>
-                        <input type="text" id="jsName" required placeholder="Contoh: Siti Aminah, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        <input type="text" id="jsName" required placeholder="Contoh: Siti Aminah, S.Pd." class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Gender (Jenis Kelamin) *</label>
-                        <select id="jsGender" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                        <select id="jsGender" required class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm bg-white">
                             <option value="">Pilih Jenis Kelamin</option>
                             <option value="Laki-laki">Laki-laki</option>
                             <option value="Perempuan">Perempuan</option>
@@ -1938,12 +1960,12 @@
 
                     <div id="jsKtpContainer">
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor KTP (16 Digit) *</label>
-                        <input type="text" id="jsKtp" maxlength="16" pattern="\d{16}" placeholder="Masukkan 16 digit Nomor KTP" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm font-mono">
+                        <input type="text" id="jsKtp" maxlength="16" pattern="\d{16}" placeholder="Masukkan 16 digit Nomor KTP" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm font-mono">
                         <span class="text-[10px] text-slate-400 mt-1 block">Harus tepat 16 digit angka.</span>
                     </div>
 
                     <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
-                        <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-700">
                             <input type="checkbox" id="jsUnderageCheck" onchange="toggleUnderageFields()" class="w-4 h-4 accent-sky-600 rounded">
                             <span>Peserta Anak di Bawah Umur (Belum Memiliki KTP)</span>
                         </label>
@@ -1952,13 +1974,13 @@
                     <div id="jsParentContainer" class="hidden space-y-4 bg-sky-50/70 border border-sky-100 p-4 rounded-xl">
                         <div>
                             <label class="block text-xs font-semibold text-sky-900 mb-1.5">Nama Orang Tua / Pendamping *</label>
-                            <input type="text" id="jsParentName" placeholder="Contoh: Budi Santoso (Orang Tua / Wali)" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                            <input type="text" id="jsParentName" placeholder="Contoh: Budi Santoso (Orang Tua / Wali)" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm bg-white">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Kelurahan di Kec. Cinere *</label>
-                        <select id="jsKelurahan" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm bg-white">
+                        <select id="jsKelurahan" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm bg-white">
                             <option value="Kelurahan Cinere">Kelurahan Cinere</option>
                             <option value="Kelurahan Gandul">Kelurahan Gandul</option>
                             <option value="Kelurahan Pangkalan Jati">Kelurahan Pangkalan Jati</option>
@@ -1969,12 +1991,12 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Alamat Lengkap *</label>
-                        <textarea id="jsAlamat" rows="2" required placeholder="Tuliskan nama jalan, RT/RW, nomor rumah" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
+                        <textarea id="jsAlamat" rows="2" required placeholder="Tuliskan nama jalan, RT/RW, nomor rumah" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Aktif *</label>
-                        <input type="text" id="jsPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        <input type="tel" id="jsPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                     </div>
 
                     <button type="submit" id="submitJalanBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
@@ -2027,17 +2049,17 @@
                 <form id="mewarnaiForm" onsubmit="handleMewarnaiSubmit(event)" class="space-y-5">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Lengkap Peserta (Nama Anak) *</label>
-                        <input type="text" id="namaAnak" required placeholder="Tuliskan nama lengkap peserta" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        <input type="text" id="namaAnak" required placeholder="Tuliskan nama lengkap peserta" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Alamat Lengkap *</label>
-                        <textarea id="alamatAnak" rows="2" required placeholder="Tuliskan alamat lengkap domisili" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
+                        <textarea id="alamatAnak" rows="2" required placeholder="Tuliskan alamat lengkap domisili" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Asal Sekolah *</label>
-                        <input type="text" id="asalSekolah" required placeholder="Jika Peserta Belum Sekolah, Tuliskan 'Belum Sekolah disertai Usia Ananda', contoh: 'Belum Sekolah Usia 5 Tahun'" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                        <input type="text" id="asalSekolah" required placeholder="Contoh: TK Islam Cinere / Belum Sekolah Usia 5 Tahun" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                         <span class="text-[10px] text-slate-400 mt-1 block">Jika belum sekolah, tuliskan 'Belum Sekolah disertai Usia Ananda', contoh: 'Belum Sekolah Usia 5 Tahun'.</span>
                     </div>
 
@@ -2045,16 +2067,16 @@
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Kategori Lomba *</label>
                         <p class="text-[11px] text-slate-500 mb-2">Jika Peserta belum sekolah pilih kategori dengan mengikuti umur Ananda, dengan ketentuan sebagai berikut:<br>1. Usia 4-5 tahun dapat memilih kategori TK A<br>2. Usia 5-6 tahun dapat memilih kategori TK B</p>
                         <div class="space-y-2">
-                            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-medium">
-                                <input type="radio" name="kategoriLombaRadio" value="TK A" required class="accent-sky-600">
+                            <label class="flex items-center gap-2.5 cursor-pointer bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs font-medium">
+                                <input type="radio" name="kategoriLombaRadio" value="TK A" required class="accent-sky-600 w-4 h-4">
                                 <span>TK A (Usia 4-5 Tahun / Sesuai Ketentuan)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-medium">
-                                <input type="radio" name="kategoriLombaRadio" value="TK B" required class="accent-sky-600">
+                            <label class="flex items-center gap-2.5 cursor-pointer bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs font-medium">
+                                <input type="radio" name="kategoriLombaRadio" value="TK B" required class="accent-sky-600 w-4 h-4">
                                 <span>TK B (Usia 5-6 Tahun / Sesuai Ketentuan)</span>
                             </label>
-                            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-medium">
-                                <input type="radio" name="kategoriLombaRadio" value="Kategori Lainnya / SD" required class="accent-sky-600">
+                            <label class="flex items-center gap-2.5 cursor-pointer bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs font-medium">
+                                <input type="radio" name="kategoriLombaRadio" value="Kategori Lainnya / SD" required class="accent-sky-600 w-4 h-4">
                                 <span>Kategori Lainnya / SD Kelas 1-6</span>
                             </label>
                         </div>
@@ -2063,11 +2085,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-slate-100">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Orang Tua / Pendamping *</label>
-                            <input type="text" id="namaOrtu" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                            <input type="text" id="namaOrtu" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nomor WhatsApp / HP Orang Tua *</label>
-                            <input type="text" id="phoneMewarnai" required placeholder="Contoh: 081234567890" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
+                            <input type="tel" id="phoneMewarnai" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                         </div>
                     </div>
 
@@ -2084,18 +2106,18 @@
 
         <!-- TAB 3: CEK STATUS PESERTA & E-TICKET -->
         <section id="tab-status" class="space-y-6 max-w-3xl mx-auto hidden">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 md:p-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
                 <div class="text-center max-w-md mx-auto mb-6">
                     <h3 class="text-xl font-bold text-slate-900">Cek Status & E-Ticket</h3>
                     <p class="text-slate-500 text-xs mt-1">Masukkan Nomor WhatsApp atau Nama Lengkap Anda (sesuai database pendaftaran) untuk memeriksa status verifikasi dan E-Ticket.</p>
-                    <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 p-2.5 rounded-xl mt-2 font-medium">
-                        🔒 <strong>Privacy Notice:</strong> Demi keamanan data peserta, pencarian wajib menggunakan nama lengkap atau nomor WhatsApp yang terdaftar secara akurat, dan nomor WhatsApp serta alamat akan disamarkan sebagian.
+                    <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 p-2 rounded-xl mt-2 font-medium">
+                        🔒 <strong>Privacy Notice:</strong> Demi keamanan data peserta, pencarian wajib menggunakan nama lengkap atau nomor WhatsApp secara akurat. Nomor HP & alamat akan disamarkan sebagian pada E-Ticket.
                     </p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto mb-6">
-                    <input type="text" id="searchKeyword" placeholder="Cari No WhatsApp atau Nama Lengkap..." class="flex-1 px-4 py-3 sm:py-2.5 rounded-xl border border-slate-300 outline-none text-sm">
-                    <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-3 sm:py-2.5 rounded-xl text-xs font-bold transition shadow-sm">Cari E-Ticket</button>
+                    <input type="text" id="searchKeyword" placeholder="Cari No WhatsApp atau Nama Lengkap..." class="flex-1 px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
+                    <button onclick="searchParticipantStatus()" class="bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-xl text-xs font-bold transition shadow-sm">Cari E-Ticket</button>
                 </div>
 
                 <div id="searchResultContainer" class="space-y-4">
@@ -2113,10 +2135,16 @@
                     <p class="text-slate-500 text-xs">Kelola verifikasi pembelian kaos dan pendaftaran peserta jalan santai serta lomba mewarnai anak.</p>
                 </div>
                 <div class="flex gap-2 flex-wrap">
-                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm">
-                         Download CSV Kaos
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm">
+                         📥 CSV Kaos
                     </button>
-                    <button onclick="lockAdminSession()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition">
+                    <button onclick="exportJalanToCSV()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm">
+                         📥 CSV Jalan Santai
+                    </button>
+                    <button onclick="exportMewarnaiToCSV()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-sm">
+                         📥 CSV Mewarnai
+                    </button>
+                    <button onclick="lockAdminSession()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs transition">
                          Keluar Panel
                     </button>
                 </div>
@@ -2125,14 +2153,14 @@
             <!-- Kelola Papan Berjalan -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
                 <h3 class="font-bold text-slate-900 text-sm">⚙️ Kelola Papan Berjalan (Pengumuman Publik)</h3>
-                <div class="flex gap-2">
+                <div class="flex flex-col sm:flex-row gap-2">
                     <input type="text" id="adminMarqueeInput" placeholder="Ketik pengumuman baru..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-xs">
                     <button onclick="updateMarqueeAnnouncement()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition">Perbarui</button>
                 </div>
             </div>
 
             <!-- Sub-Tab Panitia Selector -->
-            <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl max-w-xl overflow-x-auto">
+            <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl max-w-xl overflow-x-auto no-scrollbar">
                 <button onclick="switchAdminSubTab('kaos')" id="btn-subadmin-kaos" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm whitespace-nowrap">
                      Pembelian Kaos
                 </button>
@@ -2191,7 +2219,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-4 border-t border-slate-100 flex justify-between items-center text-xs bg-slate-50" id="kaosPaginationContainer"></div>
+                    <div class="p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs bg-slate-50" id="kaosPaginationContainer"></div>
                 </div>
             </div>
 
@@ -2247,7 +2275,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-4 border-t border-slate-100 flex justify-between items-center text-xs bg-slate-50" id="jalanPaginationContainer"></div>
+                    <div class="p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs bg-slate-50" id="jalanPaginationContainer"></div>
                 </div>
             </div>
 
@@ -2297,43 +2325,45 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-4 border-t border-slate-100 flex justify-between items-center text-xs bg-slate-50" id="mewarnaiPaginationContainer"></div>
+                    <div class="p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs bg-slate-50" id="mewarnaiPaginationContainer"></div>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 mt-12 py-6 px-4 text-center text-xs text-slate-500">
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
         <p>© 2026 Panitia Jalan Santai & Jualan UMKM Sama-Sama (Kecamatan Cinere). All rights reserved.</p>
     </footer>
 
-    <!-- Mobile Bottom Navigation Bar (Khusus Layar HP agar navigasi mudah dijangkau jempol) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_15px_rgba(0,0,0,0.06)] px-1.5 py-1.5 grid grid-cols-5 gap-1">
-        <button onclick="switchTab('beranda')" id="btn-bottom-beranda" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition">
-            <span class="text-base leading-none mb-1">🏠</span>
-            <span class="text-[10px] leading-tight">Beranda</span>
-        </button>
-        <button onclick="switchTab('form')" id="btn-bottom-form" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
-            <span class="text-base leading-none mb-1">👕</span>
-            <span class="text-[10px] leading-tight">Beli Kaos</span>
-        </button>
-        <button onclick="switchTab('pendaftaran-jalan')" id="btn-bottom-pendaftaran-jalan" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
-            <span class="text-base leading-none mb-1">🚶‍♂️</span>
-            <span class="text-[10px] leading-tight">Jalan Santai</span>
-        </button>
-        <button onclick="switchTab('mewarnai')" id="btn-bottom-mewarnai" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
-            <span class="text-base leading-none mb-1">🎨</span>
-            <span class="text-[10px] leading-tight">Mewarnai</span>
-        </button>
-        <button onclick="switchTab('status')" id="btn-bottom-status" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
-            <span class="text-base leading-none mb-1">🎟️</span>
-            <span class="text-[10px] leading-tight">E-Ticket</span>
-        </button>
+    <!-- Mobile Bottom Navigation Bar (Khusus Layar HP) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_15px_rgba(0,0,0,0.06)] px-2 py-1.5">
+        <div class="grid grid-cols-5 gap-1">
+            <button onclick="switchTab('beranda')" id="btn-bottom-beranda" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-sky-600 bg-sky-50 font-bold transition">
+                <span class="text-base leading-none mb-1">🏠</span>
+                <span class="text-[10px]">Beranda</span>
+            </button>
+            <button onclick="switchTab('form')" id="btn-bottom-form" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
+                <span class="text-base leading-none mb-1">👕</span>
+                <span class="text-[10px]">Beli Kaos</span>
+            </button>
+            <button onclick="switchTab('pendaftaran-jalan')" id="btn-bottom-pendaftaran-jalan" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
+                <span class="text-base leading-none mb-1">🚶</span>
+                <span class="text-[10px]">Jalan Santai</span>
+            </button>
+            <button onclick="switchTab('mewarnai')" id="btn-bottom-mewarnai" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
+                <span class="text-base leading-none mb-1">🎨</span>
+                <span class="text-[10px]">Mewarnai</span>
+            </button>
+            <button onclick="switchTab('status')" id="btn-bottom-status" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-slate-500 hover:text-sky-600 transition">
+                <span class="text-base leading-none mb-1">🎟️</span>
+                <span class="text-[10px]">E-Ticket</span>
+            </button>
+        </div>
     </nav>
 
     <!-- Tombol Kembali ke Atas (Scroll to Top) -->
-    <button id="scrollToTopBtn" onclick="scrollToTop()" class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 bg-sky-600 hover:bg-sky-700 text-white w-11 h-11 md:w-12 md:h-12 rounded-full shadow-2xl flex items-center justify-center text-lg md:text-xl transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4" title="Kembali ke atas">
+    <button id="scrollToTopBtn" onclick="scrollToTop()" class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 bg-sky-600 hover:bg-sky-700 text-white w-11 h-11 md:w-12 md:h-12 rounded-full shadow-2xl flex items-center justify-center text-lg md:text-xl transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4" title="Kembali ke atas">
         ↑
     </button>
 
@@ -2385,7 +2415,7 @@
 
     <!-- Culinary Category Detail Modal -->
     <div id="culinaryModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <div>
                     <span id="culinaryModalBadge" class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Kategori Kuliner</span>
@@ -2393,44 +2423,37 @@
                 </div>
                 <button onclick="closeCulinaryModal()" class="text-slate-400 hover:text-slate-700 font-bold text-xl px-2">✕</button>
             </div>
-            <div id="culinaryModalBody" class="overflow-y-auto space-y-3 pr-1 flex-grow">
-                <!-- Data stan kuliner akan dimuat dinamis -->
-            </div>
+            <div id="culinaryModalBody" class="overflow-y-auto space-y-3 pr-1 flex-grow"></div>
             <button onclick="closeCulinaryModal()" class="w-full bg-slate-900 text-white font-medium py-2.5 rounded-xl text-xs mt-2">Tutup</button>
         </div>
     </div>
 
-    <!-- Modal Detail UMKM dengan Slider Foto Produk Otomatis -->
-    <div id="umkmDetailModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 relative overflow-hidden" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+    <!-- UMKM Product Detail & Auto-Slider Modal -->
+    <div id="umkmDetailModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4" onclick="closeUmkmDetailModal()">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 relative" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                 <div>
-                    <span id="umkmStanBadge" class="bg-sky-100 text-sky-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Stan UMKM</span>
+                    <span id="umkmStanBadge" class="bg-sky-100 text-sky-800 text-[10px] font-bold px-2.5 py-0.5 rounded uppercase">Stan No. --</span>
                     <h3 id="umkmDetailTitle" class="text-lg font-black text-slate-900 mt-1">Nama UMKM</h3>
                 </div>
                 <button onclick="closeUmkmDetailModal()" class="text-slate-400 hover:text-slate-700 font-bold text-xl px-2">✕</button>
             </div>
 
-            <!-- Slider Container -->
-            <div class="relative w-full overflow-hidden rounded-xl bg-slate-900 h-64 md:h-72 flex items-center justify-center shadow-inner" id="umkmSliderContainer">
-                <div id="umkmSliderSlides" class="w-full h-full relative flex items-center justify-center">
-                    <!-- Slide foto dimuat secara dinamis -->
-                </div>
-                <button onclick="prevUmkmSlide()" id="umkmPrevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm backdrop-blur-sm transition hidden">❮</button>
-                <button onclick="nextUmkmSlide()" id="umkmNextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/70 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm backdrop-blur-sm transition hidden">❯</button>
-                <div class="absolute bottom-2 z-20 bg-black/60 text-white px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm" id="umkmSlideIndicator">
-                    1 / 1
-                </div>
+            <!-- Slider Foto Produk Otomatis -->
+            <div class="relative w-full h-64 sm:h-72 bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center shadow-inner">
+                <div id="umkmSliderSlides" class="w-full h-full flex items-center justify-center p-2"></div>
+                <button id="umkmPrevBtn" onclick="prevUmkmSlide()" class="hidden absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-9 h-9 rounded-full flex items-center justify-center text-sm backdrop-blur-sm transition">❮</button>
+                <button id="umkmNextBtn" onclick="nextUmkmSlide()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-9 h-9 rounded-full flex items-center justify-center text-sm backdrop-blur-sm transition">❯</button>
+                <div id="umkmSlideIndicator" class="absolute bottom-2.5 right-3 bg-black/60 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">1 / 1</div>
             </div>
 
-            <div>
-                <p id="umkmDetailDesc" class="text-slate-700 text-xs md:text-sm font-medium"></p>
+            <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-xs text-slate-700">
+                <strong class="text-slate-900 block mb-1">Deskripsi Produk & Menu:</strong>
+                <p id="umkmDetailDesc">-</p>
             </div>
 
-            <button onclick="closeUmkmDetailModal()" class="w-full bg-slate-900 text-white font-medium py-2.5 rounded-xl text-xs">Tutup</button>
+            <button onclick="closeUmkmDetailModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition">Tutup Detail Produk</button>
         </div>
     </div>
-
-    <!-- JavaScript Application Logic is loaded in <head> -->
 </body>
 </html>
