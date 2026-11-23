@@ -1180,10 +1180,35 @@
             const candidates = getDoorprizeCandidates();
             const countEl = document.getElementById('doorprizeCandidateCount');
             if (countEl) countEl.innerText = candidates.length + ' Kandidat Tersedia';
+            validateDoorprizeFormState();
+        }
+
+        function validateDoorprizeFormState() {
+            const prizeInput = document.getElementById('doorprizePrizeInput');
+            const startBtn = document.getElementById('btnStartSpin');
+            if (!startBtn) return;
+
+            const hasPrize = prizeInput && prizeInput.value.trim().length > 0;
+            if (!hasPrize || isSpinningDoorprize) {
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         }
 
         function startDoorprizeSpin() {
             if (isSpinningDoorprize) return;
+
+            const prizeInput = document.getElementById('doorprizePrizeInput');
+            const prizeName = prizeInput ? prizeInput.value.trim() : '';
+            if (!prizeName) {
+                showModal('Nama Hadiah Wajib Diisi ⚠️', 'Silakan isi Nama Hadiah Doorprize terlebih dahulu sebelum memulai pengundian.', '⚠️');
+                if (prizeInput) prizeInput.focus();
+                return;
+            }
+
             const candidates = getDoorprizeCandidates();
 
             if (candidates.length === 0) {
@@ -1253,6 +1278,7 @@
                 document.getElementById('doorprizeBannerStatus').innerText = '🎉 SELAMAT KEPADA PEMENANG DOORPRIZE!';
                 document.getElementById('doorprizeDisplayBox').className = 'bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-2xl p-8 text-center shadow-xl border-4 border-emerald-300 transition-all';
                 if (prizeInput) prizeInput.value = '';
+                validateDoorprizeFormState();
             }
         }
 
@@ -2098,6 +2124,7 @@
         window.prevUmkmSlide = prevUmkmSlide;
         window.closeUmkmDetailModal = closeUmkmDetailModal;
         window.updateDoorprizeCandidateCount = updateDoorprizeCandidateCount;
+        window.validateDoorprizeFormState = validateDoorprizeFormState;
         window.startDoorprizeSpin = startDoorprizeSpin;
         window.stopDoorprizeSpin = stopDoorprizeSpin;
         window.toggleDoorprizeAttendance = toggleDoorprizeAttendance;
@@ -3018,8 +3045,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Hadiah Doorprize (Opsional)</label>
-                            <input type="text" id="doorprizePrizeInput" placeholder="Contoh: Sepeda Gunung / Kompor Gas / Voucher Belanja" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-xs">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Hadiah Doorprize *</label>
+                            <input type="text" id="doorprizePrizeInput" required oninput="validateDoorprizeFormState()" placeholder="Wajib diisi! Contoh: Sepeda Gunung / Kompor Gas" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-xs">
                         </div>
                     </div>
 
@@ -3032,7 +3059,7 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row justify-center gap-3 pt-2">
-                        <button id="btnStartSpin" onclick="startDoorprizeSpin()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm shadow-md transition">
+                        <button id="btnStartSpin" onclick="startDoorprizeSpin()" disabled class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm shadow-md transition opacity-50 cursor-not-allowed">
                             🎰 Mulai Acak Undian
                         </button>
                         <button id="btnStopSpin" onclick="stopDoorprizeSpin()" class="hidden bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm shadow-md transition">
