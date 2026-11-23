@@ -48,6 +48,10 @@
         let adminJalanSearchQuery = "";
         let adminMewarnaiSearchQuery = "";
 
+        let isSubmittingKaos = false;
+        let isSubmittingJalan = false;
+        let isSubmittingMewarnai = false;
+
         let doorprizeWinners = JSON.parse(localStorage.getItem('juss_doorprize_winners')) || [];
         let doorprizeInterval = null;
         let isSpinningDoorprize = false;
@@ -296,19 +300,91 @@
             return total;
         }
 
+        function normalizePhone(phoneStr) {
+            let digits = String(phoneStr || '').replace(/\D/g, '');
+            if (digits.startsWith('62')) digits = '0' + digits.slice(2);
+            return digits;
+        }
+
+        function updateSubmitButtonState(btn, isReady, isSubmitting) {
+            if (!btn) return;
+            if (isSubmitting || !isReady) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.classList.remove('hover:from-sky-700', 'hover:to-blue-700', 'hover:to-cyan-700');
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.classList.add('hover:from-sky-700');
+            }
+        }
+
+        function validateKaosFormState() {
+            const name = document.getElementById('name')?.value.trim() || '';
+            const phone = normalizePhone(document.getElementById('phone')?.value || '');
+            const instansi = document.getElementById('instansi')?.value || '';
+            const size = document.getElementById('size')?.value || '';
+            const sleeve = document.getElementById('sleeve')?.value || '';
+            const qty = parseInt(document.getElementById('qty')?.value) || 0;
+            const fileInput = document.getElementById('paymentProof');
+            const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
+            const isReady = name.length >= 2 && phone.length >= 9 && instansi !== '' && size !== '' && sleeve !== '' && qty >= 1 && hasFile;
+            updateSubmitButtonState(document.getElementById('submitBtn'), isReady, isSubmittingKaos);
+        }
+
+        function validateJalanFormState() {
+            const name = document.getElementById('jsName')?.value.trim() || '';
+            const gender = document.getElementById('jsGender')?.value || '';
+            const isUnderage = document.getElementById('jsUnderageCheck')?.checked || false;
+            const ktp = document.getElementById('jsKtp')?.value.trim() || '';
+            const parentName = document.getElementById('jsParentName')?.value.trim() || '';
+            const kelurahan = document.getElementById('jsKelurahan')?.value || '';
+            const alamat = document.getElementById('jsAlamat')?.value.trim() || '';
+            const phone = normalizePhone(document.getElementById('jsPhone')?.value || '');
+
+            const identityValid = isUnderage ? (parentName.length >= 2) : (/^\d{16}$/.test(ktp));
+            const isReady = name.length >= 2 && gender !== '' && identityValid && kelurahan !== '' && alamat.length >= 4 && phone.length >= 9;
+            updateSubmitButtonState(document.getElementById('submitJalanBtn'), isReady, isSubmittingJalan);
+        }
+
+        function validateMewarnaiFormState() {
+            const namaAnak = document.getElementById('namaAnak')?.value.trim() || '';
+            const alamat = document.getElementById('alamatAnak')?.value.trim() || '';
+            const asalSekolah = document.getElementById('asalSekolah')?.value.trim() || '';
+            const selectedRadio = document.querySelector('input[name="kategoriLombaRadio"]:checked');
+            const ortu = document.getElementById('namaOrtu')?.value.trim() || '';
+            const phone = normalizePhone(document.getElementById('phoneMewarnai')?.value || '');
+
+            const isReady = namaAnak.length >= 2 && alamat.length >= 4 && asalSekolah.length >= 2 && Boolean(selectedRadio) && ortu.length >= 2 && phone.length >= 9;
+            updateSubmitButtonState(document.getElementById('submitMewarnaiBtn'), isReady, isSubmittingMewarnai);
+        }
+
         async function handleFormSubmit(event) {
             event.preventDefault();
+            if (isSubmittingKaos) return;
+
             const submitBtn = document.getElementById('submitBtn');
             const submitBtnText = document.getElementById('submitBtnText');
             const submitBtnSpinner = document.getElementById('submitBtnSpinner');
 
-            submitBtn.disabled = true;
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const normPhone = normalizePhone(phone);
+
+            // Validasi duplikat Nomor WhatsApp pada Pembelian Kaos
+            const existingKaos = orders.find(o => normalizePhone(o.phone) === normPhone && normPhone.length >= 9);
+            if (existingKaos) {
+                showModal('Nomor WhatsApp Sudah Terdaftar ⚠️', `Nomor WhatsApp ${phone} sudah terdaftar atas nama ${existingKaos.name} (ID: ${existingKaos.id}). Gunakan nomor WhatsApp lain atau cek status pesanan Anda di menu Cek Status & Tiket.`, '⚠️');
+                return;
+            }
+
+            isSubmittingKaos = true;
+            updateSubmitButtonState(submitBtn, false, true);
             submitBtnText.innerText = "Menyimpan ke Database...";
             submitBtnSpinner.classList.remove('hidden');
 
             try {
-                const name = document.getElementById('name').value.trim();
-                const phone = document.getElementById('phone').value.trim();
                 const instansi = document.getElementById('instansi').value;
                 const size = document.getElementById('size').value;
                 const sleeve = document.getElementById('sleeve').value;
@@ -349,9 +425,144 @@
             } catch (err) {
                 showModal('Gagal ❌', 'Terjadi kesalahan saat menyimpan data: ' + err.message, '⚠️');
             } finally {
-                submitBtn.disabled = false;
+                isSubmittingKaos = false;
                 submitBtnText.innerText = "Kirim Pesanan Kaos Sekarang 🚀";
                 submitBtnSpinner.classList.add('hidden');
+                validateKaosFormState();
+            }
+        }
+
+        async function handleJalanSantaiSubmit(event) {
+            event.preventDefault();
+            if (isSubmittingJalan) return;
+
+            const submitBtn = document.getElementById('submitJalanBtn');
+            const submitBtnText = document.getElementById('submitJalanBtnText');
+            const submitBtnSpinner = document.getElementById('submitJalanBtnSpinner');
+
+            const name = document.getElementById('jsName').value.trim();
+            const gender = document.getElementById('jsGender').value;
+            const isUnderage = document.getElementById('jsUnderageCheck').checked;
+            const phone = document.getElementById('jsPhone').value.trim();
+            const normPhone = normalizePhone(phone);
+
+            // Validasi Nomor WhatsApp: Dikecualikan jika peserta adalah anak di bawah umur
+            if (!isUnderage) {
+                const existingAdultJalan = jalanRegistrations.find(j => {
+                    const jIsChild = j.isUnderage || String(j.ktp).includes('Anak') || String(j.ktp) === 'Anak di Bawah Umur';
+                    return !jIsChild && normalizePhone(j.phone) === normPhone && normPhone.length >= 9;
+                });
+                if (existingAdultJalan) {
+                    showModal('Nomor WhatsApp Sudah Terdaftar ⚠️', `Nomor WhatsApp ${phone} sudah terdaftar atas nama peserta dewasa ${existingAdultJalan.name} (ID: ${existingAdultJalan.id}). Jika ingin mendaftarkan anak di bawah umur menggunakan nomor orang tua yang sama, silakan centang "Peserta Anak di Bawah Umur".`, '⚠️');
+                    return;
+                }
+            }
+
+            isSubmittingJalan = true;
+            updateSubmitButtonState(submitBtn, false, true);
+            submitBtnText.innerText = "Menyimpan Pendaftaran...";
+            submitBtnSpinner.classList.remove('hidden');
+
+            try {
+                const ktp = isUnderage ? 'Anak di Bawah Umur' : document.getElementById('jsKtp').value.trim();
+                const parentName = isUnderage ? document.getElementById('jsParentName').value.trim() : '';
+                const kelurahan = document.getElementById('jsKelurahan').value;
+                const alamat = document.getElementById('jsAlamat').value;
+
+                const now = new Date();
+                const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
+                const newId = 'JLS-' + Math.floor(200 + Math.random() * 800);
+
+                const newReg = { id: newId, timestamp, name, gender, ktp, isUnderage, parentName, kelurahan, alamat, phone, status: 'Terdaftar' };
+
+                if (GOOGLE_APPS_SCRIPT_URL) {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'jalanSantai', id: newId, timestamp, name, gender, ktp: isUnderage ? 'Anak di Bawah Umur' : ktp, statusKtp: isUnderage ? 'Anak di Bawah Umur' : 'KTP Valid', parentName: parentName || '-', kelurahan, alamat, phone, status: 'Terdaftar' })
+                    });
+                }
+
+                jalanRegistrations.unshift(newReg);
+                saveToStorage();
+
+                showModal('Pendaftaran Jalan Santai Berhasil 🚶‍♂️', `Terima kasih ${name} (ID: ${newId}). Pendaftaran Peserta Jalan Santai Kecamatan Cinere berhasil dicatat!`, '✓');
+                document.getElementById('jalanSantaiForm').reset();
+                document.getElementById('jsParentContainer').classList.add('hidden');
+                document.getElementById('jsKtpContainer').classList.remove('hidden');
+                document.getElementById('jsKtp').required = true;
+            } catch (err) {
+                showModal('Gagal ❌', 'Terjadi kesalahan saat menyimpan data: ' + err.message, '⚠️');
+            } finally {
+                isSubmittingJalan = false;
+                submitBtnText.innerText = "Daftar Jalan Santai Sekarang 🚶‍♂️🏃‍♀️";
+                submitBtnSpinner.classList.add('hidden');
+                validateJalanFormState();
+            }
+        }
+
+        async function handleMewarnaiSubmit(event) {
+            event.preventDefault();
+            if (isSubmittingMewarnai) return;
+
+            const submitBtn = document.getElementById('submitMewarnaiBtn');
+            const submitBtnText = document.getElementById('submitMewarnaiBtnText');
+            const submitBtnSpinner = document.getElementById('submitMewarnaiBtnSpinner');
+
+            // Peserta lomba mewarnai adalah anak-anak, sehingga nomor WhatsApp orang tua dikecualikan (boleh digunakan untuk beberapa anak)
+            isSubmittingMewarnai = true;
+            updateSubmitButtonState(submitBtn, false, true);
+            submitBtnText.innerText = "Menyimpan Pendaftaran Lomba...";
+            submitBtnSpinner.classList.remove('hidden');
+
+            try {
+                const namaAnak = document.getElementById('namaAnak').value.trim();
+                const alamat = document.getElementById('alamatAnak').value;
+                const asalSekolah = document.getElementById('asalSekolah').value;
+                const selectedRadio = document.querySelector('input[name="kategoriLombaRadio"]:checked');
+                const kategori = selectedRadio ? selectedRadio.value : 'TK A';
+                const ortu = document.getElementById('namaOrtu').value.trim();
+                const phone = document.getElementById('phoneMewarnai').value.trim();
+
+                const now = new Date();
+                const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ' WIB';
+                const newId = 'MEW-' + Math.floor(100 + Math.random() * 900);
+
+                const newReg = { 
+                    id: newId, 
+                    timestamp, 
+                    namaAnak, 
+                    alamat, 
+                    asalSekolah, 
+                    kategori, 
+                    ortu, 
+                    phone, 
+                    status: 'Terdaftar',
+                    hadir: false
+                };
+
+                if (GOOGLE_APPS_SCRIPT_URL) {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'mewarnai', id: newId, timestamp, namaAnak, alamat, asalSekolah, kategori, ortu, phone, status: 'Terdaftar', hadir: false })
+                    });
+                }
+
+                mewarnaiRegistrations.unshift(newReg);
+                saveToStorage();
+
+                showModal('Pendaftaran Lomba Berhasil 🎨', `Ananda ${namaAnak} (${asalSekolah}) berhasil terdaftar untuk Lomba Mewarnai di Mall Cinere (28 Nov 2026, 09:00 WIB)!`, '✓');
+                document.getElementById('mewarnaiForm').reset();
+            } catch (err) {
+                showModal('Gagal ❌', 'Terjadi kesalahan saat menyimpan data: ' + err.message, '⚠️');
+            } finally {
+                isSubmittingMewarnai = false;
+                submitBtnText.innerText = "Daftar Lomba Mewarnai Sekarang 🎨";
+                submitBtnSpinner.classList.add('hidden');
+                validateMewarnaiFormState();
             }
         }
 
@@ -532,14 +743,40 @@
                 let rawPhone = String(o.phone || '');
                 let maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
                 let fullName = String(o.name || 'Peserta');
+                let statusLower = String(o.status || 'Pending').toLowerCase();
+                let isPending = statusLower === 'pending' || statusLower === 'belum bayar' || statusLower === 'menunggu verifikasi';
+                let badgeClass = isPending ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-emerald-100 text-emerald-800';
+                let borderCardClass = isPending ? 'border-amber-500' : 'border-emerald-500';
+                let headerBadgeBg = isPending ? 'bg-amber-500' : 'bg-emerald-500';
+
+                let uploadProofSection = '';
+                if (isPending) {
+                    uploadProofSection = `
+                        <div class="bg-amber-50 border-2 border-dashed border-amber-300 rounded-xl p-3.5 space-y-2.5">
+                            <div class="flex items-start gap-2">
+                                <span class="text-base">📤</span>
+                                <div>
+                                    <span class="text-amber-900 font-bold text-xs block">Unggah Bukti Transfer / Struk Pembayaran</span>
+                                    <p class="text-[11px] text-amber-800 mt-0.5">Status pesanan Anda masih <strong>Pending</strong>. Silakan transfer sebesar <strong>Rp ${o.totalPrice.toLocaleString('id-ID')}</strong> ke BCA <strong>2671600624</strong> (a.n. Mayarni D Anggoro), lalu unggah bukti bayar di bawah ini:</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center pt-1">
+                                <input type="file" id="eticket-proof-${o.id}" accept="image/*" class="flex-1 px-3 py-2 rounded-lg border border-amber-300 bg-white text-[11px] text-slate-600">
+                                <button type="button" id="btn-upload-proof-${o.id}" onclick="uploadProofFromEticket('${o.id}')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-lg text-xs shadow-sm transition whitespace-nowrap">
+                                    Kirim Bukti Transfer
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
 
                 html += `
-                    <div class="bg-white border-2 border-emerald-500 rounded-2xl p-4 sm:p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
+                    <div class="bg-white border-2 ${borderCardClass} rounded-2xl p-4 sm:p-5 text-xs space-y-4 shadow-md relative overflow-hidden">
                         <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-100 pb-3 pt-1">
-                            <span class="bg-emerald-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] uppercase tracking-wider">
+                            <span class="${headerBadgeBg} text-white font-bold px-2.5 py-1 rounded-lg text-[10px] uppercase tracking-wider">
                                 👕 E-TICKET PEMBELIAN KAOS
                             </span>
-                            <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] bg-emerald-100 text-emerald-800">${o.status}</span>
+                            <span class="px-3 py-1 rounded-full font-bold uppercase text-[10px] ${badgeClass}">${escapeHtml(o.status)}</span>
                         </div>
                         <div>
                             <span class="font-extrabold text-slate-900 text-base block">${escapeHtml(fullName)}</span>
@@ -551,8 +788,10 @@
                             <div><strong>Ukuran Kaos:</strong> Size ${o.size} (${o.sleeve})</div>
                             <div><strong>Jumlah Pesanan:</strong> ${o.qty} Pcs</div>
                             <div class="sm:col-span-2"><strong>Tanggal & Waktu:</strong> Jumat, 27 November 2026 (Pukul 06.00 WIB)</div>
-                            <div class="sm:col-span-2"><strong>Total Transfer:</strong> Rp ${o.totalPrice.toLocaleString('id-ID')} (Lunas)</div>
+                            <div class="sm:col-span-2"><strong>Total Transfer:</strong> Rp ${o.totalPrice.toLocaleString('id-ID')} (${escapeHtml(o.status)})</div>
                         </div>
+
+                        ${uploadProofSection}
 
                         <div class="bg-teal-50 border border-teal-200 rounded-xl p-3 space-y-2">
                             <span class="text-teal-900 font-bold text-xs block">📦 Titik Lokasi Pengambilan Kaos Warga Cinere:</span>
@@ -695,6 +934,62 @@
             });
 
             container.innerHTML = html;
+        }
+
+        async function uploadProofFromEticket(orderId) {
+            const fileInput = document.getElementById('eticket-proof-' + orderId);
+            const btn = document.getElementById('btn-upload-proof-' + orderId);
+
+            if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+                showModal('Pilih File Terlebih Dahulu ⚠️', 'Silakan pilih foto struk atau screenshot bukti transfer Anda sebelum mengirim.', '⚠️');
+                return;
+            }
+
+            const orderIdx = orders.findIndex(item => item.id === orderId);
+            if (orderIdx === -1) return;
+
+            const originalText = btn ? btn.innerText : 'Kirim Bukti Transfer';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Mengunggah...';
+            }
+
+            try {
+                const file = fileInput.files[0];
+                const proofUrl = URL.createObjectURL(file);
+                const base64File = await toBase64(file);
+                const targetOrder = orders[orderIdx];
+
+                if (GOOGLE_APPS_SCRIPT_URL) {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'updateProofKaos',
+                            id: targetOrder.id,
+                            name: targetOrder.name,
+                            paymentProofBase64: base64File,
+                            paymentProofName: file.name,
+                            status: 'Lunas'
+                        })
+                    });
+                }
+
+                orders[orderIdx].paymentProof = proofUrl;
+                orders[orderIdx].status = 'Lunas';
+                saveToStorage();
+
+                showModal('Bukti Transfer Terkirim & Lunas ✨', `Bukti pembayaran untuk ID Pesanan ${orderId} berhasil diunggah dan status pesanan otomatis diperbarui menjadi LUNAS.`, '✓');
+                searchParticipantStatus();
+            } catch (err) {
+                showModal('Gagal Mengunggah ❌', 'Terjadi kesalahan saat mengunggah bukti transfer: ' + err.message, '⚠️');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }
         }
 
         function openAdminModalPrompt() {
@@ -966,6 +1261,19 @@
             doorprizeWinners[idx].attendance = (doorprizeWinners[idx].attendance === 'Tidak Hadir') ? 'Hadir' : 'Tidak Hadir';
             saveToStorage();
             renderDoorprizeWinners();
+
+            if (GOOGLE_APPS_SCRIPT_URL) {
+                fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'updateDoorprizeAttendance',
+                        id: doorprizeWinners[idx].id,
+                        attendance: doorprizeWinners[idx].attendance
+                    })
+                }).catch(err => console.log("Gagal update kehadiran doorprize:", err));
+            }
         }
 
         function renderDoorprizeWinners() {
@@ -1038,6 +1346,7 @@
                 parentInput.required = false;
                 parentInput.value = '';
             }
+            validateJalanFormState();
         }
 
         function filterAdminKaos() {
@@ -1067,6 +1376,89 @@
             }
         }
 
+        async function toggleKaosPaymentStatus(orderId) {
+            const idx = orders.findIndex(o => o.id === orderId);
+            if (idx === -1) return;
+            const currentStatus = String(orders[idx].status || 'Pending');
+            const newStatus = currentStatus.toLowerCase() === 'lunas' ? 'Pending' : 'Lunas';
+            orders[idx].status = newStatus;
+            saveToStorage();
+            renderAdminDashboard();
+
+            if (GOOGLE_APPS_SCRIPT_URL) {
+                try {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'updateStatusKaos',
+                            id: orderId,
+                            status: newStatus
+                        })
+                    });
+                } catch (e) {
+                    console.log('Sync status gagal:', e);
+                }
+            }
+        }
+
+        function triggerAdminProofUpload(orderId) {
+            const input = document.getElementById('admin-proof-input-' + orderId);
+            if (input) input.click();
+        }
+
+        async function handleAdminProofUpload(orderId, fileInput) {
+            if (!fileInput || !fileInput.files || !fileInput.files[0]) return;
+            const orderIdx = orders.findIndex(item => item.id === orderId);
+            if (orderIdx === -1) return;
+
+            const btn = document.getElementById('admin-proof-btn-' + orderId);
+            const originalText = btn ? btn.innerText : '📤 Upload Bukti';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Mengunggah...';
+            }
+
+            try {
+                const file = fileInput.files[0];
+                const proofUrl = URL.createObjectURL(file);
+                const base64File = await toBase64(file);
+                const targetOrder = orders[orderIdx];
+
+                if (GOOGLE_APPS_SCRIPT_URL) {
+                    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'updateProofKaos',
+                            id: targetOrder.id,
+                            name: targetOrder.name,
+                            paymentProofBase64: base64File,
+                            paymentProofName: file.name,
+                            status: 'Lunas'
+                        })
+                    });
+                }
+
+                orders[orderIdx].paymentProof = proofUrl;
+                orders[orderIdx].status = 'Lunas';
+                saveToStorage();
+                renderAdminDashboard();
+
+                showModal('Berhasil Diunggah ✨', `Bukti pembayaran untuk ${targetOrder.name} (${orderId}) berhasil diunggah oleh panitia dan status otomatis diperbarui menjadi LUNAS.`, '✓');
+            } catch (err) {
+                showModal('Gagal Mengunggah ❌', 'Terjadi kesalahan saat mengunggah bukti transfer: ' + err.message, '⚠️');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+                fileInput.value = '';
+            }
+        }
+
         function renderKaosTable() {
             const filteredOrders = orders.filter(o => 
                 o.name.toLowerCase().includes(adminKaosSearchQuery) || 
@@ -1085,17 +1477,33 @@
             if (!tbody) return;
 
             tbody.innerHTML = paginatedOrders.length === 0 ? `<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada data pembelian kaos yang cocok.</td></tr>` : paginatedOrders.map((o) => {
-                const waText = encodeURIComponent(`Halo Kak ${o.name}, terima kasih telah memesan Kaos Jalan Santai & Kuliner Nusantara JUSS 2026 (ID: ${o.id}). Pesanan ${o.qty} Pcs (Size ${o.size}, Lengan ${o.sleeve}) senilai Rp ${o.totalPrice.toLocaleString('id-ID')} telah ${o.status}. Pengambilan kaos dapat dilakukan di JS Coffee (Kedai Biru), Jl. Andara Raya No.23 dengan menunjukkan E-Ticket di portal ini. Salam UMKM Cinere!`);
-                let proofLink = (o.paymentProof && o.paymentProof !== '-') ? `<a href="${o.paymentProof}" target="_blank" class="text-sky-600 underline text-[11px] font-bold">Lihat Bukti</a>` : '<span class="text-slate-400 text-[11px]">-</span>';
+                const waText = encodeURIComponent(`Halo Kak ${o.name}, terima kasih telah memesan Kaos Jalan Santai & Kuliner Nusantara JUSS 2026 (ID: ${o.id}). Pesanan ${o.qty} Pcs (Size ${o.size}, Lengan ${o.sleeve}) senilai Rp ${o.totalPrice.toLocaleString('id-ID')} berstatus ${o.status}. Pengambilan kaos dapat dilakukan di JS Coffee (Kedai Biru), Jl. Andara Raya No.23 dengan menunjukkan E-Ticket di portal ini. Salam UMKM Cinere!`);
+                const hasProof = o.paymentProof && o.paymentProof !== '-';
+                let proofLink = hasProof
+                    ? `<div class="flex flex-col items-start gap-1">
+                        <a href="${o.paymentProof}" target="_blank" class="text-sky-600 underline text-[11px] font-bold">Lihat Bukti</a>
+                        <button type="button" id="admin-proof-btn-${o.id}" onclick="triggerAdminProofUpload('${o.id}')" class="text-[10px] text-slate-500 hover:text-sky-700 underline">Ganti Bukti</button>
+                        <input type="file" id="admin-proof-input-${o.id}" accept="image/*" class="hidden" onchange="handleAdminProofUpload('${o.id}', this)">
+                       </div>`
+                    : `<div class="flex flex-col items-start gap-1">
+                        <span class="text-amber-700 text-[10px] font-semibold">Belum Upload</span>
+                        <button type="button" id="admin-proof-btn-${o.id}" onclick="triggerAdminProofUpload('${o.id}')" class="bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-sm transition whitespace-nowrap">📤 Upload Bukti</button>
+                        <input type="file" id="admin-proof-input-${o.id}" accept="image/*" class="hidden" onchange="handleAdminProofUpload('${o.id}', this)">
+                       </div>`;
+                const statusLower = String(o.status || 'Pending').toLowerCase();
+                const isPending = statusLower === 'pending' || statusLower === 'belum bayar' || statusLower === 'menunggu verifikasi';
+                const statusBadgeHTML = isPending
+                    ? `<button onclick="toggleKaosPaymentStatus('${o.id}')" title="Klik untuk ubah menjadi Lunas" class="px-2.5 py-1 rounded-full font-bold text-[10px] bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition cursor-pointer inline-flex items-center gap-1">⏳ ${escapeHtml(o.status || 'Pending')}</button>`
+                    : `<button onclick="toggleKaosPaymentStatus('${o.id}')" title="Klik untuk ubah status" class="px-2.5 py-1 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 transition cursor-pointer inline-flex items-center gap-1">✅ ${escapeHtml(o.status)}</button>`;
                 return `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <tr class="border-b border-slate-100 ${isPending ? 'bg-amber-50/40 hover:bg-amber-50/70' : 'hover:bg-slate-50'}">
                         <td class="p-3.5"><strong class="text-slate-800 block">${o.id}</strong><span class="text-[11px]">${o.timestamp}</span></td>
                         <td class="p-3.5"><span class="font-bold block">${escapeHtml(o.name)}</span><span class="text-slate-400 font-mono text-[11px]">${escapeHtml(o.phone)}</span></td>
                         <td class="p-3.5">${escapeHtml(o.instansi)}</td>
                         <td class="p-3.5">Size <strong>${o.size}</strong> (${o.sleeve})<br><span class="text-slate-400">${o.qty} Pcs</span></td>
                         <td class="p-3.5 font-semibold">Rp ${o.totalPrice.toLocaleString('id-ID')}</td>
                         <td class="p-3.5">${proofLink}</td>
-                        <td class="p-3.5"><span class="px-2 py-0.5 rounded font-bold text-[10px] bg-emerald-100 text-emerald-800">${o.status}</span></td>
+                        <td class="p-3.5">${statusBadgeHTML}</td>
                         <td class="p-3.5 text-center"><a href="https://wa.me/${String(o.phone).replace(/^0/, '62')}?text=${waText}" target="_blank" class="bg-emerald-600 text-white px-2.5 py-1.5 rounded text-[11px] inline-flex items-center gap-1 font-bold shadow-sm">💬 WhatsApp Kaos</a></td>
                     </tr>
                 `;
@@ -1660,6 +2068,7 @@
         window.handleJalanSantaiSubmit = handleJalanSantaiSubmit;
         window.handleMewarnaiSubmit = handleMewarnaiSubmit;
         window.searchParticipantStatus = searchParticipantStatus;
+        window.uploadProofFromEticket = uploadProofFromEticket;
         window.openAdminModalPrompt = openAdminModalPrompt;
         window.closeAdminModal = closeAdminModal;
         window.verifyAdminPin = verifyAdminPin;
@@ -1670,6 +2079,9 @@
         window.filterAdminJalan = filterAdminJalan;
         window.filterAdminMewarnai = filterAdminMewarnai;
         window.toggleMewarnaiAttendance = toggleMewarnaiAttendance;
+        window.toggleKaosPaymentStatus = toggleKaosPaymentStatus;
+        window.triggerAdminProofUpload = triggerAdminProofUpload;
+        window.handleAdminProofUpload = handleAdminProofUpload;
         window.changeKaosPage = changeKaosPage;
         window.changeJalanPage = changeJalanPage;
         window.changeMewarnaiPage = changeMewarnaiPage;
@@ -1695,16 +2107,39 @@
         window.prevSlide = prevSlide;
         window.currentSlide = currentSlide;
 
+        function initFormLockListeners() {
+            const orderForm = document.getElementById('orderForm');
+            if (orderForm) {
+                orderForm.addEventListener('input', validateKaosFormState);
+                orderForm.addEventListener('change', validateKaosFormState);
+                validateKaosFormState();
+            }
+            const jalanForm = document.getElementById('jalanSantaiForm');
+            if (jalanForm) {
+                jalanForm.addEventListener('input', validateJalanFormState);
+                jalanForm.addEventListener('change', validateJalanFormState);
+                validateJalanFormState();
+            }
+            const mewarnaiForm = document.getElementById('mewarnaiForm');
+            if (mewarnaiForm) {
+                mewarnaiForm.addEventListener('input', validateMewarnaiFormState);
+                mewarnaiForm.addEventListener('change', validateMewarnaiFormState);
+                validateMewarnaiFormState();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
             loadMarqueeAnnouncement();
             fetchOrdersFromGoogleSheets();
+            initFormLockListeners();
         });
 
         window.onload = function() {
             calculateTotal();
             loadMarqueeAnnouncement();
             fetchOrdersFromGoogleSheets();
+            initFormLockListeners();
             showSlide(0);
             startSlideShow();
             setInterval(() => { fetchOrdersFromGoogleSheets(); }, 10000);
@@ -1961,8 +2396,8 @@
                             <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">FITHUB Cinere</span>
                         </div>
                         <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-sky-300 group w-full max-w-[140px]">
-                            <img src="logorspc.jpg" alt="RS PC" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'RS PURI CINERE')">
-                            <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">Logo RS PURI CINERE</span>
+                            <img src="logorspc.jpg" alt="RS PURI CINERE" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'UMKM Juara Depok')">
+                            <span class="font-bold text-slate-700 text-[11px] mt-2 group-hover:text-sky-700 transition-colors">RS Puri Cinere</span>
                         </div>
                         <div class="flex flex-col items-center justify-center p-3 bg-white rounded-xl shadow-sm border border-slate-100 transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-teal-300 group w-full max-w-[140px]">
                             <img src="https://placehold.co/100x100/0d9488/ffffff?text=JS+Coffee" alt="JS Coffee & Kedai Biru" class="max-h-14 w-auto object-contain cursor-pointer rounded-lg transition-transform duration-300 group-hover:rotate-3" onclick="openImageViewer(this.src, 'JS Coffee & Kedai Biru')">
@@ -2143,7 +2578,7 @@
                         <textarea id="notes" rows="2" placeholder="Contoh: Titip ambil di posko kelurahan..." class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm"></textarea>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+                    <button type="submit" id="submitBtn" disabled class="w-full bg-gradient-to-r from-sky-600 to-blue-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                         <span id="submitBtnText">Kirim Pesanan Kaos Sekarang 🚀</span>
                         <svg id="submitBtnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -2228,7 +2663,7 @@
                         <input type="tel" id="jsPhone" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none text-sm">
                     </div>
 
-                    <button type="submit" id="submitJalanBtn" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+                    <button type="submit" id="submitJalanBtn" disabled class="w-full bg-gradient-to-r from-sky-600 to-blue-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                         <span id="submitJalanBtnText">Daftar Jalan Santai Sekarang 🚶‍♂️🏃‍♀️</span>
                         <svg id="submitJalanBtnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -2322,7 +2757,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="submitMewarnaiBtn" class="w-full bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+                    <button type="submit" id="submitMewarnaiBtn" disabled class="w-full bg-gradient-to-r from-sky-600 to-cyan-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                         <span id="submitMewarnaiBtnText">Daftar Lomba Mewarnai Sekarang 🎨</span>
                         <svg id="submitMewarnaiBtnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
