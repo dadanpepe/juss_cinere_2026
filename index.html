@@ -21,7 +21,7 @@
         .animate-marquee {
             display: inline-block;
             white-space: nowrap;
-            animation: marqueeScroll 60s linear infinite;
+            animation: marqueeScroll 28s linear infinite;
         }
         .animate-marquee:hover {
             animation-play-state: paused;
@@ -47,6 +47,11 @@
         let adminKaosSearchQuery = "";
         let adminJalanSearchQuery = "";
         let adminMewarnaiSearchQuery = "";
+
+        let doorprizeWinners = JSON.parse(localStorage.getItem('juss_doorprize_winners')) || [];
+        let doorprizeInterval = null;
+        let isSpinningDoorprize = false;
+        let currentSpinCandidate = null;
 
         let umkmSlideIndex = 0;
         let umkmSlideInterval = null;
@@ -147,21 +152,19 @@
                     }
                 }
 
-                const resMewarnai = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getDataMewarnai");
-                if (resMewarnai.ok) {
-                    const dataMewarnai = await resMewarnai.json();
-                    if (Array.isArray(dataMewarnai) && dataMewarnai.length > 0) {
-                        mewarnaiRegistrations = dataMewarnai.map((row, index) => ({
-                            id: row["ID Pendaftaran"] || `MEW-${100 + index}`,
-                            timestamp: row["Timestamp"] || '-',
-                            namaAnak: row["Nama Anak"] || "Anak",
-                            alamat: row["Alamat"] || "-",
-                            asalSekolah: row["Asal Sekolah"] || "-",
-                            kategori: row["Kategori"] || "TK A",
-                            ortu: row["Nama Orang Tua"] || "Ortu",
-                            phone: row["No HP / WhatsApp"] || "-",
-                            status: row["Status"] || "Terdaftar",
-                            hadir: row["Hadir"] === true || row["Hadir"] === "true" || row["Hadir"] === "Hadir"
+                const resDoorprize = await fetch(GOOGLE_APPS_SCRIPT_URL + "?action=getDataDoorprize");
+                if (resDoorprize.ok) {
+                    const dataDoorprize = await resDoorprize.json();
+                    if (Array.isArray(dataDoorprize) && dataDoorprize.length > 0) {
+                        doorprizeWinners = dataDoorprize.map((row) => ({
+                            id: row["ID Tiket"] || row["id"] || "-",
+                            name: row["Nama Pemenang"] || row["name"] || "Peserta",
+                            phone: row["No HP / WhatsApp"] || row["phone"] || "-",
+                            wilayah: row["Wilayah"] || row["wilayah"] || "-",
+                            category: row["Kategori"] || row["category"] || "-",
+                            prize: row["Hadiah"] || row["prize"] || "Doorprize JUSS 2026",
+                            winTime: row["Waktu Undi"] || row["winTime"] || "-",
+                            attendance: row["Kehadiran"] || row["attendance"] || "Hadir"
                         })).reverse();
                         saveToStorage();
                     }
@@ -177,6 +180,7 @@
             localStorage.setItem('juss_kaos_orders', JSON.stringify(orders));
             localStorage.setItem('juss_jalan_regs', JSON.stringify(jalanRegistrations));
             localStorage.setItem('juss_mewarnai_regs', JSON.stringify(mewarnaiRegistrations));
+            localStorage.setItem('juss_doorprize_winners', JSON.stringify(doorprizeWinners));
         }
 
         function switchTab(tabName) {
@@ -238,17 +242,21 @@
             const contentKaos = document.getElementById('subadmin-content-kaos');
             const contentJalan = document.getElementById('subadmin-content-jalan');
             const contentMewarnai = document.getElementById('subadmin-content-mewarnai');
+            const contentUndian = document.getElementById('subadmin-content-undian');
             const btnKaos = document.getElementById('btn-subadmin-kaos');
             const btnJalan = document.getElementById('btn-subadmin-jalan');
             const btnMewarnai = document.getElementById('btn-subadmin-mewarnai');
+            const btnUndian = document.getElementById('btn-subadmin-undian');
 
             if (contentKaos) contentKaos.classList.add('hidden');
             if (contentJalan) contentJalan.classList.add('hidden');
             if (contentMewarnai) contentMewarnai.classList.add('hidden');
+            if (contentUndian) contentUndian.classList.add('hidden');
             
             if (btnKaos) btnKaos.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap';
             if (btnJalan) btnJalan.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap';
             if (btnMewarnai) btnMewarnai.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap';
+            if (btnUndian) btnUndian.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap';
 
             if (subTabName === 'kaos') {
                 if (contentKaos) contentKaos.classList.remove('hidden');
@@ -259,6 +267,10 @@
             } else if (subTabName === 'mewarnai') {
                 if (contentMewarnai) contentMewarnai.classList.remove('hidden');
                 if (btnMewarnai) btnMewarnai.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm whitespace-nowrap';
+            } else if (subTabName === 'undian') {
+                if (contentUndian) contentUndian.classList.remove('hidden');
+                if (btnUndian) btnUndian.className = 'flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-amber-500 text-white shadow-sm whitespace-nowrap';
+                renderDoorprizeWinners();
             }
         }
 
@@ -829,6 +841,181 @@
             renderKaosTable();
             renderJalanTable();
             renderMewarnaiTable();
+            renderDoorprizeWinners();
+        }
+
+        function getDoorprizeCandidates() {
+            const poolType = document.getElementById('doorprizePoolSelect')?.value || 'kaos';
+            const wonIds = new Set(doorprizeWinners.map(w => w.id));
+            let candidates = [];
+
+            if (poolType === 'kaos') {
+                candidates = orders
+                    .filter(o => o.status === 'Lunas' && !wonIds.has(o.id))
+                    .map(o => ({
+                        id: o.id,
+                        name: o.name,
+                        phone: o.phone,
+                        wilayah: o.instansi,
+                        category: 'Pembeli Kaos (' + o.qty + ' Pcs)'
+                    }));
+            } else if (poolType === 'jalan') {
+                candidates = jalanRegistrations
+                    .filter(j => !wonIds.has(j.id))
+                    .map(j => ({
+                        id: j.id,
+                        name: j.name,
+                        phone: j.phone,
+                        wilayah: j.kelurahan,
+                        category: 'Peserta Jalan Santai'
+                    }));
+            } else {
+                const kaosList = orders
+                    .filter(o => o.status === 'Lunas' && !wonIds.has(o.id))
+                    .map(o => ({ id: o.id, name: o.name, phone: o.phone, wilayah: o.instansi, category: 'Pembeli Kaos' }));
+                const jalanList = jalanRegistrations
+                    .filter(j => !wonIds.has(j.id))
+                    .map(j => ({ id: j.id, name: j.name, phone: j.phone, wilayah: j.kelurahan, category: 'Peserta Jalan Santai' }));
+                candidates = [...kaosList, ...jalanList];
+            }
+            return candidates;
+        }
+
+        function updateDoorprizeCandidateCount() {
+            const candidates = getDoorprizeCandidates();
+            const countEl = document.getElementById('doorprizeCandidateCount');
+            if (countEl) countEl.innerText = candidates.length + ' Kandidat Tersedia';
+        }
+
+        function startDoorprizeSpin() {
+            if (isSpinningDoorprize) return;
+            const candidates = getDoorprizeCandidates();
+
+            if (candidates.length === 0) {
+                showModal('Kandidat Kosong ⚠️', 'Tidak ada peserta tersisa pada kategori undian ini atau semua peserta sudah menang.', '⚠️');
+                return;
+            }
+
+            isSpinningDoorprize = true;
+            document.getElementById('btnStartSpin').classList.add('hidden');
+            document.getElementById('btnStopSpin').classList.remove('hidden');
+            document.getElementById('doorprizeBannerStatus').innerText = '🎰 SEDANG MENGACAK PEMENANG...';
+            document.getElementById('doorprizeDisplayBox').className = 'bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white rounded-2xl p-8 text-center shadow-lg border-4 border-amber-300 transition-colors';
+
+            doorprizeInterval = setInterval(() => {
+                const randIdx = Math.floor(Math.random() * candidates.length);
+                currentSpinCandidate = candidates[randIdx];
+                document.getElementById('doorprizeWinnerId').innerText = currentSpinCandidate.id;
+                document.getElementById('doorprizeWinnerName').innerText = currentSpinCandidate.name;
+                document.getElementById('doorprizeWinnerDetail').innerText = `${currentSpinCandidate.wilayah} • ${currentSpinCandidate.category}`;
+            }, 65);
+        }
+
+        function stopDoorprizeSpin() {
+            if (!isSpinningDoorprize) return;
+            clearInterval(doorprizeInterval);
+            isSpinningDoorprize = false;
+
+            document.getElementById('btnStopSpin').classList.add('hidden');
+            document.getElementById('btnStartSpin').classList.remove('hidden');
+
+            if (currentSpinCandidate) {
+                const prizeInput = document.getElementById('doorprizePrizeInput');
+                const prizeName = (prizeInput && prizeInput.value.trim() !== '') ? prizeInput.value.trim() : 'Doorprize Utama JUSS 2026';
+                const now = new Date();
+                const winTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0') + ' WIB';
+
+                const winnerRecord = {
+                    ...currentSpinCandidate,
+                    prize: prizeName,
+                    winTime: winTime,
+                    attendance: 'Hadir'
+                };
+
+                doorprizeWinners.unshift(winnerRecord);
+                saveToStorage();
+                renderDoorprizeWinners();
+
+                if (GOOGLE_APPS_SCRIPT_URL) {
+                    fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'doorprize',
+                            id: winnerRecord.id,
+                            name: winnerRecord.name,
+                            phone: winnerRecord.phone,
+                            wilayah: winnerRecord.wilayah,
+                            category: winnerRecord.category,
+                            prize: winnerRecord.prize,
+                            winTime: winnerRecord.winTime,
+                            attendance: winnerRecord.attendance
+                        })
+                    }).catch(err => console.log("Gagal kirim log doorprize:", err));
+                }
+
+                document.getElementById('doorprizeBannerStatus').innerText = '🎉 SELAMAT KEPADA PEMENANG DOORPRIZE!';
+                document.getElementById('doorprizeDisplayBox').className = 'bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 text-white rounded-2xl p-8 text-center shadow-xl border-4 border-emerald-300 transition-all';
+                if (prizeInput) prizeInput.value = '';
+            }
+        }
+
+        function toggleDoorprizeAttendance(idx) {
+            if (!doorprizeWinners[idx]) return;
+            doorprizeWinners[idx].attendance = (doorprizeWinners[idx].attendance === 'Tidak Hadir') ? 'Hadir' : 'Tidak Hadir';
+            saveToStorage();
+            renderDoorprizeWinners();
+        }
+
+        function renderDoorprizeWinners() {
+            updateDoorprizeCandidateCount();
+            const tbody = document.getElementById('doorprizeWinnersBody');
+            const badge = document.getElementById('doorprizeWinnerCountBadge');
+            if (badge) badge.innerText = doorprizeWinners.length + ' Pemenang';
+            if (!tbody) return;
+
+            if (doorprizeWinners.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400">Belum ada pemenang undian yang diundi.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = doorprizeWinners.map((w, idx) => {
+                const rawPhone = String(w.phone || '');
+                const maskedPhone = rawPhone.length > 4 ? rawPhone.substring(0, 4) + '****' + rawPhone.substring(rawPhone.length - 2) : '****';
+                const waMsg = encodeURIComponent(`Selamat Kak ${w.name} (ID E-Ticket: ${w.id})! Anda terpilih sebagai PEMENANG UNDIAN DOORPRIZE (${w.prize}) pada acara Jalan Santai & Kuliner Nusantara JUSS Kecamatan Cinere 2026. Silakan menuju panggung utama dengan menunjukkan E-Ticket Anda!`);
+                const isAbsent = w.attendance === 'Tidak Hadir';
+                return `
+                    <tr class="border-b border-slate-100 ${isAbsent ? 'bg-rose-50/40' : 'hover:bg-amber-50/40'}">
+                        <td class="p-3.5 font-black text-amber-600">#${doorprizeWinners.length - idx}</td>
+                        <td class="p-3.5"><strong class="text-slate-900 block ${isAbsent ? 'line-through text-slate-400' : ''}">${escapeHtml(w.name)}</strong><span class="font-mono text-[11px] text-sky-700 font-bold">${w.id}</span></td>
+                        <td class="p-3.5"><span class="bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-lg text-[11px]">🎁 ${escapeHtml(w.prize)}</span></td>
+                        <td class="p-3.5">${escapeHtml(w.wilayah)}<br><span class="text-[11px] text-slate-500">${escapeHtml(w.category)}</span></td>
+                        <td class="p-3.5 font-mono text-slate-600 text-[11px]">${maskedPhone}<br><span class="text-slate-400">${w.winTime}</span></td>
+                        <td class="p-3.5 text-center">
+                            <button onclick="toggleDoorprizeAttendance(${idx})" class="px-2.5 py-1 rounded-full text-[11px] font-bold transition ${isAbsent ? 'bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200'}" title="Klik untuk ubah status kehadiran">
+                                ${isAbsent ? '❌ Tidak Hadir' : '✅ Hadir'}
+                            </button>
+                        </td>
+                        <td class="p-3.5 text-center">
+                            <a href="https://wa.me/${rawPhone.replace(/^0/, '62')}?text=${waMsg}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded text-[11px] inline-flex items-center gap-1 font-bold shadow-sm">💬 WA Pemenang</a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function resetDoorprizeWinners() {
+            if (isSpinningDoorprize) return;
+            doorprizeWinners = [];
+            saveToStorage();
+            renderDoorprizeWinners();
+            document.getElementById('doorprizeBannerStatus').innerText = 'SIAP MENGUNDI DOORPRIZE JUSS 2026';
+            document.getElementById('doorprizeWinnerId').innerText = 'JUSS-XXXX';
+            document.getElementById('doorprizeWinnerName').innerText = 'Klik Tombol "Mulai Acak Undian"';
+            document.getElementById('doorprizeWinnerDetail').innerText = 'Semua peserta yang memenuhi syarat siap diundi';
+            document.getElementById('doorprizeDisplayBox').className = 'bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-2xl p-8 text-center shadow-lg border-4 border-slate-700 transition-all';
+            showModal('Riwayat Direset 🔄', 'Daftar pemenang doorprize telah dikosongkan dan seluruh peserta kembali masuk ke daftar undian.', '✓');
         }
 
         function toggleUnderageFields() {
@@ -1167,7 +1354,7 @@
                     { 
                         name: 'Gado-Gado Jakarta', 
                         stan: 'Stan No. 11', 
-                        logo: 'logogado.jpeg',
+                        logo: 'https://placehold.co/150x150/0ea5e9/ffffff?text=Logo+Gado2',
                         desc: 'Gado-gado asli Jakarta dengan kerupuk melinjo.', 
                         images: [
                             'https://placehold.co/600x400/0ea5e9/ffffff?text=Gado-Gado+Jakarta'
@@ -1195,12 +1382,13 @@
                         ]
                     },
                     { 
-                        name: 'Aiko cookies', 
+                        name: 'Aiko Cookies', 
                         stan: 'Stan No. 14', 
                         logo: 'aikocookies.jpeg',
-                        desc: 'Menyediakan berbagai jenis kue kering premium, nastar lumer, kastengel keju, dan cookies kekinian.', 
+                        desc: 'Menyediakan berbagai jenis kue kering premium, nastar, dan cookies.', 
                         images: [
-                            'aikocookies.jpeg'
+                            'aikocookies.jpeg',
+                            'https://placehold.co/600x400/db2777/ffffff?text=Nastar+Lumer+Aiko'
                         ]
                     },
                     { 
@@ -1209,9 +1397,8 @@
                         logo: 'https://placehold.co/150x150/dc2626/ffffff?text=Logo+Zil',
                         desc: 'Rujak buah segar dengan bumbu gula merah kental & bumbu rujak Bangkok pedas manis.', 
                         images: [
-                            'zil_rujak.jpeg',
-                            'zil_jellydrink.jpeg',
-                            'zil_cilok.jpeg'
+                            'https://placehold.co/600x400/dc2626/ffffff?text=Rujak+Bangkok+by+Zil',
+                            'https://placehold.co/600x400/16a34a/ffffff?text=Ngerujak+Sab+Segar'
                         ]
                     },
                     { 
@@ -1498,6 +1685,11 @@
         window.nextUmkmSlide = nextUmkmSlide;
         window.prevUmkmSlide = prevUmkmSlide;
         window.closeUmkmDetailModal = closeUmkmDetailModal;
+        window.updateDoorprizeCandidateCount = updateDoorprizeCandidateCount;
+        window.startDoorprizeSpin = startDoorprizeSpin;
+        window.stopDoorprizeSpin = stopDoorprizeSpin;
+        window.toggleDoorprizeAttendance = toggleDoorprizeAttendance;
+        window.resetDoorprizeWinners = resetDoorprizeWinners;
         window.scrollToTop = scrollToTop;
         window.nextSlide = nextSlide;
         window.prevSlide = prevSlide;
@@ -2197,7 +2389,7 @@
             </div>
 
             <!-- Sub-Tab Panitia Selector -->
-            <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl max-w-xl overflow-x-auto no-scrollbar">
+            <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl max-w-2xl overflow-x-auto no-scrollbar">
                 <button onclick="switchAdminSubTab('kaos')" id="btn-subadmin-kaos" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition bg-white text-sky-700 shadow-sm whitespace-nowrap">
                      Pembelian Kaos
                 </button>
@@ -2206,6 +2398,9 @@
                 </button>
                 <button onclick="switchAdminSubTab('mewarnai')" id="btn-subadmin-mewarnai" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap">
                      Lomba Mewarnai
+                </button>
+                <button onclick="switchAdminSubTab('undian')" id="btn-subadmin-undian" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 whitespace-nowrap">
+                     🎰 Undian Doorprize
                 </button>
             </div>
 
@@ -2363,6 +2558,83 @@
                         </table>
                     </div>
                     <div class="p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs bg-slate-50" id="mewarnaiPaginationContainer"></div>
+                </div>
+            </div>
+
+            <!-- SUB-TAB CONTENT 4: UNDIAN DOORPRIZE -->
+            <div id="subadmin-content-undian" class="space-y-6 hidden">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">Live Doorprize JUSS 2026</span>
+                            <h3 class="text-lg font-extrabold text-slate-900 mt-1">Mesin Pengundi Nomor E-Ticket & Peserta</h3>
+                            <p class="text-xs text-slate-500">Pemenang yang sudah terpilih otomatis tidak ikut terundi kembali pada putaran berikutnya.</p>
+                        </div>
+                        <span id="doorprizeCandidateCount" class="bg-sky-100 text-sky-800 font-bold px-3 py-1.5 rounded-xl text-xs">0 Kandidat Tersedia</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Sumber Peserta Undian *</label>
+                            <select id="doorprizePoolSelect" onchange="updateDoorprizeCandidateCount()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-xs font-semibold bg-white">
+                                <option value="kaos">Pembeli Kaos Jalan Santai (Status Lunas)</option>
+                                <option value="jalan">Seluruh Peserta Jalan Santai Terdaftar</option>
+                                <option value="semua">Gabungan Pembeli Kaos & Peserta Jalan Santai</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Hadiah Doorprize (Opsional)</label>
+                            <input type="text" id="doorprizePrizeInput" placeholder="Contoh: Sepeda Gunung / Kompor Gas / Voucher Belanja" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 outline-none text-xs">
+                        </div>
+                    </div>
+
+                    <!-- Layar Utama Undian -->
+                    <div id="doorprizeDisplayBox" class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-2xl p-8 text-center shadow-lg border-4 border-slate-700 transition-all">
+                        <span id="doorprizeBannerStatus" class="text-[11px] font-bold uppercase tracking-widest text-amber-300 block mb-2">SIAP MENGUNDI DOORPRIZE JUSS 2026</span>
+                        <div id="doorprizeWinnerId" class="font-mono text-sm sm:text-base font-bold bg-white/15 inline-block px-4 py-1 rounded-full mb-2">JUSS-XXXX</div>
+                        <h4 id="doorprizeWinnerName" class="text-2xl sm:text-4xl font-black tracking-tight my-1">Klik Tombol "Mulai Acak Undian"</h4>
+                        <p id="doorprizeWinnerDetail" class="text-xs sm:text-sm text-slate-300 mt-1">Semua peserta yang memenuhi syarat siap diundi</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-3 pt-2">
+                        <button id="btnStartSpin" onclick="startDoorprizeSpin()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm shadow-md transition">
+                            🎰 Mulai Acak Undian
+                        </button>
+                        <button id="btnStopSpin" onclick="stopDoorprizeSpin()" class="hidden bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white font-extrabold px-8 py-3.5 rounded-xl text-sm shadow-md transition">
+                            🛑 BERHENTI & TENTUKAN PEMENANG!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabel Riwayat Pemenang -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3 bg-amber-50/70">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">🏆 Daftar Pemenang Undian Doorprize</h3>
+                            <span id="doorprizeWinnerCountBadge" class="bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full text-[11px] font-bold mt-1 inline-block">0 Pemenang</span>
+                        </div>
+                        <button onclick="resetDoorprizeWinners()" class="bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-bold px-3.5 py-2 rounded-xl text-xs transition">
+                            🔄 Reset Daftar Pemenang
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                                    <th class="p-3.5">No</th>
+                                    <th class="p-3.5">Pemenang & ID Tiket</th>
+                                    <th class="p-3.5">Hadiah</th>
+                                    <th class="p-3.5">Wilayah & Kategori</th>
+                                    <th class="p-3.5">No HP & Waktu</th>
+                                    <th class="p-3.5 text-center">Status Kehadiran</th>
+                                    <th class="p-3.5 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doorprizeWinnersBody">
+                                <tr><td colspan="7" class="text-center py-8 text-slate-400">Belum ada pemenang undian yang diundi.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
